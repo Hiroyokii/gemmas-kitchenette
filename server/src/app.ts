@@ -1,18 +1,13 @@
 import express from "express";
 import cors from "cors";
+import authRoutes from "./routes/auth.routes.js";
 
 const app = express();
 
-// Middleware
 app.use(cors());
+
 app.use(express.json());
 
-// Temporary Route
-app.get("/health", (_req, res) => {
-  res.json({
-    status: "ok",
-    message: "Gemma's Kitchenette API is running 🚀",
-  });
-});
+app.use("/auth", authRoutes);
 
 export default app;

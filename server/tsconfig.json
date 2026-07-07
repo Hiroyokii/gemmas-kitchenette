@@ -19,7 +19,10 @@
     "types": ["node"]
   },
 
-  "include": ["src"],
+  "include": [
+    "src",
+    "prisma"
+  ],
 
   "exclude": [
     "node_modules",
