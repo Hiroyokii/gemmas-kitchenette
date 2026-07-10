@@ -7,19 +7,37 @@ async function main() {
 
     await prisma.role.createMany({
         data:[
-            {name: "ADMIN"},
-            {name: "STAFF"},
-            {name: "CUSTOMER"}
+            { name: "ADMIN" },
+            { name: "STAFF" },
+            { name: "CUSTOMER" }
         ],
         skipDuplicates: true,
     });
 
     console.log("Roles seeded.")
+
+    await prisma.category.createMany({
+        data: [
+            { name: "Rice Meals" },
+            { name: "Chicken Dishes" },
+            { name: "Pork Dishes" },
+            { name: "Beef Dishes" },
+            { name: "Seafood" },
+            { name: "Vegetable Dishes" },
+            { name: "Soup" },
+            { name: "Noodles" },
+            { name: "Merienda" },
+            { name: "Beverages" },
+        ],
+        skipDuplicates: true,
+    })
+
+    console.log("Categories seeded.");
 }
 
 main()
     .catch((error) => {
-        console.log(error);
+        console.error(error);
         process.exit(1)
 
     })
