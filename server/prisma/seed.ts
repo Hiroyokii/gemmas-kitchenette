@@ -30,9 +30,20 @@ async function main() {
             { name: "Beverages" },
         ],
         skipDuplicates: true,
-    })
+    });
 
     console.log("Categories seeded.");
+
+    await prisma.unit.createMany({
+        data: [
+            { name: "Kilogram" },
+            { name: "Liter " },
+            { name: "Piece" },
+        ],
+        skipDuplicates: true,
+    });
+
+    console.log("Unit Seeded.");
 }
 
 main()

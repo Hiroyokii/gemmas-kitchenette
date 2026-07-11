@@ -45,6 +45,8 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  purchases Purchase[]
 }
 
 model Category {
@@ -72,4 +74,60 @@ model Food {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Unit {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  ingredients Ingredient[]
+}
+
+model Ingredient {
+  id Int @id @default(autoincrement())
+
+  name String @unique
+
+  currentStock Decimal @db.Decimal(10, 2)
+
+  minimumStock Decimal @db.Decimal(10, 2)
+
+  costPerUnit Decimal @db.Decimal(10, 2)
+
+  isActive Boolean @default(true)
+
+  unitId Int
+  unit   Unit @relation(fields: [unitId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  purchaseItems PurchaseItem[]
+}
+
+model Purchase {
+  id Int @id @default(autoincrement())
+
+  totalCost Decimal @db.Decimal(10, 2)
+
+  createdAt DateTime @default(now())
+
+  createdById Int
+  createdBy   User @relation(fields: [createdById], references: [id])
+
+  purchaseItems PurchaseItem[]
+}
+
+model PurchaseItem {
+  id Int @id @default(autoincrement())
+
+  purchaseId Int
+  purchase   Purchase @relation(fields: [purchaseId], references: [id])
+
+  ingredientId Int
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+
+  quantity Decimal @db.Decimal(10, 2)
+
+  unitCost Decimal @db.Decimal(10, 2)
 }
