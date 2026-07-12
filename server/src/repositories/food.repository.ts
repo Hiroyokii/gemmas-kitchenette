@@ -22,3 +22,11 @@ export async function createFood(data: CreateFoodInput) {
         data,
     });
 }
+
+export async function findFoodById(id: number) {
+    return prisma.food.findUnique({
+        where: {
+            id,
+        },
+    });
+}

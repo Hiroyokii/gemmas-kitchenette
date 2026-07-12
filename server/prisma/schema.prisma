@@ -74,6 +74,9 @@ model Food {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  dailyMenus        DailyMenu[]
+  recipeIngredients RecipeIngredient[]
 }
 
 model Unit {
@@ -102,7 +105,8 @@ model Ingredient {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  purchaseItems PurchaseItem[]
+  purchaseItems     PurchaseItem[]
+  recipeIngredients RecipeIngredient[]
 }
 
 model Purchase {
@@ -130,4 +134,33 @@ model PurchaseItem {
   quantity Decimal @db.Decimal(10, 2)
 
   unitCost Decimal @db.Decimal(10, 2)
+}
+
+model RecipeIngredient {
+  foodId Int
+  food   Food @relation(fields: [foodId], references: [id])
+
+  ingredientId Int
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+
+  quantity Decimal @db.Decimal(10, 2)
+
+  @@id([foodId, ingredientId])
+}
+
+model DailyMenu {
+  id Int @id @default(autoincrement())
+
+  date DateTime
+
+  foodId Int
+  food   Food @relation(fields: [foodId], references: [id])
+
+  preparedServings Int
+
+  remainingServings Int
+
+  createdAt DateTime @default(now())
+
+  @@unique([date, foodId])
 }

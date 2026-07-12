@@ -1,8 +1,9 @@
 import express from "express";
 import cors from "cors";
 import authRoutes from "./routes/auth.routes.js";
-import foodRoutes from "./routes/food.routes.js"
-import purchaseRoutes from "./routes/purchase.routes.js"
+import foodRoutes from "./routes/food.routes.js";
+import purchaseRoutes from "./routes/purchase.routes.js";
+import recipeRoutes from "./routes/recipe.routes.js"
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(express.json());
 
 app.use("/auth", authRoutes);
 app.use("/foods", foodRoutes);
-app.use("/purchase", purchaseRoutes)
+app.use("/purchases", purchaseRoutes);
+app.use("/recipes", recipeRoutes);
 
 export default app;
