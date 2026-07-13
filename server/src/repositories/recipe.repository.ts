@@ -5,7 +5,13 @@ export async function findRecipeIngredients(
     foodId: number
 ) {
     return prisma.recipeIngredient.findMany({
+        where: {
+            foodId,
+        },
 
+        include: {
+            ingredient: true,
+        }
     })
 }
 
