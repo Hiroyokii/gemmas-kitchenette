@@ -11,7 +11,7 @@ import { createRecipeSchema } from "../schemas/recipe.schema.js";
 const router = Router();
 
 router.put(
-    ":foodId",
+    "/:foodId",
     authenticate,
     authorize("ADMIN"),
     validate(createRecipeSchema),

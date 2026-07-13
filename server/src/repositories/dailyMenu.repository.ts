@@ -28,3 +28,35 @@ export async function createDailyMenu(
         },
     });
 }
+
+export async function findDailyMenuById(
+    id: number
+) {
+    return prisma.dailyMenu.findUnique({
+        where: {
+            id,
+        },
+        include: {
+            food: true,
+        },
+    });
+}
+
+export async function decreaseRemainingServings(
+    tx: Prisma.TransactionClient,
+    dailyMenuId: number,
+    quantity: number
+) {
+    return tx.dailyMenu.update({
+        where: {
+            id: dailyMenuId,
+        },
+        data: {
+            remainingServings: {
+                decrement: quantity,
+            },
+        },
+    });
+}
+
+

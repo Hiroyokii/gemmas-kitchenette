@@ -47,6 +47,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   purchases Purchase[]
+  orders    Order[]
 }
 
 model Category {
@@ -160,7 +161,49 @@ model DailyMenu {
 
   remainingServings Int
 
-  createdAt DateTime @default(now())
+  createdAt  DateTime    @default(now())
+  orderItems OrderItem[]
 
   @@unique([date, foodId])
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  OUT_FOR_DELIVERY
+  COMPLETED
+  CANCELLED
+}
+
+model Order {
+  id Int @id @default(autoincrement())
+
+  customerId Int
+  customer   User @relation(fields: [customerId], references: [id])
+
+  deliveryAddress String
+
+  total Decimal @db.Decimal(10, 2)
+
+  status OrderStatus
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orderItems OrderItem[]
+}
+
+model OrderItem {
+  id Int @id @default(autoincrement())
+
+  orderId Int
+  order   Order @relation(fields: [orderId], references: [id])
+
+  dailyMenuId Int
+  dailyMenu   DailyMenu @relation(fields: [dailyMenuId], references: [id])
+
+  quantity Int
+
+  price Decimal @db.Decimal(10, 2)
 }

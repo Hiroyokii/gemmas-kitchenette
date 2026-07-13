@@ -1,21 +1,21 @@
 import { Router } from "express";
 
-import { createDailyMenu } from "../controllers/dailyMenu.controller.js";
+import { createOrder } from "../controllers/order.controller.js";
 
 import { authenticate } from "../middleware/auth.middleware.js";
 import { authorize } from "../middleware/authorize.middleware.js";
 import { validate } from "../middleware/validate.middleware.js";
 
-import { createDailyMenuSchema } from "../schemas/dailyMenu.schema.js";
+import { createOrderSchema } from "../schemas/order.schema.js";
 
 const router = Router();
 
 router.post(
     "/",
     authenticate,
-    authorize("ADMIN"),
-    validate(createDailyMenuSchema),
-    createDailyMenu
+    authorize("CUSTOMER"),
+    validate(createOrderSchema),
+    createOrder
 )
 
 export default router;
