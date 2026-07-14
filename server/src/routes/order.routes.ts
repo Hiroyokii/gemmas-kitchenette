@@ -1,6 +1,7 @@
 import { Router } from "express";
 
-import { createOrder } from "../controllers/order.controller.js";
+import { createOrder, updateOrderStatus } from "../controllers/order.controller.js";
+import { updateOrderStatusSchema } from "../schemas/orderStatus.schema.js";
 
 import { authenticate } from "../middleware/auth.middleware.js";
 import { authorize } from "../middleware/authorize.middleware.js";
@@ -16,6 +17,14 @@ router.post(
     authorize("CUSTOMER"),
     validate(createOrderSchema),
     createOrder
+)
+
+router.patch(
+    "/:id/status",
+    authenticate,
+    authorize("ADMIN", "STAFF"),
+    validate(updateOrderStatusSchema),
+    updateOrderStatus
 )
 
 export default router;

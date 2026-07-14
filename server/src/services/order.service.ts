@@ -1,10 +1,11 @@
 import { prisma } from "../lib/prisma.js";
-import { Prisma } from "../generated/prisma/index.js";
+import { OrderStatus, Prisma } from "../generated/prisma/index.js";
 
 import { createOrder, createOrderItems } from "../repositories/order.repository.js";
 import { findDailyMenuById, decreaseRemainingServings } from "../repositories/dailyMenu.repository.js";
 
 import type { CreateOrderInput } from "../schemas/order.schema.js";
+import { findOrderById, updateOrderStatus } from "../repositories/food.repository.js";
 
 export async function createOrderService(
     customerId: number,
@@ -104,3 +105,63 @@ export async function createOrderService(
         return order;
     })
 }
+
+export async function updateOrderStatusService(
+    orderId: number,
+    status: OrderStatus
+) {
+    const order = await findOrderById(orderId);
+
+    if (!order) {
+        throw new Error(
+            "Order not found."
+        )
+    }
+
+    const allowedTransitions: Record<
+        OrderStatus,
+        OrderStatus[]
+    > = {
+        PENDING: [
+            OrderStatus.CONFIRMED,
+            OrderStatus.CANCELLED,
+        ],
+
+        CONFIRMED: [
+            OrderStatus.PREPARING,
+        ],
+
+        PREPARING: [
+            OrderStatus.OUT_FOR_DELIVERY,
+        ],
+
+        OUT_FOR_DELIVERY: [
+            OrderStatus.COMPLETED,
+        ],
+
+        COMPLETED: [],
+        CANCELLED: [],
+    };
+
+    const allowed = 
+        allowedTransitions[
+            order.status
+        ];
+    
+    if (!allowed.includes(status)) {
+        throw new Error(
+            `Cannot change order from ${order.status} to ${status}.`
+        );
+    }
+
+    return prisma.$transaction(async (tx) => {
+        return updateOrderStatus(
+            tx,
+            orderId,
+            status
+        );
+    });
+}
+
+
+
