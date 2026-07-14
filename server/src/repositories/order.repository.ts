@@ -35,3 +35,27 @@ export async function createOrderItems(
         })),
     });
 }
+
+export async function findOrdersByCustomer(
+    customerId: number
+) {
+    return prisma.order.findMany({
+        where: {
+            customerId,
+        },
+        include: {
+            orderItems: {
+                include: {
+                    dailyMenu: {
+                        include: {
+                            food: true,
+                        },
+                    },
+                },
+            },
+        },
+        orderBy: {
+            createdAt: "desc",
+        },
+    });
+}

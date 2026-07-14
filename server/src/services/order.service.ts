@@ -1,7 +1,7 @@
 import { prisma } from "../lib/prisma.js";
 import { OrderStatus, Prisma } from "../generated/prisma/index.js";
 
-import { createOrder, createOrderItems } from "../repositories/order.repository.js";
+import { createOrder, createOrderItems, findOrdersByCustomer } from "../repositories/order.repository.js";
 import { findDailyMenuById, decreaseRemainingServings } from "../repositories/dailyMenu.repository.js";
 
 import type { CreateOrderInput } from "../schemas/order.schema.js";
@@ -161,6 +161,14 @@ export async function updateOrderStatusService(
             status
         );
     });
+}
+
+export async function getMyOrdersService(
+    customerId: number
+) {
+    return findOrdersByCustomer(
+        customerId
+    );
 }
 
 

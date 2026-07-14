@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { createOrderService } from "../services/order.service.js";
+import { createOrderService, getMyOrdersService } from "../services/order.service.js";
 import { updateOrderStatusService } from "../services/order.service.js";
 import { OrderStatus } from "../generated/prisma/index.js";
 
@@ -26,4 +26,16 @@ export async function updateOrderStatus(
     );
 
     res.json(order);
+}
+
+export async function getMyOrders(
+    req: Request,
+    res: Response
+) {
+    const orders =
+        await getMyOrdersService(
+            req.user!.userId
+        );
+
+    res.json(orders);
 }

@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { createOrder, updateOrderStatus } from "../controllers/order.controller.js";
+import { createOrder, getMyOrders, updateOrderStatus } from "../controllers/order.controller.js";
 import { updateOrderStatusSchema } from "../schemas/orderStatus.schema.js";
 
 import { authenticate } from "../middleware/auth.middleware.js";
@@ -18,6 +18,13 @@ router.post(
     validate(createOrderSchema),
     createOrder
 )
+
+router.get(
+    "/my",
+    authenticate,
+    authorize("CUSTOMER"),
+    getMyOrders
+);
 
 router.patch(
     "/:id/status",
