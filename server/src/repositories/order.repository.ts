@@ -59,3 +59,29 @@ export async function findOrdersByCustomer(
         },
     });
 }
+
+export async function findAllOrders() {
+    return prisma.order.findMany({
+        include: {
+            customer: {
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                },
+            },
+            orderItems: {
+                include: {
+                    dailyMenu: {
+                        include: {
+                            food: true,
+                        },
+                    },
+                },
+            },
+        },
+        orderBy: {
+            createdAt: "desc",
+        },
+    });
+}

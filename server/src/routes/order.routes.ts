@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { createOrder, getMyOrders, updateOrderStatus } from "../controllers/order.controller.js";
+import { createOrder, getMyOrders, updateOrderStatus, getAllOrders } from "../controllers/order.controller.js";
 import { updateOrderStatusSchema } from "../schemas/orderStatus.schema.js";
 
 import { authenticate } from "../middleware/auth.middleware.js";
@@ -11,13 +11,12 @@ import { createOrderSchema } from "../schemas/order.schema.js";
 
 const router = Router();
 
-router.post(
+router.get(
     "/",
     authenticate,
-    authorize("CUSTOMER"),
-    validate(createOrderSchema),
-    createOrder
-)
+    authorize("ADMIN", "STAFF"),
+    getAllOrders
+);
 
 router.get(
     "/my",
@@ -25,6 +24,14 @@ router.get(
     authorize("CUSTOMER"),
     getMyOrders
 );
+
+router.post(
+    "/",
+    authenticate,
+    authorize("CUSTOMER"),
+    validate(createOrderSchema),
+    createOrder
+)
 
 router.patch(
     "/:id/status",
