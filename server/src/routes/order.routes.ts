@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import { createOrder, getMyOrders, updateOrderStatus, getAllOrders } from "../controllers/order.controller.js";
 import { updateOrderStatusSchema } from "../schemas/orderStatus.schema.js";
+import { paginationSchema } from "../schemas/pagination.schema.js";
 
 import { authenticate } from "../middleware/auth.middleware.js";
 import { authorize } from "../middleware/authorize.middleware.js";
@@ -15,6 +16,10 @@ router.get(
     "/",
     authenticate,
     authorize("ADMIN", "STAFF"),
+    validate(
+        paginationSchema,
+        "query"
+    ),
     getAllOrders
 );
 

@@ -2,23 +2,25 @@ import { Request, Response, NextFunction } from "express";
 import type { ZodType } from "zod";
 
 export function validate(
-    schema: ZodType
+    schema: ZodType,
+    source: "body" | "query" | "params" = "body"
 ) {
     return (
-        req: Request, 
-        res: Response, 
+        req: Request,
+        res: Response,
         next: NextFunction
     ) => {
-        const result = schema.safeParse(req.body);
+        const result =
+            schema.safeParse(req[source]);
 
         if (!result.success) {
             return res.status(400).json({
-                message: "Validation failed.",
                 errors: result.error.issues,
             });
         }
 
-        req.body = result.data;
+        req[source] = result.data;
+
         next();
     };
 }

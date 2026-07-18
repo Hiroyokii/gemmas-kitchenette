@@ -60,8 +60,14 @@ export async function findOrdersByCustomer(
     });
 }
 
-export async function findAllOrders() {
+export async function findAllOrders(
+    page: number,
+    limit: number
+) {
+    const skip = (page - 1) * limit;
     return prisma.order.findMany({
+        skip,
+        take: limit,
         include: {
             customer: {
                 select: {

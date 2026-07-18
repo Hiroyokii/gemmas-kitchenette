@@ -171,8 +171,14 @@ export async function getMyOrdersService(
     );
 }
 
-export async function getAllOrdersService() {
-    return findAllOrders();
+export async function getAllOrdersService(
+    page: number,
+    limit: number
+) {
+    return findAllOrders(
+        page,
+        limit,
+    );
 }
 
 

@@ -3,6 +3,8 @@ import { createOrderService, getMyOrdersService, getAllOrdersService } from "../
 import { updateOrderStatusService } from "../services/order.service.js";
 import { OrderStatus } from "../generated/prisma/index.js";
 
+import type { PaginationInput } from "../schemas/pagination.schema.js";
+
 
 export async function createOrder(
     req: Request,
@@ -44,8 +46,16 @@ export async function getAllOrders(
     req: Request,
     res: Response
 ) {
-    const orders =
-        await getAllOrdersService();
+    const {
+    page,
+    limit,
+} = req.query as unknown as PaginationInput;
 
-    res.json(orders);
+const orders =
+    await getAllOrdersService(
+        page,
+        limit
+    );
+
+res.json(orders);
 }
