@@ -4,6 +4,7 @@ import {
     findFoodByName,
     findCategoryById,
     createFood,
+    findFoods,
 } from "../repositories/food.repository.js";
 
 
@@ -31,4 +32,14 @@ export async function createFoodService(
     }
 
     return createFood(data)
+}
+
+export async function getFoodsService(
+    search?: string,
+    categoryId?: number
+) {
+    return findFoods(
+        search,
+        categoryId
+    );
 }

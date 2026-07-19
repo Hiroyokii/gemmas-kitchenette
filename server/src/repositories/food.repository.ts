@@ -54,3 +54,27 @@ export async function updateOrderStatus(
         },
     });
 }
+
+export async function findFoods(
+    search?: string,
+    categoryId?: number
+) {
+    return prisma.food.findMany({
+        where: {
+            ...(search && {
+                name: {
+                    contains: search,
+                    mode: "insensitive",
+                },
+            }),
+
+            ...(categoryId && {
+                categoryId,
+            }),
+        },
+
+        orderBy: {
+            name: "asc",
+        },
+    });
+}

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import { createFoodService } from "../services/food.service.js";
+import { createFoodService, getFoodsService } from "../services/food.service.js";
 import { createFoodSchema } from "../schemas/food.schema.js";
 
 export async function createFood(
@@ -23,4 +23,25 @@ export async function createFood(
             message: "Internal Server Error",
         });
     }
+}
+
+export async function getFoods(
+    req: Request,
+    res: Response
+) {
+    const search =
+        req.query.search as string | undefined;
+
+    const categoryId =
+        req.query.categoryId
+            ? Number(req.query.categoryId)
+            : undefined;
+
+    const foods =
+        await getFoodsService(
+            search,
+            categoryId
+        );
+
+    res.json(foods);
 }
