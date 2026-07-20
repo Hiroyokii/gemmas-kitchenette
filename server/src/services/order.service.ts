@@ -6,6 +6,7 @@ import { findDailyMenuById, decreaseRemainingServings } from "../repositories/da
 
 import type { CreateOrderInput } from "../schemas/order.schema.js";
 import { findOrderById, updateOrderStatus } from "../repositories/food.repository.js";
+import { BadRequestError } from "../errors/BadRequestError.js";
 
 export async function createOrderService(
     customerId: number,
@@ -18,7 +19,7 @@ export async function createOrderService(
     const uniqueIds = new Set(menuIds);
 
     if (menuIds.length !== uniqueIds.size) {
-        throw new Error(
+        throw new BadRequestError(
             "Order contains duplicate menu items."
         );
     }

@@ -1,15 +1,10 @@
-import type { Request, Response, NextFunction } from "express";
 import { registerSchema, loginSchema } from "../schemas/auth.schema.js";
 import { registerUser, loginUser } from "../services/auth.service.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
-export async function register(
-    req: Request,
-    res: Response,
-    next: NextFunction
-) {
-    try {
+export const register = asyncHandler(async (req, res) => {
     const data = registerSchema.parse(req.body);
-    const user = await registerUser(data)
+    const user = await registerUser(data);
 
     return res.status(201).json({
         message: "Registration successful.",
@@ -20,35 +15,21 @@ export async function register(
             email: user.email,
         },
     });
-} catch (error) {
-    next(error);
-}
-} 
+});
 
-export async function login(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-){
-    try{
-        const data = loginSchema.parse(req.body);
-        const result = await loginUser(data);
+export const login = asyncHandler(async (req, res) => {
+    const data = loginSchema.parse(req.body);
+    const result = await loginUser(data);
 
-        return res.status(200).json({
-            message: "Login successful.",
-            ...result,
-        });
-    } catch (error) {
-        next(error)
-    }
-}
+    return res.status(200).json({
+        message: "Login successful.",
+        ...result,
+    });
+});
 
-export async function me(
-    req: Request,
-    res: Response
-) {
+export const me = asyncHandler(async (req, res) => {
     return res.status(200).json({
         message: "Authenticated",
         user: req.user,
     });
-}
+});

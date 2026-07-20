@@ -1,18 +1,8 @@
-import type {
-    Request,
-    Response
-} from "express";
+import { getTodaySalesReportService } from "../services/report.service.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
-import {
-    getTodaySalesReportService
-} from "../services/report.service.js";
-
-export async function getTodaySalesReport(
-    req: Request,
-    res: Response
-) {
-    const report =
-        await getTodaySalesReportService();
+export const getTodaySalesReport = asyncHandler(async (_, res) => {
+    const report = await getTodaySalesReportService();
 
     res.json(report);
-}
+});

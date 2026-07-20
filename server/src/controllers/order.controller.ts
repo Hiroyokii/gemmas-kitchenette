@@ -1,61 +1,47 @@
-import type { Request, Response } from "express";
-import { createOrderService, getMyOrdersService, getAllOrdersService } from "../services/order.service.js";
-import { updateOrderStatusService } from "../services/order.service.js";
 import { OrderStatus } from "../generated/prisma/index.js";
-
 import type { PaginationInput } from "../schemas/pagination.schema.js";
+import {
+    createOrderService,
+    getMyOrdersService,
+    getAllOrdersService,
+    updateOrderStatusService,
+} from "../services/order.service.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
-
-export async function createOrder(
-    req: Request,
-    res: Response
-) {
+export const createOrder = asyncHandler(async (req, res) => {
     const order = await createOrderService(
         req.user!.userId,
         req.body
     );
 
     res.status(201).json(order);
-}
+});
 
-export async function updateOrderStatus(
-    req: Request,
-    res: Response
-) {
+export const updateOrderStatus = asyncHandler(async (req, res) => {
     const order = await updateOrderStatusService(
         Number(req.params.id),
         req.body.status as OrderStatus
     );
 
     res.json(order);
-}
+});
 
-export async function getMyOrders(
-    req: Request,
-    res: Response
-) {
-    const orders =
-        await getMyOrdersService(
-            req.user!.userId
-        );
+export const getMyOrders = asyncHandler(async (req, res) => {
+    const orders = await getMyOrdersService(
+        req.user!.userId
+    );
 
     res.json(orders);
-}
+});
 
-export async function getAllOrders(
-    req: Request,
-    res: Response
-) {
-    const {
-    page,
-    limit,
-} = req.query as unknown as PaginationInput;
+export const getAllOrders = asyncHandler(async (req, res) => {
+    const { page, limit } =
+        req.query as unknown as PaginationInput;
 
-const orders =
-    await getAllOrdersService(
+    const orders = await getAllOrdersService(
         page,
         limit
     );
 
-res.json(orders);
-}
+    res.json(orders);
+});

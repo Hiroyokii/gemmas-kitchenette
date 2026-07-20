@@ -1,14 +1,14 @@
-import type { Request, Response } from "express";
+import { getTodayMenuService, prepareDailyFood } from "../services/dailyMenu.service.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
-import { prepareDailyFood } from "../services/dailyMenu.service.js";
-
-export async function createDailyMenu(
-    req: Request,
-    res: Response
-) {
-    const dailyMenu = await prepareDailyFood(
-        req.body
-    );
+export const createDailyMenu = asyncHandler(async (req, res) => {
+    const dailyMenu = await prepareDailyFood(req.body);
 
     res.status(201).json(dailyMenu);
-}
+});
+
+export const getTodayMenu = asyncHandler(async (_, res) => {
+    const menu = await getTodayMenuService();
+
+    res.json(menu);
+});

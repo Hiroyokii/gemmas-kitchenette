@@ -1,15 +1,11 @@
-import { Request, Response } from "express";
-
 import { createPurchaseService } from "../services/purchase.service.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
-export async function createPurchase(
-    req: Request,
-    res: Response
-) {
+export const createPurchase = asyncHandler(async (req, res) => {
     const purchase = await createPurchaseService(
         req.body,
         req.user!.userId
     );
 
-    res.status(201).json(purchase)
-}
+    res.status(201).json(purchase);
+});

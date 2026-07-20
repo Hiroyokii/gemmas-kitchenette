@@ -1,47 +1,25 @@
-import { Request, Response } from "express";
-
 import { createFoodService, getFoodsService } from "../services/food.service.js";
 import { createFoodSchema } from "../schemas/food.schema.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
-export async function createFood(
-    req: Request,
-    res: Response,
-) {
-    try {
-        const data = createFoodSchema.parse(req.body);
-        const food = await createFoodService(data);
+export const createFood = asyncHandler(async (req, res) => {
+    const data = createFoodSchema.parse(req.body);
+    const food = await createFoodService(data);
 
-        res.status(201).json(food)
-    } catch (error) {
-        if (error instanceof Error) {
-            return res.status(400).json({
-                message: error.message,
-            });
-        }
+    res.status(201).json(food);
+});
 
-        return res.status(500).json({
-            message: "Internal Server Error",
-        });
-    }
-}
+export const getFoods = asyncHandler(async (req, res) => {
+    const search = req.query.search as string | undefined;
 
-export async function getFoods(
-    req: Request,
-    res: Response
-) {
-    const search =
-        req.query.search as string | undefined;
+    const categoryId = req.query.categoryId
+        ? Number(req.query.categoryId)
+        : undefined;
 
-    const categoryId =
-        req.query.categoryId
-            ? Number(req.query.categoryId)
-            : undefined;
-
-    const foods =
-        await getFoodsService(
-            search,
-            categoryId
-        );
+    const foods = await getFoodsService(
+        search,
+        categoryId
+    );
 
     res.json(foods);
-}
+});

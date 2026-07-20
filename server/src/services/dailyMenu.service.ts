@@ -3,12 +3,14 @@ import { prisma } from "../lib/prisma.js";
 import { decreaseIngredientStock} from "../repositories/ingredient.repository.js"
 import { findRecipeIngredients } from "../repositories/recipe.repository.js";
 import { findFoodById } from "../repositories/food.repository.js";
+import { findTodayMenu } from "../repositories/dailyMenu.repository.js";
 import { 
     findDailyMenuByFoodAndDate,
     createDailyMenu,
 } from "../repositories/menu.repository.js";
 
 import type { CreateDailyMenuInput } from "../schemas/dailyMenu.schema.js";
+import { NotFoundError } from "../errors/NotFoundError.js";
 
 export async function prepareDailyFood(
     data: CreateDailyMenuInput
@@ -19,7 +21,7 @@ export async function prepareDailyFood(
     const food = await findFoodById(data.foodId);
 
     if (!food) {
-        throw new Error("Food not found.");
+        throw new NotFoundError("Food not found.");
     }
 
     const existing = 
@@ -88,4 +90,14 @@ export async function prepareDailyFood(
 
         return dailyMenu;
     })
+}
+
+export async function getTodayMenuService() {
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(start);
+    end.setDate(end.getDate() + 1);
+
+    return findTodayMenu(start, end);
 }
