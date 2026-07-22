@@ -2,6 +2,7 @@ import {
     createContext,
     useContext,
     useState,
+    useEffect,
 } from "react";
 
 import type { User } from "../types/User";
@@ -33,15 +34,44 @@ export function AuthProvider({
     const [token, setToken] =
         useState<string | null>(null);
 
+    useEffect(() => {
+        const token = 
+            localStorage.getItem("token");
+
+        const user =
+            localStorage.getItem("user");
+
+        if (token && user) {
+            setToken(token);
+
+            setUser(
+                JSON.parse(user)
+            );
+        }
+    }, []); 
+
     function login(
         token: string,
         user: User
     ) {
+        localStorage.setItem(
+            "token",
+            token
+        );
+
+        localStorage.setItem(
+            "user",
+            JSON.stringify(user)
+        );
+
         setToken(token);
         setUser(user);
     }
 
     function logout() {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+
         setToken(null);
         setUser(null);
     }
