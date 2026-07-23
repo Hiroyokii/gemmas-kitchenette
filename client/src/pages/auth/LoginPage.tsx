@@ -41,7 +41,19 @@ export default function LoginPage() {
                 response.user
             );
 
-            navigate("/");
+            switch (response.user.role) {
+                case "ADMIN":
+                case "STAFF":
+                    navigate("/admin");
+                    break;
+
+                case "CUSTOMER":
+                    navigate("/");
+                    break;
+
+                default:
+                    navigate("/")
+            }
 
         } catch (error) {
             console.log(error);

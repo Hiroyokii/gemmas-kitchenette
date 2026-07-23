@@ -19,70 +19,101 @@ import DailyMenuPage from "../pages/admin/DailyMenuPage";
 import OrdersPage from "../pages/admin/OrdersPage";
 import ReportsPage from "../pages/admin/ReportsPage";
 
+import ProtectedRoute from "../components/ProtectedRoute";
+import PublicRoute from "../components/PublicRoute";
+
+import CustomerLayout from "../layouts/CustomerLayout";
+
 export default function AppRoutes() {
     return (
         <BrowserRouter>
             <Routes>
 
-                <Route
-                    path="/"
-                    element={<HomePage />}
-                />
+                <Route element={<PublicRoute />}>
+
+                    <Route
+                        path="/login"
+                        element={<LoginPage />}
+                    />
+
+                    <Route
+                        path="/register"
+                        element={<RegisterPage />}
+                    />
+
+                </Route>
 
                 <Route
-                    path="/login"
-                    element={<LoginPage />}
-                />
+                    element={<CustomerLayout />}
+                >
+
+                    <Route
+                        path="/"
+                        element={<HomePage />}
+                    />
+
+                    <Route
+                        element={
+                            <ProtectedRoute
+                                roles={["CUSTOMER"]}
+                            />
+                        }
+                    >
+                        <Route
+                            path="/cart"
+                            element={<CartPage />}
+                        />
+
+                        <Route
+                            path="/orders"
+                            element={<OrderHistoryPage />}
+                        />
+                    </Route>
+
+                </Route>
 
                 <Route
-                    path="/register"
-                    element={<RegisterPage />}
-                />
+                    element={
+                        <ProtectedRoute
+                            roles={["ADMIN"]}
+                        />
+                    }
+                >
+                    <Route
+                        path="/admin"
+                        element={<DashboardPage />}
+                    />
 
-                <Route
-                    path="/cart"
-                    element={<CartPage />}
-                />
+                    <Route
+                        path="/admin/foods"
+                        element={<FoodsPage />}
+                    />
 
-                <Route
-                    path="/orders"
-                    element={<OrderHistoryPage />}
-                />
+                    <Route
+                        path="/admin/purchases"
+                        element={<PurchasesPage />}
+                    />
 
-                <Route
-                    path="/admin"
-                    element={<DashboardPage />}
-                />
+                    <Route
+                        path="/admin/recipes"
+                        element={<RecipesPage />}
+                    />
 
-                <Route
-                    path="/admin/foods"
-                    element={<FoodsPage />}
-                />
+                    <Route
+                        path="/admin/menu"
+                        element={<DailyMenuPage />}
+                    />
 
-                <Route
-                    path="/admin/purchases"
-                    element={<PurchasesPage />}
-                />
+                    <Route
+                        path="/admin/orders"
+                        element={<OrdersPage />}
+                    />
 
-                <Route
-                    path="/admin/recipes"
-                    element={<RecipesPage />}
-                />
-
-                <Route
-                    path="/admin/menu"
-                    element={<DailyMenuPage />}
-                />
-
-                <Route
-                    path="/admin/orders"
-                    element={<OrdersPage />}
-                />
-
-                <Route
-                    path="/admin/reports"
-                    element={<ReportsPage />}
-                />
+                    <Route
+                        path="/admin/reports"
+                        element={<ReportsPage />}
+                    />
+                </Route>
 
             </Routes>
         </BrowserRouter>
