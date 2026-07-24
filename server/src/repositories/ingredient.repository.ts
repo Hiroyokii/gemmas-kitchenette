@@ -25,3 +25,59 @@ export async function decreaseIngredientStock(
         },
     });
 }
+
+export async function getIngredients() {
+    return prisma.ingredient.findMany({
+        where: {
+            isActive: true,
+        },
+        include: {
+            unit: true,
+        },
+        orderBy: {
+            name: "asc",
+        },
+    });
+}
+
+export async function findIngredientByName(
+    name: string
+) {
+    return prisma.ingredient.findFirst({
+        where: {
+            name,
+            isActive: true,
+        },
+    });
+}
+
+export async function createIngredient(
+    data: {
+        name: string;
+        unitId: number;
+        minimumStock: number;
+        costPerUnit: number;
+    }
+) {
+    return prisma.ingredient.create({
+        data: {
+
+            ...data,
+
+            currentStock: 0,
+
+            isActive: true,
+
+        },
+    });
+}
+
+export async function findUnitById(
+    id: number
+) {
+    return prisma.unit.findUnique({
+        where: {
+            id,
+        },
+    });
+}

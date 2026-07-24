@@ -44,11 +44,11 @@ export default function AppRoutes() {
                 </Route>
 
                 <Route
+                    path="/"
                     element={<CustomerLayout />}
                 >
-
                     <Route
-                        path="/"
+                        index
                         element={<HomePage />}
                     />
 
@@ -60,16 +60,15 @@ export default function AppRoutes() {
                         }
                     >
                         <Route
-                            path="/cart"
+                            path="cart"
                             element={<CartPage />}
                         />
 
                         <Route
-                            path="/orders"
+                            path="orders"
                             element={<OrderHistoryPage />}
                         />
                     </Route>
-
                 </Route>
 
                 <Route

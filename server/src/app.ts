@@ -3,6 +3,7 @@ import cors from "cors";
 
 import authRoutes from "./routes/auth.routes.js";
 import foodRoutes from "./routes/food.routes.js";
+import ingredientRoutes from "./routes/ingredient.routes.js"
 import purchaseRoutes from "./routes/purchase.routes.js";
 import recipeRoutes from "./routes/recipe.routes.js"
 import dailyMenuRoutes from "./routes/dailyMenu.routes.js"
@@ -27,6 +28,7 @@ app.use(
 
 app.use("/auth", authRoutes);
 app.use("/foods", foodRoutes);
+app.use("/ingredients", ingredientRoutes);
 app.use("/purchases", purchaseRoutes);
 app.use("/recipes", recipeRoutes);
 app.use("/daily-menu", dailyMenuRoutes);

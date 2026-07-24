@@ -1,4 +1,5 @@
 import type { DailyMenu } from "../types/DailyMenu";
+import { useCart } from "../contexts/CartContext";
 
 interface FoodCardProps {
     menu: DailyMenu;
@@ -7,6 +8,9 @@ interface FoodCardProps {
 export default function FoodCard({
     menu,
 }: FoodCardProps) {
+
+    const { addToCart } =
+        useCart();
 
     return (
         
@@ -27,6 +31,9 @@ export default function FoodCard({
             </p>
 
             <button
+                onClick={() => 
+                    addToCart(menu)
+                }
                 className="mt-3 rounded bg-orange-600 px-4 py-2 text-white"
             >
                 Add to Cart

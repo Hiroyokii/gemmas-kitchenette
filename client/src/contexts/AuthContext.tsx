@@ -11,6 +11,7 @@ import type { User } from "../types/User";
 interface AuthContextType {
     user: User | null;
     token: string | null;
+    isLoading: boolean;
 
     login: (
         token: string,
@@ -34,6 +35,10 @@ export function AuthProvider({
     const [token, setToken] =
         useState<string | null>(null);
 
+    const [isLoading, setIsLoading] = 
+        useState(true);
+    
+
     useEffect(() => {
         const token = 
             localStorage.getItem("token");
@@ -48,6 +53,8 @@ export function AuthProvider({
                 JSON.parse(user)
             );
         }
+
+        setIsLoading(false);
     }, []); 
 
     function login(
@@ -81,6 +88,7 @@ export function AuthProvider({
             value={{
                 user,
                 token,
+                isLoading,
                 login,
                 logout,
             }}

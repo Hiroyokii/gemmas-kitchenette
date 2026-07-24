@@ -47,7 +47,7 @@ export async function increaseIngredientStock(
     ingredientId: number,
     quantity: number
 ) {
-    return prisma.ingredient.update({
+    return tx.ingredient.update({
         where: {
             id: ingredientId,
         },

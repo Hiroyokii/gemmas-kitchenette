@@ -4,7 +4,7 @@ import { getTodayMenu } from "../../services/dailyMenu.service";
 import type { DailyMenu } from "../../types/DailyMenu";
 import FoodCard from "../../components/FoodCard";
 
-export default function LoginPage() {
+export default function HomePage() {
 
     const [menu, setMenu] = 
     useState<DailyMenu[]>([]);

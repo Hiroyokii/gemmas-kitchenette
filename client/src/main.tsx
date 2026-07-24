@@ -5,11 +5,14 @@ import { AuthProvider } from "./contexts/AuthContext.tsx";
 import "./style.css"
 
 import App from './App.tsx'
+import { CartProvider } from './contexts/CartContext.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <AuthProvider>
-    <StrictMode>
-      <App />
-    </StrictMode>
+    <CartProvider>
+      <StrictMode>
+        <App />
+      </StrictMode>
+    </CartProvider>
   </AuthProvider>,
 )
