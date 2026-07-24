@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 
 import { getTodayMenu } from "../../services/dailyMenu.service";
+import type { DailyMenu } from "../../types/DailyMenu";
+import FoodCard from "../../components/FoodCard";
 
 export default function LoginPage() {
 
     const [menu, setMenu] = 
-    useState([]);
+    useState<DailyMenu[]>([]);
 
     const [loading, setLoading] =
         useState(true);
@@ -57,27 +59,11 @@ export default function LoginPage() {
 
             {menu.map((item: any) => (
 
-                <div
+                <FoodCard
                     key={item.id}
-                    className="border rounded p-4"
-                >
+                    menu={item}
+                />
 
-                    <h2 className="font-bold">
-                        {item.food.name}
-                    </h2>
-
-                    <p>
-                        ₱{item.food.price}
-                    </p>
-
-                    <p>
-                        Remaining:
-                        {" "}
-                        {item.remainingServings}
-                    </p>
-                    
-                </div>
-                
             ))}
 
         </div>
