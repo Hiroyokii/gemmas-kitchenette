@@ -78,3 +78,23 @@ export async function findFoods(
         },
     });
 }
+
+export async function updateFood(
+    id: number,
+    data: {
+        name: string;
+        description: string;
+        price: number;
+        categoryId: number;
+    }
+) {
+    return prisma.food.update({
+        where: {
+            id,
+        },
+        data,
+        include: {
+            category: true,
+        },
+    });
+}

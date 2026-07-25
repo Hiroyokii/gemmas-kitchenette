@@ -1,4 +1,4 @@
-import { createFoodService, getFoodsService } from "../services/food.service.js";
+import { createFoodService, getFoodsService, updateFoodService } from "../services/food.service.js";
 import { createFoodSchema } from "../schemas/food.schema.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
@@ -23,3 +23,15 @@ export const getFoods = asyncHandler(async (req, res) => {
 
     res.json(foods);
 });
+
+export const updateFood =
+    asyncHandler(async (req, res) => {
+
+        const food =
+            await updateFoodService(
+                Number(req.params.id),
+                req.body
+            );
+
+        res.json(food);
+    });

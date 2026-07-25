@@ -1,8 +1,10 @@
 import { Router } from "express";
 
-import { createFood, getFoods } from "../controllers/food.controller.js";
+import { createFood, getFoods, updateFood } from "../controllers/food.controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 import { authorize } from "../middleware/authorize.middleware.js";
+import { validate } from "../middleware/validate.middleware.js";
+import { createFoodSchema } from "../schemas/food.schema.js";
 
 
 const router = Router();
@@ -28,6 +30,14 @@ router.post(
     authenticate,
     authorize("ADMIN"),
     createFood
+)
+
+router.put(
+    "/:id",
+    authenticate,
+    authorize("ADMIN"),
+    validate(createFoodSchema),
+    updateFood
 )
 
 export default router;
