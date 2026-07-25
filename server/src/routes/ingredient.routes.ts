@@ -4,9 +4,9 @@ import { authenticate } from "../middleware/auth.middleware.js";
 import { authorize } from "../middleware/authorize.middleware.js";
 import { validate } from "../middleware/validate.middleware.js";
 
-import { createIngredient } from "../controllers/ingredient.controller.js";
+import { createIngredient, updateIngredient } from "../controllers/ingredient.controller.js";
 import { getIngredients } from "../repositories/ingredient.repository.js";
-import { createIngredientSchema } from "../schemas/ingredient.schema.js";
+import { createIngredientSchema, updateIngredientSchema } from "../schemas/ingredient.schema.js";
 
 const router = Router();
 
@@ -23,6 +23,14 @@ router.post(
     authorize("ADMIN"),
     validate(createIngredientSchema),
     createIngredient
+)
+
+router.put(
+    "/:id",
+    authenticate,
+    authorize("ADMIN"),
+    validate(updateIngredientSchema),
+    updateIngredient
 )
 
 export default router;

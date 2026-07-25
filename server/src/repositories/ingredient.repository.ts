@@ -81,3 +81,23 @@ export async function findUnitById(
         },
     });
 }
+
+export async function updateIngredient(
+    ingredientId: number,
+    data: {
+        name: string;
+        unitId: number;
+        minimumStock: number;
+        costPerUnit: number;
+    }
+) {
+    return prisma.ingredient.update({
+        where: {
+            id: ingredientId
+        },
+        data,
+        include: {
+            unit: true,
+        },
+    });
+}

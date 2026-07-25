@@ -3,8 +3,11 @@ import {
     findIngredientByName, 
     findUnitById, 
     getIngredients, 
-    createIngredient 
+    createIngredient, 
+    findIngredientById,
+    updateIngredient
 } from "../repositories/ingredient.repository.js";
+import { AppError } from "../errors/AppError.js";
 
 
 export async function getIngredientsService() {
@@ -40,4 +43,53 @@ export async function createIngredientService(
     }
 
     return createIngredient(data)
+}
+
+export async function updateIngredientService(
+    ingredientId: number,
+    data: CreateIngredientInput
+) {
+    const ingredient =
+        await findIngredientById(
+            ingredientId
+        );
+
+    if (!ingredient) {
+        throw new AppError(
+            404,
+            "Ingredient not found."
+        );
+    }
+
+    const unit =
+        await findUnitById(
+            data.unitId
+        );
+    
+    if (!unit) {
+        throw new AppError(
+            404,
+            "Unit not found."
+        );
+    }
+
+    const existingIngredient = 
+        await findIngredientByName(
+            data.name
+        );
+
+    if (
+        existingIngredient &&
+        existingIngredient.id !== ingredientId
+    ) {
+        throw new AppError(
+            409,
+            "Ingredient already exists."
+        );
+    }
+
+    return updateIngredient(
+        ingredientId,
+        data
+    );
 }

@@ -1,3 +1,4 @@
+import { create } from "node:domain";
 import { z } from "zod";
 
 export const createIngredientSchema = z.object({
@@ -12,3 +13,6 @@ export const createIngredientSchema = z.object({
 });
 
 export type CreateIngredientInput = z.infer<typeof createIngredientSchema>;
+
+export const updateIngredientSchema = 
+    createIngredientSchema;
