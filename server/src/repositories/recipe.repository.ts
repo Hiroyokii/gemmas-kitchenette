@@ -56,3 +56,25 @@ export async function findRecipeByFood(
     });
 }
 
+export async function getRecipeByFoodId(
+    foodId: number
+) {
+    return prisma.recipeIngredient.findMany({
+        where: {
+            foodId,
+        },
+        include: {
+            ingredient: {
+                include: {
+                    unit: true,
+                },
+            },
+        },
+        orderBy: {
+            ingredient: {
+                name: "asc",
+            }
+        }
+    });
+}
+
