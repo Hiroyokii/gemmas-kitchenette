@@ -1,4 +1,4 @@
-import { createPurchaseService } from "../services/purchase.service.js";
+import { createPurchaseService, getPurchasesServices } from "../services/purchase.service.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const createPurchase = asyncHandler(async (req, res) => {
@@ -9,3 +9,10 @@ export const createPurchase = asyncHandler(async (req, res) => {
 
     res.status(201).json(purchase);
 });
+
+export const getPurchases = asyncHandler(async (_, res) => {
+    const purchase =
+        await getPurchasesServices();
+
+    res.json(purchase);
+})

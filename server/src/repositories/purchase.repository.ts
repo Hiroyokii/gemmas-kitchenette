@@ -1,5 +1,6 @@
 import { prisma } from "../lib/prisma.js"
 import { Prisma } from "../generated/prisma/index.js"
+import { CreatePurchaseInput } from "../schemas/purchase.schema.js";
 
 export async function findIngredientById(
     id: number
@@ -25,14 +26,11 @@ export async function createPurchase(
 }
 
 export async function createPurchaseItems(
+    tx: Prisma.TransactionClient,
     purchaseId: number,
-    items: {
-        ingredientId: number;
-        quantity: number;
-        unitCost: number;
-    }[]
+    items: CreatePurchaseInput["items"]
 ) {
-    return prisma.purchaseItem.createMany({
+    return tx.purchaseItem.createMany({
         data: items.map(item => ({
             purchaseId,
             ingredientId: item.ingredientId,
@@ -56,6 +54,31 @@ export async function increaseIngredientStock(
             currentStock: {
                 increment: quantity,
             },
+        },
+    });
+}
+
+export async function getPurchases() {
+    return prisma.purchase.findMany({
+        include: {
+            createdBy: {
+                select: {
+                    id: true,
+                    name: true,
+                },
+            },
+            purchaseItems: {
+                include: {
+                    ingredient: {
+                        include: {
+                            unit: true,
+                        },
+                    },
+                },
+            },
+        },
+        orderBy: {
+            createdAt: "desc",
         },
     });
 }

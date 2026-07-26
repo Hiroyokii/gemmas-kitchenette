@@ -1,6 +1,6 @@
 import { prisma } from "../lib/prisma.js";
 
-import { createPurchase, createPurchaseItems } from "../repositories/purchase.repository.js";
+import { createPurchase, createPurchaseItems, getPurchases } from "../repositories/purchase.repository.js";
 import { increaseIngredientStock, findIngredientById } from "../repositories/purchase.repository.js";
 
 import type { CreatePurchaseInput } from "../schemas/purchase.schema.js";
@@ -32,14 +32,24 @@ export async function createPurchaseService(
             userId
         );
 
+        await createPurchaseItems(
+            tx,
+            purchase.id,
+            data.items
+        );
+
         for (const items of data.items) {
             await increaseIngredientStock(
                 tx,
                 items.ingredientId,
                 items.quantity
-            )
+            );
         }
+        
         return purchase;
     });
 }
 
+export async function getPurchasesServices() {
+    return getPurchases();
+}
