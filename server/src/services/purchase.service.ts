@@ -5,6 +5,8 @@ import { increaseIngredientStock, findIngredientById } from "../repositories/pur
 
 import type { CreatePurchaseInput } from "../schemas/purchase.schema.js";
 
+import { NotFoundError } from "../errors/NotFoundError.js";
+
 export async function createPurchaseService(
     data: CreatePurchaseInput,
     userId: number
@@ -13,7 +15,7 @@ export async function createPurchaseService(
         const ingredient = await findIngredientById(item.ingredientId);
 
         if (!ingredient) {
-            throw new Error(
+            throw new NotFoundError(
                 `Ingredient ${item.ingredientId} not found.`
             );
         }

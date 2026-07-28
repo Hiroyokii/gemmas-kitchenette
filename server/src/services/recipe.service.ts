@@ -7,14 +7,20 @@ import { createRecipeIngredients, deleteRecipe, getRecipeByFoodId } from "../rep
 
 import type { CreateRecipeInput } from "../schemas/recipe.schema.js";
 
+import { NotFoundError } from "../errors/NotFoundError.js";
+import { BadRequestError } from "../errors/BadRequestError.js";
+
 export async function replaceRecipe(
     foodId: number,
     data: CreateRecipeInput
 ) {
-    const food = await findFoodById(foodId);
+    const food = 
+        await findFoodById(foodId);
 
     if (!food) {
-        throw new Error("Food not found.");
+        throw new NotFoundError(
+            "Food not found."
+        );
     }
 
     for (const ingredient of data.ingredients) {
@@ -24,7 +30,9 @@ export async function replaceRecipe(
             );
     
         if (!ingredient) {
-            throw new Error("Ingredient not found.");
+            throw new NotFoundError(
+                "Ingredient not found."
+            );
         }
     }
 
@@ -35,7 +43,7 @@ export async function replaceRecipe(
     const uniqueIds = new Set(ingredientIds);
 
     if (ingredientIds.length !== uniqueIds.size) {
-        throw new Error(
+        throw new BadRequestError(
             "Recipe contains duplicate ingredients."
         );
     }
@@ -61,8 +69,7 @@ export async function getRecipeService(
         await findFoodById(foodId);
 
     if (!food) {
-        throw new AppError(
-            404,
+        throw new NotFoundError(
             "Food not found."
         );
     }

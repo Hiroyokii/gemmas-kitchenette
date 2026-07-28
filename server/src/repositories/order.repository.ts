@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma.js";
-import type { Prisma } from "../generated/prisma/index.js";
+import type { Prisma, OrderStatus } from "../generated/prisma/index.js";
 
 export async function createOrder(
     tx: Prisma.TransactionClient,
@@ -88,6 +88,29 @@ export async function findAllOrders(
         },
         orderBy: {
             createdAt: "desc",
+        },
+    });
+}
+
+export async function findOrderById(id: number) {
+    return prisma.order.findUnique({
+        where: {
+            id,
+        },
+    });
+}
+
+export async function updateOrderStatus(
+    tx: Prisma.TransactionClient,
+    orderId: number,
+    status: OrderStatus
+) {
+    return tx.order.update({
+        where: {
+            id: orderId,
+        },
+        data: {
+            status,
         },
     });
 }

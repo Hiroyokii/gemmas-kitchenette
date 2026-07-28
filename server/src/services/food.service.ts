@@ -8,7 +8,9 @@ import {
     findFoodById,
     updateFood
 } from "../repositories/food.repository.js";
-import { AppError } from "../errors/AppError.js";
+
+import { ConflictError } from "../errors/ConflictError.js";
+import { NotFoundError } from "../errors/NotFoundError.js";
 
 
 export async function createFoodService(
@@ -18,7 +20,7 @@ export async function createFoodService(
         await findFoodByName(data.name);
 
     if (existingFood) {
-        throw new Error(
+        throw new ConflictError(
             "Food already exists."
         );
     }
@@ -29,7 +31,7 @@ export async function createFoodService(
         );
 
     if (!category) {
-        throw new Error(
+        throw new NotFoundError(
             "Category not found."
         );
     }
@@ -56,8 +58,7 @@ export async function updateFoodService(
         await findFoodById(foodId);
 
     if (!food) {
-        throw new AppError(
-            404,
+        throw new NotFoundError(
             "Food not found."
         );
     }
@@ -68,8 +69,7 @@ export async function updateFoodService(
         );
 
     if (!category) {
-        throw new AppError(
-            404,
+        throw new NotFoundError(
             "Category not found."
         );
     }
@@ -83,8 +83,7 @@ export async function updateFoodService(
         existingFood &&
         existingFood.id !== foodId
     ) {
-        throw new AppError(
-            409,
+        throw new ConflictError(
             "Food already exists."
         );
     }

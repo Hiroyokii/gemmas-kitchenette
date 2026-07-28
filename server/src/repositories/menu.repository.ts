@@ -28,3 +28,32 @@ export async function createDailyMenu(
         }
     })
 }
+
+export async function findTodayMenu(
+    start: Date,
+    end: Date
+) {
+    return prisma.dailyMenu.findMany({
+        where: {
+            date: {
+                gte: start,
+                lt: end,
+            },
+            remainingServings: {
+                gt: 0,
+            },
+        },
+        include: {
+            food: {
+                include: {
+                    category: true,
+                },
+            },
+        },
+        orderBy: {
+            food: {
+                name: 'asc',
+            },
+        },
+    });
+}

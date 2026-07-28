@@ -1,12 +1,20 @@
 import { prisma } from "../lib/prisma.js";
 import { OrderStatus, Prisma } from "../generated/prisma/index.js";
 
-import { createOrder, createOrderItems, findOrdersByCustomer, findAllOrders } from "../repositories/order.repository.js";
+import { 
+    createOrder, 
+    createOrderItems, 
+    findOrdersByCustomer, 
+    findAllOrders, 
+    findOrderById, 
+    updateOrderStatus 
+} from "../repositories/order.repository.js";
 import { findDailyMenuById, decreaseRemainingServings } from "../repositories/dailyMenu.repository.js";
 
 import type { CreateOrderInput } from "../schemas/order.schema.js";
-import { findOrderById, updateOrderStatus } from "../repositories/food.repository.js";
+
 import { BadRequestError } from "../errors/BadRequestError.js";
+import { NotFoundError } from "../errors/NotFoundError.js";
 
 export async function createOrderService(
     customerId: number,
@@ -37,7 +45,7 @@ export async function createOrderService(
             );
         
         if (!menu) {
-            throw new Error(
+            throw new NotFoundError(
                 "Daily menu not found."
             );
         }
@@ -54,7 +62,7 @@ export async function createOrderService(
         if (
             menu.remainingServings < item.quantity
         ) {
-            throw new Error(
+            throw new BadRequestError(
                 `${menu.food.name} has insufficient servings.`
             );
         }
@@ -114,7 +122,7 @@ export async function updateOrderStatusService(
     const order = await findOrderById(orderId);
 
     if (!order) {
-        throw new Error(
+        throw new NotFoundError(
             "Order not found."
         )
     }
@@ -150,7 +158,7 @@ export async function updateOrderStatusService(
         ];
     
     if (!allowed.includes(status)) {
-        throw new Error(
+        throw new BadRequestError(
             `Cannot change order from ${order.status} to ${status}.`
         );
     }

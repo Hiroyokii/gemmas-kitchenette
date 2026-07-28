@@ -21,7 +21,7 @@ export const getFoods = asyncHandler(async (req, res) => {
         categoryId
     );
 
-    res.json(foods);
+    res.status(200).json(foods);
 });
 
 export const updateFood =
@@ -33,5 +33,5 @@ export const updateFood =
                 req.body
             );
 
-        res.json(food);
+        res.status(200).json(food);
     });

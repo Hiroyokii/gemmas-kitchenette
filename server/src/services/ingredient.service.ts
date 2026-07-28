@@ -7,7 +7,9 @@ import {
     findIngredientById,
     updateIngredient
 } from "../repositories/ingredient.repository.js";
-import { AppError } from "../errors/AppError.js";
+
+import { ConflictError } from "../errors/ConflictError.js";
+import { NotFoundError } from "../errors/NotFoundError.js";
 
 
 export async function getIngredientsService() {
@@ -24,8 +26,7 @@ export async function createIngredientService(
         );
 
     if (existingIngredient) {
-        
-        throw new Error(
+        throw new ConflictError(
             "Ingredient already exists."
         );
     }
@@ -36,13 +37,12 @@ export async function createIngredientService(
         );
     
     if (!unit) {
-        
-        throw new Error(
+        throw new NotFoundError(
             "Unit not found."
         );
     }
 
-    return createIngredient(data)
+    return createIngredient(data);
 }
 
 export async function updateIngredientService(
@@ -55,8 +55,7 @@ export async function updateIngredientService(
         );
 
     if (!ingredient) {
-        throw new AppError(
-            404,
+        throw new NotFoundError(
             "Ingredient not found."
         );
     }
@@ -67,8 +66,7 @@ export async function updateIngredientService(
         );
     
     if (!unit) {
-        throw new AppError(
-            404,
+        throw new NotFoundError(
             "Unit not found."
         );
     }
@@ -82,8 +80,7 @@ export async function updateIngredientService(
         existingIngredient &&
         existingIngredient.id !== ingredientId
     ) {
-        throw new AppError(
-            409,
+        throw new ConflictError(
             "Ingredient already exists."
         );
     }

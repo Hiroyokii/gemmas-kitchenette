@@ -20,5 +20,5 @@ export const getRecipe =
                 Number(req.params.id)
             );
         
-        res.json(recipe);
+        res.status(200).json(recipe);
     });

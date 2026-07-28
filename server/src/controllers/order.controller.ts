@@ -23,7 +23,7 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
         req.body.status as OrderStatus
     );
 
-    res.json(order);
+    res.status(200).json(order);
 });
 
 export const getMyOrders = asyncHandler(async (req, res) => {
@@ -31,7 +31,7 @@ export const getMyOrders = asyncHandler(async (req, res) => {
         req.user!.userId
     );
 
-    res.json(orders);
+    res.status(200).json(orders);
 });
 
 export const getAllOrders = asyncHandler(async (req, res) => {
@@ -43,5 +43,5 @@ export const getAllOrders = asyncHandler(async (req, res) => {
         limit
     );
 
-    res.json(orders);
+    res.status(200).json(orders);
 });

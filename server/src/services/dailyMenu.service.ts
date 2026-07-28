@@ -3,14 +3,17 @@ import { prisma } from "../lib/prisma.js";
 import { decreaseIngredientStock} from "../repositories/ingredient.repository.js"
 import { findRecipeIngredients } from "../repositories/recipe.repository.js";
 import { findFoodById } from "../repositories/food.repository.js";
-import { findTodayMenu } from "../repositories/dailyMenu.repository.js";
+import { findTodayMenu } from "../repositories/menu.repository.js";
 import { 
     findDailyMenuByFoodAndDate,
     createDailyMenu,
 } from "../repositories/menu.repository.js";
 
 import type { CreateDailyMenuInput } from "../schemas/dailyMenu.schema.js";
+
 import { NotFoundError } from "../errors/NotFoundError.js";
+import { ConflictError } from "../errors/ConflictError.js";
+import { BadRequestError } from "../errors/BadRequestError.js";
 
 export async function prepareDailyFood(
     data: CreateDailyMenuInput
@@ -18,10 +21,13 @@ export async function prepareDailyFood(
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const food = await findFoodById(data.foodId);
+    const food = 
+        await findFoodById(data.foodId);
 
     if (!food) {
-        throw new NotFoundError("Food not found.");
+        throw new NotFoundError(
+            "Food not found."
+        );
     }
 
     const existing = 
@@ -31,7 +37,7 @@ export async function prepareDailyFood(
         );
 
     if (existing) {
-        throw new Error(
+        throw new ConflictError(
             "Food has already been prepared today."
         );
     }
@@ -39,10 +45,10 @@ export async function prepareDailyFood(
     const recipe = 
         await findRecipeIngredients(
             data.foodId
-        )
+        );
     
     if (recipe.length === 0) {
-        throw new Error(
+        throw new BadRequestError(
             "Recipe has not been configured."
         );
     }
@@ -65,7 +71,7 @@ export async function prepareDailyFood(
             Number(recipeIngredient.ingredient.currentStock)
             < item.quantity
         ) {
-            throw new Error(
+            throw new BadRequestError(
                 `${recipeIngredient.ingredient.name} has insufficient stock.` 
             );
         }

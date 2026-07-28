@@ -3,11 +3,9 @@ import { getTodaySalesReport } from "../repositories/report.repository.js";
 export async function getTodaySalesReportService() {
 
     const start = new Date();
-
     start.setHours(0,0,0,0);
 
     const end = new Date(start);
-
     end.setDate(end.getDate() + 1);
 
     const {

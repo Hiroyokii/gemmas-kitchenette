@@ -7,7 +7,7 @@ export const getIngredients =
         const ingredients =
             await getIngredientsService();
 
-        res.json(ingredients);
+        res.status(200).json(ingredients);
 
     });
 
@@ -30,5 +30,5 @@ export const updateIngredient =
                 req.body
             );
         
-        res.json(ingredient);
+        res.status(200).json(ingredient);
     });

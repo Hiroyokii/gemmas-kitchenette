@@ -10,5 +10,5 @@ export const createDailyMenu = asyncHandler(async (req, res) => {
 export const getTodayMenu = asyncHandler(async (_, res) => {
     const menu = await getTodayMenuService();
 
-    res.json(menu);
+    res.status(200).json(menu);
 });

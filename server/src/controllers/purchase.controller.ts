@@ -14,5 +14,5 @@ export const getPurchases = asyncHandler(async (_, res) => {
     const purchase =
         await getPurchasesServices();
 
-    res.json(purchase);
+    res.status(200).json(purchase);
 })
