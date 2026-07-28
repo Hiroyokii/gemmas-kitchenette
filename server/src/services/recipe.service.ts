@@ -29,7 +29,7 @@ export async function replaceRecipe(
                 ingredient.ingredientId
             );
     
-        if (!ingredient) {
+        if (!existing) {
             throw new NotFoundError(
                 "Ingredient not found."
             );
