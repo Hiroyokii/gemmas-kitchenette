@@ -104,15 +104,25 @@ export async function createOrderService(
         );
 
         for (const item of orderItems) {
-            await decreaseRemainingServings(
+            const updatedRows = await decreaseRemainingServings(
                 tx,
                 item.dailyMenuId,
                 item.quantity
             );
+
+            if (updatedRows === null) {
+                const menu = menus.find(
+                    m => m.id === item.dailyMenuId
+                )!;
+
+                throw new BadRequestError(
+                    `${menu.food.name} no longer has enough servings available.`
+                );
+            }
         }
 
         return order;
-    })
+    });
 }
 
 export async function updateOrderStatusService(
