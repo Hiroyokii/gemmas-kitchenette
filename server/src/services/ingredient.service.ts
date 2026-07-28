@@ -13,7 +13,7 @@ import { NotFoundError } from "../errors/NotFoundError.js";
 
 
 export async function getIngredientsService() {
-    return getIngredients
+    return getIngredients();
 }
 
 export async function createIngredientService(
