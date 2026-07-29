@@ -44,3 +44,52 @@ export async function findRoleByName(name: string) {
         },
     });
 }
+
+export async function storeRefreshToken(
+    userId: number,
+    tokenHash: string,
+    expiresAt: Date
+) {
+    return prisma.refreshToken.create({
+        data: {
+            userId,
+            tokenHash,
+            expiresAt,
+        },
+    });
+}
+
+export async function findValidRefreshToken(
+    tokenHash: string
+) {
+    return prisma.refreshToken.findFirst({
+        where: {
+            tokenHash,
+            revokedAt: null,
+            expiresAt: {
+                gt: new Date(),
+            },
+        },
+        include: {
+            user: {
+                include: {
+                    role: true
+                },
+            },
+        },
+    });
+}
+
+export async function revokeRefreshToken(
+    tokenHash: string
+) {
+    return prisma.refreshToken.updateMany({
+        where: {
+            tokenHash,
+            revokedAt: null, 
+        },
+        data: {
+            revokedAt: new Date(),
+        },
+    });
+}

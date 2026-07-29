@@ -1,6 +1,14 @@
 import { Router } from "express";
-import { register, login, me } from "../controllers/auth.controller.js";
+
+import { 
+    register, 
+    login, 
+    refresh, 
+    logout, 
+} from "../controllers/auth.controller.js";
+
 import { authenticate } from "../middleware/auth.middleware.js";
+import { authRateLimiter } from "../middleware/rateLimit.middleware.js";
 
 const router = Router();
 
@@ -29,7 +37,7 @@ const router = Router();
  *       200:
  *         description: Login successful
  */
-router.post("/login", login);
+router.post("/login", authRateLimiter, login);
 
 /**
  * @openapi
@@ -66,7 +74,34 @@ router.post("/login", login);
  *       201:
  *         description: Customer registered successfully.
  */
-router.post("/register", register);
-router.get("/me", authenticate, me);
+router.post("/register", authRateLimiter, register);
+
+/**
+ * @openapi
+ * /auth/refresh:
+ *   post:
+ *     summary: Exchange the httpOnly refresh cookie for a new access token
+ *     tags:
+ *       - Authentication
+ *     responses:
+ *       200:
+ *         description: Session refreshed
+ *       401:
+ *         description: No valid session
+ */
+router.post("/refresh", refresh);
+
+/**
+ * @openapi
+ * /auth/logout:
+ *   post:
+ *     summary: Revoke the current refresh token and clear the session cookie
+ *     tags:
+ *       - Authentication
+ *     responses:
+ *       200:
+ *         description: Logged out
+ */
+router.post("/logout", logout);
 
 export default router;
