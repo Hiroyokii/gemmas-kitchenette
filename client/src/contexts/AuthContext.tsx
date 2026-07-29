@@ -6,6 +6,7 @@ import {
 } from "react";
 
 import type { User } from "../types/User";
+import { refreshSession, logout as logoutRequest } from "../services/auth.service";
 
 
 interface AuthContextType {
@@ -40,21 +41,20 @@ export function AuthProvider({
     
 
     useEffect(() => {
-        const token = 
-            localStorage.getItem("token");
+        async function restoreSession() {
+            try {
+                const response = await refreshSession();
 
-        const user =
-            localStorage.getItem("user");
-
-        if (token && user) {
-            setToken(token);
-
-            setUser(
-                JSON.parse(user)
-            );
+                login(response.token, response.user);
+            } catch {
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+            } finally {
+                setIsLoading(false);
+            }
         }
 
-        setIsLoading(false);
+        restoreSession();
     }, []); 
 
     function login(
@@ -75,7 +75,13 @@ export function AuthProvider({
         setUser(user);
     }
 
-    function logout() {
+    async function logout() {
+        try {
+            await logoutRequest();
+        } catch {
+
+        }
+
         localStorage.removeItem("token");
         localStorage.removeItem("user");
 
