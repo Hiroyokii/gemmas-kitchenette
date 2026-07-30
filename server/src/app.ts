@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 import authRoutes from "./routes/auth.routes.js";
 import foodRoutes from "./routes/food.routes.js";
@@ -8,7 +9,8 @@ import purchaseRoutes from "./routes/purchase.routes.js";
 import recipeRoutes from "./routes/recipe.routes.js"
 import dailyMenuRoutes from "./routes/dailyMenu.routes.js"
 import orderRoutes from "./routes/order.routes.js";
-import reportRoutes from "./routes/report.routes.js"
+import reportRoutes from "./routes/report.routes.js";
+import categoryRoutes from "./routes/category.routes.js";
 
 import { errorHandler } from "./middleware/error.middleware.js";
 
@@ -17,8 +19,12 @@ import { swaggerSpec } from "./config/swagger.js";
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: process.env.FRONTEND_URL ?? "http://localhost:5173",
+    credentials: true,
+}));
 
+app.use(cookieParser());
 app.use(express.json());
 app.use(
     "/api-docs",
@@ -34,6 +40,7 @@ app.use("/recipes", recipeRoutes);
 app.use("/daily-menu", dailyMenuRoutes);
 app.use("/orders", orderRoutes);
 app.use("/reports", reportRoutes);
+app.use("/categories", categoryRoutes);
 
 app.use(errorHandler);
 
