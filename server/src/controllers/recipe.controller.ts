@@ -17,7 +17,7 @@ export const getRecipe =
 
         const recipe = 
             await getRecipeService(
-                Number(req.params.id)
+                Number(req.params.foodId)
             );
         
         res.status(200).json(recipe);

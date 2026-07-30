@@ -3,11 +3,11 @@ import { prisma } from "../lib/prisma.js";
 import { decreaseIngredientStock} from "../repositories/ingredient.repository.js"
 import { findRecipeIngredients } from "../repositories/recipe.repository.js";
 import { findFoodById } from "../repositories/food.repository.js";
-import { findTodayMenu } from "../repositories/menu.repository.js";
 import { 
+    findTodayMenu,
     findDailyMenuByFoodAndDate,
     createDailyMenu,
-} from "../repositories/menu.repository.js";
+} from "../repositories/dailyMenu.repository.js";
 
 import type { CreateDailyMenuInput } from "../schemas/dailyMenu.schema.js";
 

@@ -64,7 +64,8 @@ export async function getPurchases() {
             createdBy: {
                 select: {
                     id: true,
-                    name: true,
+                    firstName: true,
+                    lastName: true,
                 },
             },
             purchaseItems: {
