@@ -65,31 +65,38 @@ export async function findAllOrders(
     limit: number
 ) {
     const skip = (page - 1) * limit;
-    return prisma.order.findMany({
-        skip,
-        take: limit,
-        include: {
-            customer: {
-                select: {
-                    id: true,
-                    firstName: true,
-                    lastName: true,
+
+    const [orders, total] = await Promise.all([
+        prisma.order.findMany({
+            skip,
+            take: limit,
+            include: {
+                customer: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                    },
                 },
-            },
-            orderItems: {
-                include: {
-                    dailyMenu: {
-                        include: {
-                            food: true,
+                orderItems: {
+                    include: {
+                        dailyMenu: {
+                            include: {
+                                food: true,
+                            },
                         },
                     },
                 },
             },
-        },
-        orderBy: {
-            createdAt: "desc",
-        },
-    });
+            orderBy: {
+                createdAt: "desc",
+            },
+        }),
+
+        prisma.order.count(),
+    ]);
+
+    return { orders, total };
 }
 
 export async function findOrderById(id: number) {

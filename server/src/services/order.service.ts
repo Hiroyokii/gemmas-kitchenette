@@ -11,7 +11,7 @@ import {
 } from "../repositories/order.repository.js";
 import { findDailyMenuById, decreaseRemainingServings } from "../repositories/dailyMenu.repository.js";
 
-import type { CreateOrderInput } from "../schemas/order.schema.js";
+import { orderItemSchema, type CreateOrderInput } from "../schemas/order.schema.js";
 
 import { BadRequestError } from "../errors/BadRequestError.js";
 import { NotFoundError } from "../errors/NotFoundError.js";
@@ -194,10 +194,20 @@ export async function getAllOrdersService(
     page: number,
     limit: number
 ) {
-    return findAllOrders(
-        page,
+    const { orders, total } = await findAllOrders(
+        page, 
         limit,
     );
+
+    return {
+        orders,
+        pagination: {
+            page,
+            limit,
+            total,
+            totalPage: Math.ceil(total / limit),
+        },
+    };
 }
 
 
