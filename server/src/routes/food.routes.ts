@@ -4,7 +4,7 @@ import { createFood, getFoods, updateFood } from "../controllers/food.controller
 import { authenticate } from "../middleware/auth.middleware.js";
 import { authorize } from "../middleware/authorize.middleware.js";
 import { validate } from "../middleware/validate.middleware.js";
-import { createFoodSchema } from "../schemas/food.schema.js";
+import { updateFoodSchema } from "../schemas/food.schema.js";
 
 
 const router = Router();
@@ -36,7 +36,7 @@ router.put(
     "/:id",
     authenticate,
     authorize("ADMIN"),
-    validate(createFoodSchema),
+    validate(updateFoodSchema),
     updateFood
 )
 

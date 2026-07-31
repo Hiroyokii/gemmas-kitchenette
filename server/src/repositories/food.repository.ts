@@ -63,6 +63,8 @@ export async function updateFood(
         description: string;
         price: number;
         categoryId: number;
+        imageUrl?: string;
+        isAvailable: boolean;
     }
 ) {
     return prisma.food.update({

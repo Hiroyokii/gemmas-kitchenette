@@ -13,3 +13,9 @@ export const createFoodSchema = z.object({
 });
 
 export type CreateFoodInput = z.infer<typeof createFoodSchema>;
+
+export const updateFoodSchema = createFoodSchema.extend({
+    isAvailable: z.boolean(),
+});
+
+export type UpdatgeFoodInput = z.infer<typeof updateFoodSchema>;

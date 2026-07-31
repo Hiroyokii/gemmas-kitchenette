@@ -1,4 +1,4 @@
-import type { CreateFoodInput } from "../schemas/food.schema.js";
+import type { CreateFoodInput, UpdatgeFoodInput } from "../schemas/food.schema.js";
 
 import {
     findFoodByName,
@@ -51,7 +51,7 @@ export async function getFoodsService(
 
 export async function updateFoodService(
     foodId: number,
-    data: CreateFoodInput
+    data: UpdatgeFoodInput
 ) {
 
     const food =
