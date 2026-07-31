@@ -6,9 +6,17 @@ import { validate } from "../middleware/validate.middleware.js";
 
 import { createIngredient, updateIngredient } from "../controllers/ingredient.controller.js";
 import { getIngredients } from "../repositories/ingredient.repository.js";
+import { getUnits } from "../controllers/ingredient.controller.js";
 import { createIngredientSchema, updateIngredientSchema } from "../schemas/ingredient.schema.js";
 
 const router = Router();
+
+router.get(
+    "/units",
+    authenticate,
+    authorize("ADMIN"),
+    getUnits
+);   
 
 router.get(
     "/",

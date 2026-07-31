@@ -1,5 +1,16 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { createIngredientService, getIngredientsService, updateIngredientService } from "../services/ingredient.service.js";
+import { findAllUnits } from "../repositories/ingredient.repository.js";
+
+export const getUnits =
+    asyncHandler(async (_, res) => {
+
+        const units =
+            await findAllUnits();
+
+        res.status(200).json(units);
+        
+    });
 
 export const getIngredients =
     asyncHandler(async (_, res) => {

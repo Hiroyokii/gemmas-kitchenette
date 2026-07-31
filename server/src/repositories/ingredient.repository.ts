@@ -82,6 +82,14 @@ export async function findUnitById(
     });
 }
 
+export async function findAllUnits() {
+    return prisma.unit.findMany({
+        orderBy: {
+            name: "asc",
+        },
+    });
+}
+
 export async function updateIngredient(
     ingredientId: number,
     data: {
