@@ -17,4 +17,5 @@ export const ingredientSchema = z.object({
         .nonnegative("Cost can't be negative."),
 });
 
-export type IngredientForm = z.infer<typeof ingredientSchema>;
+export type IngredientFormInput = z.input<typeof ingredientSchema>;
+export type IngredientForm = z.output<typeof ingredientSchema>;  

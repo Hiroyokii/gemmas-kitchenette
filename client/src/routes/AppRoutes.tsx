@@ -13,6 +13,7 @@ import OrderHistoryPage from "../pages/customer/OrderHistoryPage";
 
 import DashboardPage from "../pages/admin/DashboardPage";
 import FoodsPage from "../pages/admin/FoodsPage";
+import IngredientsPage from "../pages/admin/IngredientsPage";
 import PurchasesPage from "../pages/admin/PurchasesPage";
 import RecipesPage from "../pages/admin/RecipesPage";
 import DailyMenuPage from "../pages/admin/DailyMenuPage";
@@ -23,6 +24,7 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import PublicRoute from "../components/PublicRoute";
 
 import CustomerLayout from "../layouts/CustomerLayout";
+import AdminLayout from "../layouts/AdminLayout";
 
 export default function AppRoutes() {
     return (
@@ -72,46 +74,54 @@ export default function AppRoutes() {
                 </Route>
 
                 <Route
+                    path="/admin"
                     element={
                         <ProtectedRoute
                             roles={["ADMIN"]}
                         />
                     }
                 >
-                    <Route
-                        path="/admin"
-                        element={<DashboardPage />}
-                    />
+                    <Route element={<AdminLayout />}>
+                        <Route
+                            index
+                            element={<DashboardPage />}
+                        />
 
-                    <Route
-                        path="/admin/foods"
-                        element={<FoodsPage />}
-                    />
+                        <Route
+                            path="foods"
+                            element={<FoodsPage />}
+                        />
 
-                    <Route
-                        path="/admin/purchases"
-                        element={<PurchasesPage />}
-                    />
+                        <Route
+                            path="ingredients"
+                            element={<IngredientsPage />}
+                        />
 
-                    <Route
-                        path="/admin/recipes"
-                        element={<RecipesPage />}
-                    />
+                        <Route
+                            path="purchases"
+                            element={<PurchasesPage />}
+                        />
 
-                    <Route
-                        path="/admin/menu"
-                        element={<DailyMenuPage />}
-                    />
+                        <Route
+                            path="recipes"
+                            element={<RecipesPage />}
+                        />
 
-                    <Route
-                        path="/admin/orders"
-                        element={<OrdersPage />}
-                    />
+                        <Route
+                            path="menu"
+                            element={<DailyMenuPage />}
+                        />
 
-                    <Route
-                        path="/admin/reports"
-                        element={<ReportsPage />}
-                    />
+                        <Route
+                            path="orders"
+                            element={<OrdersPage />}
+                        />
+
+                        <Route
+                            path="reports"
+                            element={<ReportsPage />}
+                        />
+                    </Route>
                 </Route>
 
             </Routes>

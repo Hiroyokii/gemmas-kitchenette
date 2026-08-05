@@ -19,4 +19,5 @@ export const foodSchema = z.object({
     isAvailable: z.boolean(),
 })
 
-export type FoodForm = z.infer<typeof foodSchema>;
+export type FoodFormInput = z.input<typeof foodSchema>;
+export type FoodForm = z.output<typeof foodSchema>; 
