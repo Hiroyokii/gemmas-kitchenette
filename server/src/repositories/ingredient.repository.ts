@@ -14,9 +14,12 @@ export async function decreaseIngredientStock(
     ingredientId: number,
     quantity: number
 ) {
-    return tx.ingredient.update({
+    const result = await tx.ingredient.updateMany({
         where: {
             id: ingredientId,
+            currentStock: {
+                gte: quantity,
+            },
         },
         data: {
             currentStock: {
@@ -24,6 +27,8 @@ export async function decreaseIngredientStock(
             },
         },
     });
+
+    return result.count;
 }
 
 export async function getIngredients() {

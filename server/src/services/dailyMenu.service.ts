@@ -6,6 +6,7 @@ import { findFoodById } from "../repositories/food.repository.js";
 import { 
     findTodayMenu,
     findDailyMenuByFoodAndDate,
+    findTodayMenuForAdmin,
     createDailyMenu,
 } from "../repositories/dailyMenu.repository.js";
 
@@ -79,11 +80,21 @@ export async function prepareDailyFood(
 
     return prisma.$transaction(async (tx) => {
         for (const item of required) {
-            await decreaseIngredientStock(
+            const updatedRows = await decreaseIngredientStock(
                 tx,
                 item.ingredientId,
                 item.quantity
             );
+
+            if (updatedRows === 0) {
+                const recipeIngredient = recipe.find(
+                    r => r.ingredientId === item.ingredientId
+                )!;
+
+                throw new BadRequestError(
+                    `${recipeIngredient.ingredient.name} no longer has enough stock.`
+                );
+            }
         }
 
         const dailyMenu =
@@ -106,4 +117,14 @@ export async function getTodayMenuService() {
     end.setDate(end.getDate() + 1);
 
     return findTodayMenu(start, end);
+}
+
+export async function getTodayMenuForAdminService() {
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(start);
+    end.setDate(end.getDate() + 1);
+
+    return findTodayMenuForAdmin(start, end);
 }

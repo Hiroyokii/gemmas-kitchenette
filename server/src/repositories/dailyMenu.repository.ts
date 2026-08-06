@@ -77,16 +77,44 @@ export async function decreaseRemainingServings(
     dailyMenuId: number,
     quantity: number
 ) {
-    return tx.dailyMenu.update({
+    const result = await tx.dailyMenu.updateMany({
         where: {
             id: dailyMenuId,
             remainingServings: {
-                gte: quantity
-            }
+                gte: quantity,
+            },
         },
         data: {
             remainingServings: {
                 decrement: quantity,
+            },
+        },
+    });
+
+    return result.count;
+}
+
+export async function findTodayMenuForAdmin(
+    start: Date,
+    end: Date
+) {
+    return prisma.dailyMenu.findMany({
+        where: {
+            date: {
+                gte: start,
+                lt: end,
+            },
+        },
+        include: {
+            food: {
+                include: {
+                    category: true,
+                },
+            },
+        },
+        orderBy: {
+            food: {
+                name: 'asc',
             },
         },
     });

@@ -1,6 +1,10 @@
 import { Router } from "express";
 
-import { createDailyMenu, getTodayMenu } from "../controllers/dailyMenu.controller.js";
+import { 
+    createDailyMenu,
+    getTodayMenu,
+    getTodayMenuForAdmin
+} from "../controllers/dailyMenu.controller.js";
 
 import { authenticate } from "../middleware/auth.middleware.js";
 import { authorize } from "../middleware/authorize.middleware.js";
@@ -13,6 +17,13 @@ const router = Router();
 router.get(
     "/today",
     getTodayMenu
+)
+
+router.get(
+    "/",
+    authenticate,
+    authorize("ADMIN", "STAFF"),
+    getTodayMenuForAdmin
 )
 
 router.post(
