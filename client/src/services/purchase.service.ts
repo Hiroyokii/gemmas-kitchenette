@@ -17,7 +17,7 @@ export async function getPurchases(): Promise<Purchase[]> {
     return response.data;
 }
 
-export async function createdPurchase(
+export async function createPurchase(
     data: CreatePurchaseInput
 ): Promise<Purchase> {
     const response = await api.post("/purchases", data);
