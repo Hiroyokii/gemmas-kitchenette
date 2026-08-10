@@ -12,4 +12,5 @@ export const prepareFoodSchema = z.object({
         .positive("Servings must be at least 1."),
 });
 
-export type PreparedFoodForm = z.infer<typeof prepareFoodSchema>;
+export type PrepareFoodFormInput = z.input<typeof prepareFoodSchema>;
+export type PrepareFoodForm = z.output<typeof prepareFoodSchema>;
