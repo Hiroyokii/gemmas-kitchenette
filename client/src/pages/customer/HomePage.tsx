@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { getTodayMenu } from "../../services/dailyMenu.service";
 import type { DailyMenu } from "../../types/DailyMenu";
 import FoodCard from "../../components/FoodCard";
+import { getErrorMessage } from "../../utils/getErrorMessage";
 
 export default function HomePage() {
 
@@ -11,6 +12,9 @@ export default function HomePage() {
 
     const [loading, setLoading] =
         useState(true);
+
+    const [error, setError] =
+        useState("");
 
     useEffect(() => {
 
@@ -23,9 +27,14 @@ export default function HomePage() {
                 
                 setMenu(data);
 
-            } catch (error) {
+            } catch (err) {
 
-                console.error(error);
+                setError(
+                    getErrorMessage(
+                        err,
+                        "Failed to load today's menu."
+                    )
+                );
 
             } finally {
 
@@ -40,6 +49,10 @@ export default function HomePage() {
 
     if (loading) {
         return <p>Loading today's menu...</p>;
+    }
+
+    if (error) {
+        return <p className="text-red-500">{error}</p>;
     }
 
     if (menu.length === 0) {
@@ -57,7 +70,7 @@ export default function HomePage() {
                 Today's Menu
             </h1>
 
-            {menu.map((item: any) => (
+            {menu.map((item) => (
 
                 <FoodCard
                     key={item.id}
