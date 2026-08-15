@@ -119,5 +119,23 @@ export async function updateOrderStatus(
         data: {
             status,
         },
+        include: {
+            customer: {
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                },
+            },
+            orderItems: {
+                include: {
+                    dailyMenu: {
+                        include: {
+                            food: true,
+                        },
+                    },
+                },
+            },
+        },
     });
 }
