@@ -4,6 +4,8 @@ import type {
     Response,
 } from "express";
 
+import { ZodError } from "zod";
+
 import { AppError } from "../errors/AppError.js";
 
 export function errorHandler(
@@ -16,6 +18,12 @@ export function errorHandler(
         return res.status(err.statusCode).json({
             message: err.message,
         });
+    }
+
+    if (err instanceof ZodError) {
+        return res.status(400).json({
+            errors: err.issues,
+        })
     }
 
     console.error(err);
