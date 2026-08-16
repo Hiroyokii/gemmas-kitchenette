@@ -19,7 +19,7 @@ export default defineConfig([
       globals: globals.browser,
     },
     rules: {
-      "react-refresh/only-expor-components": [
+      "react-refresh/only-export-components": [
         "warn",
         {
           allowConstantExport: true,

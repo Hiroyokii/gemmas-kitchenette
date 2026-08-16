@@ -24,7 +24,7 @@ export interface Order {
     total: number;
     deliveryAddress: string;
     createdAt: string;
-    customer: {
+    customer?: {
         id: number;
         firstName: string;
         lastName: string;
