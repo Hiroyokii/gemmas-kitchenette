@@ -18,7 +18,7 @@ const REFRESH_COOKIE_OPTION = {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax" as const,
     path: "/auth",
-    maxAge: 7 * 24 * 60 * 1000,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
 }
 
 function setRefreshCookie(
@@ -49,6 +49,8 @@ export const register = asyncHandler(async (req, res) => {
     const data = registerSchema.parse(req.body);
     const result = await registerUser(data);
 
+    setRefreshCookie(res, result.refreshToken);
+
     return res.status(201).json({
         message: "Registration successful.",
         token: result.accessToken,
@@ -59,6 +61,8 @@ export const register = asyncHandler(async (req, res) => {
 export const login = asyncHandler(async (req, res) => {
     const data = loginSchema.parse(req.body);
     const result = await loginUser(data);
+
+    setRefreshCookie(res, result.refreshToken);
 
     return res.status(200).json({
         message: "Login successful.",

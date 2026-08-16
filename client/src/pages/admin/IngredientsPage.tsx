@@ -47,12 +47,35 @@ export default function IngredientsPage() {
     }
 
     useEffect(() => {
-        loadIngredients();
+        let ignore = false;
+
+        getIngredients()
+            .then((data) => {
+                if (ignore) return;
+                setIngredients(data);
+                setLoadError("");
+            })
+            .catch((error) => {
+                if (ignore) return;
+                setLoadError(
+                    getErrorMessage(error, "Failed to load ingredients.")
+                );
+            })
+            .finally(() => {
+                if (!ignore) setLoading(false);
+            });
 
         getUnits()
-            .then(setUnits)
+            .then((data) => {
+                if (!ignore) setUnits(data);
+            })
             .catch(() => {
+                // Non-fatal: list still loads, form just won't have options.
             });
+
+        return () => {
+            ignore = true;
+        };
     }, []);
 
     function openCreateModal() {
@@ -205,7 +228,7 @@ function IngredientFormModal({
         register,
         handleSubmit,
         formState: { errors, isSubmitting },
-    } = useForm<IngredientFormInput, any, IngredientForm>({
+    } = useForm<IngredientFormInput, unknown, IngredientForm>({
         resolver: zodResolver(ingredientSchema),
         defaultValues: ingredient
             ? {
