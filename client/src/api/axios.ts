@@ -1,76 +1,84 @@
-import axios from "axios";
+import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
+import { clearAccessToken, getAccessToken, setAccessToken } from "./tokenStore";
+
+interface RefreshResponse {
+    token: string;
+}
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
-
     withCredentials: true,
+    headers: {
+        "Content-Type": "application/json",
+    },
 });
 
+let refreshPromise: Promise<string | null> | null = null;
+let isRedirectingToLogin = false;
+
+function isAuthEndpoint(url?: string): boolean {
+    return Boolean(
+        url?.includes("/auth/login") ||
+        url?.includes("/auth/register") ||
+        url?.includes("/auth/refresh")
+    );
+}
+
+function redirectToLogin(): void {
+    if (isRedirectingToLogin || window.location.pathname === "/login") {
+        return;
+    }
+
+    isRedirectingToLogin = true;
+    window.location.assign("/login");
+}
+
+function clearSession(): void {
+    clearAccessToken();
+}
+
 api.interceptors.request.use((config) => {
-    const token = localStorage.getItem("token");
+    const token = getAccessToken();
 
-    const isRefreshRequest = config.url?.includes("/auth/refresh");
-
-    if (token && !isRefreshRequest) {
+    if (token && !config.url?.includes("/auth/refresh")) {
         config.headers.Authorization = `Bearer ${token}`;
     }
 
     return config;
 });
 
-let refreshPromise: Promise<string | null> | null = null;
-
-function clearSession() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-}
-
 api.interceptors.response.use(
     (response) => response,
-    async (error) => {
-        const originalRequest = error.config;
+    async (error: AxiosError) => {
+        const originalRequest = error.config as
+            | (InternalAxiosRequestConfig & { _retry?: boolean })
+            | undefined;
 
-        const isAuthEndpoint =
-            originalRequest?.url?.includes("/auth/login") ||
-            originalRequest?.url?.includes("/auth/register") ||
-            originalRequest?.url?.includes("/auth/refresh");
+        const status = error.response?.status;
+        const url = originalRequest?.url;
 
-        if (
-            error.response?.status !== 401 ||
-            isAuthEndpoint ||
-            originalRequest._retried
-        ) {
-            if (error.response?.status === 401 && !isAuthEndpoint) {
-                clearSession();
-
-                if (window.location.pathname !== "/login") {
-                    window.location.href = "/login";
-                }
-            }
-
+        if (status !== 401 || !originalRequest || isAuthEndpoint(url)) {
             return Promise.reject(error);
         }
 
-        originalRequest._retried = true;
+        if (originalRequest._retry) {
+            clearSession();
+            redirectToLogin();
+            return Promise.reject(error);
+        }
+
+        originalRequest._retry = true;
 
         if (!refreshPromise) {
             refreshPromise = api
-                .post("/auth/refresh")
-                .then((res) => {
-                    const { token, user } = res.data;
-
-                    localStorage.setItem("token", token);
-                    localStorage.setItem("user", JSON.stringify(user));
-
-                    return token as string;
+                .post<RefreshResponse>("/auth/refresh")
+                .then(({ data }) => {
+                    setAccessToken(data.token);
+                    return data.token;
                 })
                 .catch(() => {
                     clearSession();
-
-                    if (window.location.pathname !== "/login") {
-                        window.location.href = "/login";
-                    }
-
+                    redirectToLogin();
                     return null;
                 })
                 .finally(() => {
@@ -86,7 +94,7 @@ api.interceptors.response.use(
 
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
 
-        return api(originalRequest);
+        return api.request(originalRequest);
     }
 );
 
