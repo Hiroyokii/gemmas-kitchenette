@@ -11,7 +11,7 @@ import type { CartItem } from "../types/CartItem";
 import {
     CartContext,
     type CartContextValue,
-} from "./CartContext";
+} from "../contexts/CartContext";
 
 export function CartProvider({
     children,
@@ -98,8 +98,7 @@ export function CartProvider({
     const itemCount = useMemo(
         () =>
             cart.reduce(
-                (sum, item) =>
-                    sum + item.quantity,
+                (sum, item) => sum + item.quantity,
                 0
             ),
         [cart]

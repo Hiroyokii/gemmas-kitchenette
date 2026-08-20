@@ -21,27 +21,19 @@ import {
 import {
     AuthContext,
     type AuthContextValue,
-} from "./AuthContext";
+} from "../contexts/AuthContext";
 
 export function AuthProvider({
     children,
 }: {
     children: ReactNode;
 }) {
-    const [user, setUser] =
-        useState<User | null>(null);
-
-    const [token, setToken] =
-        useState<string | null>(null);
-
-    const [isLoading, setIsLoading] =
-        useState(true);
+    const [user, setUser] = useState<User | null>(null);
+    const [token, setToken] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     const login = useCallback(
-        (
-            nextToken: string,
-            nextUser: User
-        ) => {
+        (nextToken: string, nextUser: User) => {
             setAccessToken(nextToken);
             setToken(nextToken);
             setUser(nextUser);
@@ -64,14 +56,10 @@ export function AuthProvider({
 
         async function restoreSession() {
             try {
-                const response =
-                    await refreshSession();
+                const response = await refreshSession();
 
                 if (!cancelled) {
-                    login(
-                        response.token,
-                        response.user
-                    );
+                    login(response.token, response.user);
                 }
             } catch {
                 if (!cancelled) {
@@ -93,23 +81,16 @@ export function AuthProvider({
         };
     }, [login]);
 
-    const value =
-        useMemo<AuthContextValue>(
-            () => ({
-                user,
-                token,
-                isLoading,
-                login,
-                logout,
-            }),
-            [
-                user,
-                token,
-                isLoading,
-                login,
-                logout,
-            ]
-        );
+    const value = useMemo<AuthContextValue>(
+        () => ({
+            user,
+            token,
+            isLoading,
+            login,
+            logout,
+        }),
+        [user, token, isLoading, login, logout]
+    );
 
     return (
         <AuthContext.Provider value={value}>

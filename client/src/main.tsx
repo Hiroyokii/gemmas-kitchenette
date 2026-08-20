@@ -5,7 +5,7 @@ import { AuthProvider } from "./contexts/AuthProvider.tsx";
 import "./style.css"
 
 import App from './App.tsx'
-import { CartProvider } from "./contexts/CartProvider";
+import { CartProvider } from "./provider/CartProvider.tsx";
 
 createRoot(document.getElementById('root')!).render(
   <AuthProvider>
