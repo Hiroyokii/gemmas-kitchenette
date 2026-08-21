@@ -1,30 +1,15 @@
-import { Navigate, Outlet } from "react-router-dom"
-import { useAuth } from "../contexts/AuthContext"
+import { Navigate, Outlet } from "react-router-dom";
+
+import { useAuth } from "../hooks/useAuth";
 
 export default function PublicRoute() {
     const { user } = useAuth();
 
     if (user) {
-        switch(user.role) {
-            case "ADMIN":
-            case "STAFF":
-                return (
-                    <Navigate
-                        to="/admin"
-                        replace
-                    />
-                );
-            
-            default:
-                return (
-                    <Navigate
-                        to="/"
-                        replace
-                    />
-                );
-        }
+        const destination = user.role === "ADMIN" || user.role === "STAFF" ? "/admin" : "/";
+
+        return <Navigate to={destination} replace />;
     }
 
     return <Outlet />;
-    
 }
