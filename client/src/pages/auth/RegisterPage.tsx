@@ -3,14 +3,15 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import {
-    registerSchema,
-    type RegisterForm,
-} from "../../schemas/register.schema";
-
+import { registerSchema, type RegisterForm } from "../../schemas/register.schema";
 import { register as registerRequest } from "../../services/auth.service";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import { getErrorMessage } from "../../utils/getErrorMessage";
+
+import Input from "../../components/ui/Input";
+import Button from "../../components/ui/Button";
+import Alert from "../../components/ui/Alert";
+import Icon from "../../components/ui/Icon";
 
 export default function RegisterPage() {
     const {
@@ -36,172 +37,128 @@ export default function RegisterPage() {
             });
 
             loginContext(response.token, response.user);
-
             navigate("/");
         } catch (error) {
-            setSubmitError(
-                getErrorMessage(error, "Failed to register. Please try again.")
-            );
+            setSubmitError(getErrorMessage(error, "Failed to register. Please try again."));
         }
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center py-10">
-            <form
-                onSubmit={handleSubmit(onSubmit)}
-                className="w-full max-w-md space-y-4"
-            >
-                <h1 className="text-3xl font-bold">Create an account</h1>
-
-                <div className="grid grid-cols-2 gap-3">
-                    <div>
-                        <input
-                            placeholder="First name"
-                            {...register("firstName")}
-                            className="border rounded w-full p-2"
-                        />
-                        {errors.firstName && (
-                            <p className="text-red-500 text-sm">
-                                {errors.firstName.message}
-                            </p>
-                        )}
-                    </div>
-
-                    <div>
-                        <input
-                            placeholder="Last name"
-                            {...register("lastName")}
-                            className="border rounded w-full p-2"
-                        />
-                        {errors.lastName && (
-                            <p className="text-red-500 text-sm">
-                                {errors.lastName.message}
-                            </p>
-                        )}
-                    </div>
+        <div className="flex min-h-screen items-center justify-center bg-ink-50 px-4 py-12">
+            <div className="w-full max-w-2xl">
+                <div className="mb-8 text-center">
+                    <span className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-brand-500 text-white">
+                        <Icon name="bowl" className="h-6 w-6" />
+                    </span>
+                    <h1 className="font-display text-3xl font-semibold text-ink-900">
+                        Create an account
+                    </h1>
+                    <p className="mt-1 text-sm text-ink-500">
+                        Set up delivery to your block and start ordering.
+                    </p>
                 </div>
 
-                <div>
-                    <input
-                        placeholder="Middle name (optional)"
-                        {...register("middleName")}
-                        className="border rounded w-full p-2"
-                    />
-                </div>
-
-                <div>
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        {...register("email")}
-                        className="border rounded w-full p-2"
-                    />
-                    {errors.email && (
-                        <p className="text-red-500 text-sm">
-                            {errors.email.message}
-                        </p>
-                    )}
-                </div>
-
-                <div>
-                    <input
-                        type="password"
-                        placeholder="Password (min. 8 characters)"
-                        {...register("password")}
-                        className="border rounded w-full p-2"
-                    />
-                    {errors.password && (
-                        <p className="text-red-500 text-sm">
-                            {errors.password.message}
-                        </p>
-                    )}
-                </div>
-
-                <div>
-                    <input
-                        placeholder="Phone number (11 digits)"
-                        {...register("phoneNumber")}
-                        className="border rounded w-full p-2"
-                    />
-                    {errors.phoneNumber && (
-                        <p className="text-red-500 text-sm">
-                            {errors.phoneNumber.message}
-                        </p>
-                    )}
-                </div>
-
-                <p className="text-sm font-medium text-gray-600 pt-2">
-                    Delivery address
-                </p>
-
-                <div className="grid grid-cols-3 gap-3">
-                    <div>
-                        <input
-                            placeholder="Block"
-                            {...register("block")}
-                            className="border rounded w-full p-2"
-                        />
-                        {errors.block && (
-                            <p className="text-red-500 text-sm">
-                                {errors.block.message}
-                            </p>
-                        )}
-                    </div>
-
-                    <div>
-                        <input
-                            placeholder="Lot"
-                            {...register("lot")}
-                            className="border rounded w-full p-2"
-                        />
-                        {errors.lot && (
-                            <p className="text-red-500 text-sm">
-                                {errors.lot.message}
-                            </p>
-                        )}
-                    </div>
-
-                    <div>
-                        <input
-                            placeholder="Street"
-                            {...register("street")}
-                            className="border rounded w-full p-2"
-                        />
-                        {errors.street && (
-                            <p className="text-red-500 text-sm">
-                                {errors.street.message}
-                            </p>
-                        )}
-                    </div>
-                </div>
-
-                <div>
-                    <input
-                        placeholder="Landmark (optional)"
-                        {...register("landmark")}
-                        className="border rounded w-full p-2"
-                    />
-                </div>
-
-                {submitError && (
-                    <p className="text-red-500 text-sm">{submitError}</p>
-                )}
-
-                <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="bg-orange-600 text-white w-full py-2 rounded disabled:opacity-50"
+                <form
+                    onSubmit={handleSubmit(onSubmit)}
+                    className="space-y-6 rounded-2xl border border-ink-200 bg-white p-6 shadow-[var(--shadow-card)] sm:p-8"
                 >
-                    {isSubmitting ? "Creating account..." : "Register"}
-                </button>
+                    <Alert type="error" message={submitError} />
 
-                <p className="text-sm text-center text-gray-600">
-                    Already have an account?{" "}
-                    <Link to="/login" className="text-orange-600 hover:underline">
-                        Log in
-                    </Link>
-                </p>
-            </form>
+                    <div className="space-y-4">
+                        <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-400">
+                            Your details
+                        </h2>
+
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <Input
+                                label="First name"
+                                error={errors.firstName?.message}
+                                {...register("firstName")}
+                            />
+                            <Input
+                                label="Last name"
+                                error={errors.lastName?.message}
+                                {...register("lastName")}
+                            />
+                        </div>
+
+                        <Input
+                            label="Middle name (optional)"
+                            error={errors.middleName?.message}
+                            {...register("middleName")}
+                        />
+
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <Input
+                                type="email"
+                                label="Email"
+                                autoComplete="email"
+                                error={errors.email?.message}
+                                {...register("email")}
+                            />
+                            <Input
+                                type="password"
+                                label="Password"
+                                hint="At least 8 characters."
+                                autoComplete="new-password"
+                                error={errors.password?.message}
+                                {...register("password")}
+                            />
+                        </div>
+
+                        <Input
+                            label="Phone number"
+                            hint="11 digits, no spaces."
+                            error={errors.phoneNumber?.message}
+                            {...register("phoneNumber")}
+                        />
+                    </div>
+
+                    <div className="space-y-4 border-t border-ink-100 pt-6">
+                        <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-400">
+                            Delivery address
+                        </h2>
+
+                        <div className="grid gap-4 sm:grid-cols-3">
+                            <Input
+                                label="Block"
+                                error={errors.block?.message}
+                                {...register("block")}
+                            />
+                            <Input
+                                label="Lot"
+                                error={errors.lot?.message}
+                                {...register("lot")}
+                            />
+                            <Input
+                                label="Street"
+                                error={errors.street?.message}
+                                {...register("street")}
+                            />
+                        </div>
+
+                        <Input
+                            label="Landmark (optional)"
+                            error={errors.landmark?.message}
+                            {...register("landmark")}
+                        />
+                    </div>
+
+                    <Button type="submit" fullWidth isLoading={isSubmitting}>
+                        {isSubmitting ? "Creating account…" : "Create account"}
+                    </Button>
+
+                    <p className="text-center text-sm text-ink-500">
+                        Already have an account?{" "}
+                        <Link
+                            to="/login"
+                            className="font-medium text-brand-600 hover:underline"
+                        >
+                            Log in
+                        </Link>
+                    </p>
+                </form>
+            </div>
         </div>
     );
 }
