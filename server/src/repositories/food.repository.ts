@@ -1,5 +1,4 @@
 import { prisma } from "../lib/prisma.js";
-import type { Prisma, OrderStatus } from "../generated/prisma/index.js";
 import type { CreateFoodInput } from "../schemas/food.schema.js";
 
 export async function findFoodByName(name: string) {

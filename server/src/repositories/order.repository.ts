@@ -36,6 +36,18 @@ export async function createOrderItems(
     });
 }
 
+const orderInclude = {
+    payment: true,
+    orderItems: { 
+        include: { 
+            dailyMenu: { 
+                include: { 
+                    food: true 
+                } }, 
+                review: true 
+            } },
+} as const;
+
 export async function findOrdersByCustomer(
     customerId: number
 ) {
@@ -61,41 +73,27 @@ export async function findOrdersByCustomer(
 }
 
 export async function findAllOrders(
-    page: number,
+    page: number, 
     limit: number
 ) {
     const skip = (page - 1) * limit;
-
     const [orders, total] = await Promise.all([
-        prisma.order.findMany({
-            skip,
-            take: limit,
-            include: {
-                customer: {
-                    select: {
-                        id: true,
-                        firstName: true,
-                        lastName: true,
-                    },
-                },
-                orderItems: {
-                    include: {
-                        dailyMenu: {
-                            include: {
-                                food: true,
-                            },
-                        },
-                    },
-                },
-            },
-            orderBy: {
-                createdAt: "desc",
-            },
-        }),
-
+        prisma.order.findMany({ 
+            skip, 
+            take: limit, 
+            include: { 
+                ...orderInclude, 
+                customer: { 
+                    select: { 
+                        id: true, 
+                        firstName: true, 
+                        lastName: true 
+                    } } }, 
+                    orderBy: { 
+                        createdAt: "desc" 
+                    } }),
         prisma.order.count(),
     ]);
-
     return { orders, total };
 }
 
@@ -104,38 +102,31 @@ export async function findOrderById(id: number) {
         where: {
             id,
         },
+        include: { 
+            payment: true 
+        }
     });
 }
 
 export async function updateOrderStatus(
-    tx: Prisma.TransactionClient,
-    orderId: number,
+    tx: Prisma.TransactionClient, 
+    orderId: number, 
     status: OrderStatus
 ) {
     return tx.order.update({
-        where: {
-            id: orderId,
+        where: { 
+            id: orderId 
         },
-        data: {
-            status,
+        data: { 
+            status 
         },
-        include: {
-            customer: {
-                select: {
-                    id: true,
-                    firstName: true,
-                    lastName: true,
-                },
-            },
-            orderItems: {
-                include: {
-                    dailyMenu: {
-                        include: {
-                            food: true,
-                        },
-                    },
-                },
-            },
-        },
+        include: { 
+            customer: { 
+                select: { 
+                    id: true, 
+                    firstName: true, 
+                    lastName: true 
+                } }, 
+                ...orderInclude },
     });
 }
