@@ -16,6 +16,11 @@ export const createOrderSchema = z.object({
         .trim()
         .min(5)
         .max(255),
+    paymentMethod: z
+        .enum([
+            "COD", 
+            "GCASH"
+        ]),
 })
 
 export type CreateOrderInput = z.infer<typeof createOrderSchema>;
