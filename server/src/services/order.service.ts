@@ -11,7 +11,7 @@ import {
 } from "../repositories/order.repository.js";
 import { findDailyMenuById, decreaseRemainingServings } from "../repositories/dailyMenu.repository.js";
 
-import { orderItemSchema, type CreateOrderInput } from "../schemas/order.schema.js";
+import type { CreateOrderInput } from "../schemas/order.schema.js";
 
 import { BadRequestError } from "../errors/BadRequestError.js";
 import { NotFoundError } from "../errors/NotFoundError.js";
@@ -49,6 +49,11 @@ export async function createOrderService(
                 "Daily menu not found."
             );
         }
+
+        if (menu.remainingServings < item.quantity) 
+            throw new BadRequestError(
+                `${menu.food.name} has insufficient servings.`
+            );
 
         menus.push(menu);
     }
@@ -103,6 +108,15 @@ export async function createOrderService(
             orderItems
         );
 
+        await tx.payment.create({ 
+            data: { 
+                orderId: order.id, 
+                method: data.paymentMethod, 
+                status: data.paymentMethod === "COD" 
+                    ? "NOT_APPLICABLE" 
+                    : "PENDING" 
+                } });
+
         for (const item of orderItems) {
             const updatedRows = await decreaseRemainingServings(
                 tx,
@@ -121,7 +135,23 @@ export async function createOrderService(
             }
         }
 
-        return order;
+        return tx.order.findUniqueOrThrow({ 
+            where: { 
+                id: order.id 
+            }, 
+            include: { 
+                payment: true, 
+                orderItems: { 
+                    include: { 
+                        dailyMenu: { 
+                            include: { 
+                                food: true 
+                            } 
+                        } 
+                    } 
+                } 
+            } 
+        });
     });
 }
 
@@ -137,48 +167,167 @@ export async function updateOrderStatusService(
         )
     }
 
-    const allowedTransitions: Record<
-        OrderStatus,
-        OrderStatus[]
-    > = {
+    const transitions: Record<OrderStatus, OrderStatus[]> = {
         PENDING: [
-            OrderStatus.CONFIRMED,
-            OrderStatus.CANCELLED,
-        ],
-
+            OrderStatus.CONFIRMED, 
+            OrderStatus.CANCELLED
+        ], 
         CONFIRMED: [
-            OrderStatus.PREPARING,
-        ],
-
+            OrderStatus.PREPARING
+        ], 
         PREPARING: [
-            OrderStatus.OUT_FOR_DELIVERY,
-        ],
-
+            OrderStatus.OUT_FOR_DELIVERY
+        ], 
         OUT_FOR_DELIVERY: [
-            OrderStatus.COMPLETED,
-        ],
-
-        COMPLETED: [],
+            OrderStatus.COMPLETED
+        ], 
+        COMPLETED: [], 
         CANCELLED: [],
     };
 
-    const allowed = 
-        allowedTransitions[
-            order.status
-        ];
-    
-    if (!allowed.includes(status)) {
+    if (!transitions[order.status].includes(status)) 
         throw new BadRequestError(
             `Cannot change order from ${order.status} to ${status}.`
         );
-    }
+
+    if (order.payment?.method === "GCASH" 
+        && order.payment.status !== "VERIFIED" 
+        && status === "CONFIRMED"
+    ) throw new BadRequestError(
+        "GCash payment must be verified before confirming the order."
+        );
+
+    return prisma.$transaction((tx) => 
+        updateOrderStatus(
+            tx, 
+            orderId, 
+            status
+        ));
+}
+
+export async function submitPaymentReferenceService(
+    orderId: number, 
+    customerId: number, 
+    referenceNumber: string
+) {
+    const order = await prisma.order.findFirst({ 
+        where: { 
+            id: orderId, 
+            customerId 
+        }, 
+        include: { 
+            payment: true 
+        } 
+    });
+
+    if (!order || !order.payment) 
+        throw new NotFoundError(
+            "Order payment not found."
+        );
+
+    if (order.payment.method !== "GCASH") 
+        throw new BadRequestError(
+            "This order does not use GCash."
+        );
+
+    if (order.payment.status === "VERIFIED") 
+        throw new BadRequestError(
+            "Payment is already verified."
+        );
+
+    return prisma.payment.update({ 
+        where: { 
+            id: order.payment.id 
+        }, 
+        data: { 
+            referenceNumber: referenceNumber.trim(), 
+            status: "PENDING", 
+            rejectionReason: null 
+        } 
+    });
+}
+
+export async function verifyPaymentService(
+    orderId: number, 
+    adminId: number
+) {
+    const payment = await prisma.payment.findUnique({ 
+        where: { orderId } 
+    });
+
+    if (!payment) throw new NotFoundError("Payment not found.");
+
+    if (payment.method !== "GCASH") 
+        throw new BadRequestError(
+            "Only GCash payments require verification."
+        );
+
+    if (!payment.referenceNumber) 
+        throw new BadRequestError(
+            "Customer has not submitted a GCash reference number."
+        );
 
     return prisma.$transaction(async (tx) => {
-        return updateOrderStatus(
-            tx,
-            orderId,
-            status
+        await tx.payment.update({ 
+            where: { 
+                id: payment.id 
+            }, 
+            data: { 
+                status: "VERIFIED", 
+                verifiedAt: new Date(), 
+                verifiedById: adminId, 
+                rejectionReason: null 
+            } 
+        });
+
+        return tx.order.findUniqueOrThrow({ 
+            where: { 
+                id: orderId 
+            }, 
+            include: { 
+                payment: true, 
+                orderItems: { 
+                    include: { 
+                        dailyMenu: { 
+                            include: { 
+                                food: true 
+                            } 
+                        }, 
+                        review: 
+                        true 
+                    } 
+                } 
+            } 
+        });
+    });
+}
+
+export async function rejectPaymentService(
+    orderId: number, 
+    reason?: string
+) {
+    const payment = await prisma.payment.findUnique({ 
+        where: { 
+            orderId 
+        } 
+    });
+
+    if (!payment) throw new NotFoundError("Payment not found.");
+
+    if (payment.method !== "GCASH") 
+        throw new BadRequestError(
+            "Only GCash payments can be rejected."
         );
+    
+    return prisma.payment.update({ 
+        where: { 
+            id: payment.id 
+        }, 
+        data: { 
+            status: "REJECTED", 
+            rejectionReason: reason?.trim() || "Payment could not be verified.", 
+            verifiedAt: null, verifiedById: null 
+        } 
     });
 }
 
