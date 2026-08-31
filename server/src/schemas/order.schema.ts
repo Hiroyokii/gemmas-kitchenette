@@ -23,4 +23,12 @@ export const createOrderSchema = z.object({
         ]),
 })
 
+export const referenceSchema = z.object({ 
+    referenceNumber: z
+    .string()
+    .trim()
+    .min(4)
+    .max(100) 
+});
+
 export type CreateOrderInput = z.infer<typeof createOrderSchema>;
