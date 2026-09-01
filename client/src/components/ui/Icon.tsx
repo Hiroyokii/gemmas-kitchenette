@@ -24,7 +24,9 @@ export type IconName =
     | "chart"
     | "mapPin"
     | "search"
-    | "warning";
+    | "warning"
+    | "eye"
+    | "eyeOff";
 
 interface IconProps extends SVGAttributes<SVGSVGElement> {
     name: IconName;
@@ -163,6 +165,21 @@ const ICON_PATHS: Record<IconName, React.ReactNode> = {
         <>
             <path d="M12 3.5L21.5 20h-19L12 3.5z" />
             <path d="M12 10v4M12 17.2h.01" />
+        </>
+    ),
+    eye: (
+        <>
+            <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z" />
+            <circle cx="12" cy="12" r="2.5" />
+        </>
+    ),
+
+    eyeOff: (
+        <>
+            <path d="M3 3l18 18" />
+            <path d="M10.6 6.2A10.7 10.7 0 0112 6c6 0 9.5 6 9.5 6a17 17 0 01-3.2 3.9" />
+            <path d="M6.2 6.7C3.7 8.3 2.5 12 2.5 12s3.5 6 9.5 6c1.8 0 3.4-.5 4.8-1.2" />
+            <path d="M9.9 9.9a3 3 0 004.2 4.2" />
         </>
     ),
 };

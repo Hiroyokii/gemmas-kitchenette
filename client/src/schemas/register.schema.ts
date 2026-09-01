@@ -10,6 +10,10 @@ export const registerSchema = z.object({
         .string()
         .min(8, "Password must be at least 8 characters.")
         .max(100),
+        
+    confirmPassword: z
+    .string()
+    .min(1, "Please confirm your password."),
 
     phoneNumber: z
         .string()
@@ -19,6 +23,13 @@ export const registerSchema = z.object({
     lot: z.string().trim().min(1, "Lot is required."),
     street: z.string().trim().min(1, "Street is required."),
     landmark: z.string().trim().optional().or(z.literal("")),
-});
+})
+.refine(
+    (data) => data.password === data.confirmPassword,
+    {
+        message: "Passwords do not match.",
+        path: ["confirmPassword"],
+    }
+);
 
 export type RegisterForm = z.infer<typeof registerSchema>;

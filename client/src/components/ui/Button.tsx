@@ -13,11 +13,13 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
     primary:
-        "bg-brand-500 text-white hover:bg-brand-600 active:bg-brand-700 disabled:bg-brand-300",
+        "bg-orange-500 text-white hover:bg-orange-600 active:bg-orange-700 disabled:bg-orange-300",
     secondary:
-        "bg-white text-ink-800 border border-ink-200 hover:bg-ink-50 active:bg-ink-100 disabled:text-ink-400",
-    ghost: "text-ink-700 hover:bg-ink-100 active:bg-ink-200 disabled:text-ink-400",
-    danger: "bg-white text-red-600 border border-red-200 hover:bg-red-50 active:bg-red-100 disabled:text-red-300",
+        "border border-stone-200 bg-white text-stone-800 hover:bg-stone-50 active:bg-stone-100 disabled:text-stone-400",
+    ghost:
+        "text-stone-700 hover:bg-stone-100 active:bg-stone-200 disabled:text-stone-400",
+    danger:
+        "border border-red-200 bg-white text-red-600 hover:bg-red-50 active:bg-red-100 disabled:text-red-300",
 };
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {
@@ -45,7 +47,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
             disabled={disabled || isLoading}
             className={[
                 "inline-flex items-center justify-center rounded-lg font-medium transition-colors",
-                "disabled:cursor-not-allowed",
+                "disabled:cursor-not-allowed disabled:opacity-60",
                 VARIANT_CLASSES[variant],
                 SIZE_CLASSES[size],
                 fullWidth ? "w-full" : "",
@@ -61,6 +63,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
                     aria-hidden="true"
                 />
             )}
+
             {children}
         </button>
     );
