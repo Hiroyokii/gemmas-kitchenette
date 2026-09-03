@@ -7,17 +7,21 @@ import {
     type IngredientForm,
     type IngredientFormInput,
 } from "../../schemas/ingredient.schema";
+
 import {
     getIngredients,
     getUnits,
     createIngredient,
     updateIngredient,
 } from "../../services/ingredient.service";
+
 import type { Ingredient, Unit } from "../../types/Ingredient";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 
-import Modal from "../../components/admin/Modal";
-import Alert from "../../components/admin/Alert";
+import Modal from "../../components/ui/Modal";
+import Alert from "../../components/ui/Alert";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
 
 export default function IngredientsPage() {
     const [ingredients, setIngredients] = useState<Ingredient[]>([]);
@@ -52,11 +56,13 @@ export default function IngredientsPage() {
         getIngredients()
             .then((data) => {
                 if (ignore) return;
+
                 setIngredients(data);
                 setLoadError("");
             })
             .catch((error) => {
                 if (ignore) return;
+
                 setLoadError(
                     getErrorMessage(error, "Failed to load ingredients.")
                 );
@@ -89,110 +95,158 @@ export default function IngredientsPage() {
     }
 
     return (
-        <div>
-            <div className="mb-6 flex items-center justify-between">
-                <h1 className="text-2xl font-bold">Ingredients</h1>
+        <div className="px-6 pt-6 pb-8 lg:px-8 lg:pt-8">
+            {/* Page Header */}
+            <div className="mb-7 flex items-start justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight text-ink-900">
+                        Ingredients
+                    </h1>
 
-                <button
+                    <p className="mt-1 text-sm text-ink-500">
+                        Manage ingredients, stock levels, and costs.
+                    </p>
+                </div>
+
+                <Button
                     onClick={openCreateModal}
-                    className="rounded bg-orange-600 px-4 py-2 text-white text-sm font-medium hover:bg-orange-700"
+                    className="shrink-0"
                 >
                     + Add Ingredient
-                </button>
+                </Button>
             </div>
 
             <Alert type="error" message={loadError} />
 
-            <div className="border rounded-lg overflow-hidden">
-                <table className="w-full text-sm">
-                    <thead className="bg-gray-50 text-left">
-                        <tr>
-                            <th className="p-3">Name</th>
-                            <th className="p-3">Unit</th>
-                            <th className="p-3">Current Stock</th>
-                            <th className="p-3">Minimum Stock</th>
-                            <th className="p-3">Cost / Unit</th>
-                            <th className="p-3"></th>
-                        </tr>
-                    </thead>
+            {/* Ingredients Table */}
+            <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+                <div className="overflow-x-auto">
+                    <table className="w-full min-w-[700px] text-sm">
+                        <thead className="border-b border-stone-200 bg-stone-50">
+                            <tr className="text-left">
+                                <th className="px-6 py-4 font-semibold text-ink-800">
+                                    Name
+                                </th>
 
-                    <tbody>
-                        {loading && (
-                            <tr>
-                                <td className="p-3" colSpan={6}>
-                                    Loading...
-                                </td>
+                                <th className="px-6 py-4 font-semibold text-ink-800">
+                                    Unit
+                                </th>
+
+                                <th className="px-6 py-4 font-semibold text-ink-800">
+                                    Current Stock
+                                </th>
+
+                                <th className="px-6 py-4 font-semibold text-ink-800">
+                                    Minimum Stock
+                                </th>
+
+                                <th className="px-6 py-4 font-semibold text-ink-800">
+                                    Cost / Unit
+                                </th>
+
+                                <th className="px-6 py-4 text-right font-semibold text-ink-800">
+                                    Action
+                                </th>
                             </tr>
-                        )}
+                        </thead>
 
-                        {!loading && ingredients.length === 0 && (
-                            <tr>
-                                <td className="p-3 text-gray-500" colSpan={6}>
-                                    No ingredients yet.
-                                </td>
-                            </tr>
-                        )}
-
-                        {!loading &&
-                            ingredients.map((ingredient) => {
-                                const isLow =
-                                    Number(ingredient.currentStock) <
-                                    Number(ingredient.minimumStock);
-
-                                return (
-                                    <tr
-                                        key={ingredient.id}
-                                        className="border-t"
+                        <tbody>
+                            {loading && (
+                                <tr>
+                                    <td
+                                        className="px-6 py-10 text-center text-ink-500"
+                                        colSpan={6}
                                     >
-                                        <td className="p-3 font-medium">
-                                            {ingredient.name}
-                                        </td>
-                                        <td className="p-3">
-                                            {ingredient.unit?.name ?? "—"}
-                                        </td>
-                                        <td className="p-3">
-                                            <span
-                                                className={
-                                                    isLow
-                                                        ? "text-red-600 font-semibold"
-                                                        : ""
-                                                }
-                                            >
-                                                {ingredient.currentStock}
-                                            </span>
-                                            {isLow && (
-                                                <span className="ml-2 rounded-full bg-red-100 text-red-700 px-2 py-0.5 text-xs">
-                                                    Low stock
-                                                </span>
-                                            )}
-                                        </td>
-                                        <td className="p-3">
-                                            {ingredient.minimumStock}
-                                        </td>
-                                        <td className="p-3">
-                                            ₱{ingredient.costPerUnit}
-                                        </td>
-                                        <td className="p-3 text-right">
-                                            <button
-                                                onClick={() =>
-                                                    openEditModal(ingredient)
-                                                }
-                                                className="text-orange-600 hover:underline"
-                                            >
-                                                Edit
-                                            </button>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                    </tbody>
-                </table>
+                                        Loading ingredients...
+                                    </td>
+                                </tr>
+                            )}
+
+                            {!loading && ingredients.length === 0 && (
+                                <tr>
+                                    <td
+                                        className="px-6 py-10 text-center text-ink-500"
+                                        colSpan={6}
+                                    >
+                                        No ingredients yet.
+                                    </td>
+                                </tr>
+                            )}
+
+                            {!loading &&
+                                ingredients.map((ingredient) => {
+                                    const isLow =
+                                        Number(ingredient.currentStock) <
+                                        Number(ingredient.minimumStock);
+
+                                    return (
+                                        <tr
+                                            key={ingredient.id}
+                                            className="border-b border-stone-100 last:border-b-0 hover:bg-stone-50/70"
+                                        >
+                                            <td className="px-6 py-4 font-medium text-ink-900">
+                                                {ingredient.name}
+                                            </td>
+
+                                            <td className="px-6 py-4 text-ink-600">
+                                                {ingredient.unit?.name ?? "—"}
+                                            </td>
+
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-2">
+                                                    <span
+                                                        className={
+                                                            isLow
+                                                                ? "font-semibold text-red-600"
+                                                                : "text-ink-800"
+                                                        }
+                                                    >
+                                                        {
+                                                            ingredient.currentStock
+                                                        }
+                                                    </span>
+
+                                                    {isLow && (
+                                                        <span className="rounded-full bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600">
+                                                            Low stock
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </td>
+
+                                            <td className="px-6 py-4 text-ink-600">
+                                                {ingredient.minimumStock}
+                                            </td>
+
+                                            <td className="px-6 py-4 font-medium text-ink-800">
+                                                ₱{ingredient.costPerUnit}
+                                            </td>
+
+                                            <td className="px-6 py-4 text-right">
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        openEditModal(
+                                                            ingredient
+                                                        )
+                                                    }
+                                                    className="font-medium text-orange-600 transition-colors hover:text-orange-700 hover:underline"
+                                                >
+                                                    Edit
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             {units.length === 0 && !loading && (
-                <p className="mt-3 text-sm text-gray-500">
-                    No units are set up yet. Units come from the database
-                    seed (Kilogram, Liter, Piece).
+                <p className="mt-3 text-sm text-ink-500">
+                    No units are set up yet. Units come from the database seed
+                    (Kilogram, Liter, Piece).
                 </p>
             )}
 
@@ -270,106 +324,93 @@ function IngredientFormModal({
             title={isEditing ? "Edit Ingredient" : "Add Ingredient"}
             onClose={onClose}
         >
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                 <Alert type="error" message={submitError} />
 
-                <div>
-                    <label className="block text-sm font-medium mb-1">
-                        Name
-                    </label>
-                    <input
-                        {...register("name")}
-                        className="border rounded w-full p-2"
-                    />
-                    {errors.name && (
-                        <p className="text-red-500 text-sm">
-                            {errors.name.message}
-                        </p>
-                    )}
-                </div>
+                <Input
+                    label="Name"
+                    placeholder="e.g. Chicken"
+                    error={errors.name?.message}
+                    {...register("name")}
+                />
 
                 <div>
-                    <label className="block text-sm font-medium mb-1">
+                    <label
+                        htmlFor="unit"
+                        className="mb-1.5 block text-sm font-medium text-ink-800"
+                    >
                         Unit
                     </label>
+
                     <select
+                        id="unit"
                         {...register("unitId")}
-                        className="border rounded w-full p-2"
+                        className={[
+                            "w-full rounded-lg border border-stone-200 bg-white",
+                            "px-3 py-2 text-sm text-ink-900",
+                            "transition-colors focus:border-orange-500",
+                            "focus:outline-none focus:ring-2 focus:ring-orange-500/20",
+                        ].join(" ")}
                     >
-                        <option value="">Select...</option>
-                        {units.map((u) => (
-                            <option key={u.id} value={u.id}>
-                                {u.name}
+                        <option value="">Select unit...</option>
+
+                        {units.map((unit) => (
+                            <option key={unit.id} value={unit.id}>
+                                {unit.name}
                             </option>
                         ))}
                     </select>
+
                     {errors.unitId && (
-                        <p className="text-red-500 text-sm">
+                        <p className="mt-1 text-xs text-red-600">
                             {errors.unitId.message}
                         </p>
                     )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium mb-1">
-                            Minimum Stock
-                        </label>
-                        <input
-                            type="number"
-                            step="0.01"
-                            {...register("minimumStock")}
-                            className="border rounded w-full p-2"
-                        />
-                        {errors.minimumStock && (
-                            <p className="text-red-500 text-sm">
-                                {errors.minimumStock.message}
-                            </p>
-                        )}
-                    </div>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <Input
+                        label="Minimum Stock"
+                        type="number"
+                        step="0.01"
+                        error={errors.minimumStock?.message}
+                        {...register("minimumStock")}
+                    />
 
-                    <div>
-                        <label className="block text-sm font-medium mb-1">
-                            Cost per Unit (₱)
-                        </label>
-                        <input
-                            type="number"
-                            step="0.01"
-                            {...register("costPerUnit")}
-                            className="border rounded w-full p-2"
-                        />
-                        {errors.costPerUnit && (
-                            <p className="text-red-500 text-sm">
-                                {errors.costPerUnit.message}
-                            </p>
-                        )}
-                    </div>
+                    <Input
+                        label="Cost per Unit (₱)"
+                        type="number"
+                        step="0.01"
+                        error={errors.costPerUnit?.message}
+                        {...register("costPerUnit")}
+                    />
                 </div>
 
                 {isEditing && (
-                    <p className="text-xs text-gray-500">
-                        Current stock ({ingredient?.currentStock}) can only
-                        be changed by recording a Purchase or preparing the
-                        Daily Menu — not edited directly here.
-                    </p>
+                    <div className="rounded-lg bg-stone-50 px-3 py-2.5">
+                        <p className="text-xs leading-relaxed text-ink-500">
+                            Current stock ({ingredient?.currentStock}) can only
+                            be changed by recording a Purchase or preparing
+                            the Daily Menu — not edited directly here.
+                        </p>
+                    </div>
                 )}
 
-                <div className="flex justify-end gap-2 pt-2">
-                    <button
+                <div className="flex justify-end gap-2 border-t border-stone-100 pt-4">
+                    <Button
                         type="button"
+                        variant="secondary"
                         onClick={onClose}
-                        className="px-4 py-2 rounded border text-sm"
                     >
                         Cancel
-                    </button>
+                    </Button>
 
-                    <button
+                    <Button
                         type="submit"
-                        disabled={isSubmitting}
-                        className="px-4 py-2 rounded bg-orange-600 text-white text-sm font-medium hover:bg-orange-700 disabled:opacity-50"
+                        isLoading={isSubmitting}
                     >
                         {isSubmitting ? "Saving..." : "Save"}
-                    </button>
+                    </Button>
                 </div>
             </form>
         </Modal>
