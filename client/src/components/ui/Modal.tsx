@@ -5,9 +5,22 @@ interface ModalProps {
     title: string;
     onClose: () => void;
     children: ReactNode;
+    size?: "sm" | "md" | "lg" | "xl";
 }
 
-export default function Modal({ title, onClose, children }: ModalProps) {
+const SIZE_CLASSES = {
+    sm: "sm:max-w-md",
+    md: "sm:max-w-lg",
+    lg: "sm:max-w-2xl",
+    xl: "sm:max-w-4xl",
+};
+
+export default function Modal({
+    title,
+    onClose,
+    children,
+    size = "md",
+}: ModalProps) {
     useEffect(() => {
         function handleKeyDown(event: KeyboardEvent) {
             if (event.key === "Escape") {
@@ -26,7 +39,7 @@ export default function Modal({ title, onClose, children }: ModalProps) {
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-end justify-center bg-ink-900/40 backdrop-blur-[2px] sm:items-center sm:p-4"
+            className="fixed inset-0 z-50 flex items-end justify-center bg-black/16 backdrop-blur-[2px] sm:items-center sm:p-4"
             onClick={onClose}
             role="presentation"
         >
@@ -35,7 +48,12 @@ export default function Modal({ title, onClose, children }: ModalProps) {
                 aria-modal="true"
                 aria-label={title}
                 onClick={(event) => event.stopPropagation()}
-                className="max-h-[90vh] w-full overflow-y-auto rounded-t-2xl bg-white p-5 shadow-[var(--shadow-pop)] sm:max-w-lg sm:rounded-2xl sm:p-6"
+                className={[
+                    "max-h-[90vh] w-full overflow-y-auto rounded-t-2xl",
+                    "bg-white p-5 shadow-[var(--shadow-pop)]",
+                    "sm:rounded-2xl sm:p-6",
+                    SIZE_CLASSES[size],
+                ].join(" ")}
             >
                 <div className="mb-4 flex items-center justify-between gap-4">
                     <h2 className="font-display text-xl font-semibold text-ink-900">
@@ -56,7 +74,10 @@ export default function Modal({ title, onClose, children }: ModalProps) {
                             className="h-4 w-4"
                             aria-hidden="true"
                         >
-                            <path strokeLinecap="round" d="M18 6L6 18M6 6l12 12" />
+                            <path
+                                strokeLinecap="round"
+                                d="M18 6L6 18M6 6l12 12"
+                            />
                         </svg>
                     </button>
                 </div>
