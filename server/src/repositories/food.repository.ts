@@ -49,6 +49,10 @@ export async function findFoods(
             }),
         },
 
+        include: {
+            category: true,
+        },
+
         orderBy: {
             name: "asc",
         },

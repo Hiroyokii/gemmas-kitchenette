@@ -1,25 +1,37 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import {
+    useMutation,
+    useQuery,
+    useQueryClient,
+} from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { foodSchema, type FoodForm, type FoodFormInput } from "../../schemas/food.schema";
+import {
+    foodSchema,
+    type FoodForm,
+    type FoodFormInput,
+} from "../../schemas/food.schema";
+
 import {
     getFoods,
     createFood,
     updateFood,
 } from "../../services/food.service";
+
 import { getCategories } from "../../services/category.service";
+
 import type { Food, Category } from "../../types/Food";
+
 import { getErrorMessage } from "../../utils/getErrorMessage";
 
-import Modal from "../../components/admin/Modal";
-import Alert from "../../components/admin/Alert";
+import Modal from "../../components/ui/Modal";
+import Alert from "../../components/ui/Alert";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
 
 export default function FoodsPage() {
-    const [foods, setFoods] = useState<Food[]>([]);
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [loadError, setLoadError] = useState("");
+    const queryClient = useQueryClient();
 
     const [search, setSearch] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("");
@@ -27,37 +39,43 @@ export default function FoodsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingFood, setEditingFood] = useState<Food | null>(null);
 
-    async function loadFoods() {
-        try {
-            setLoading(true);
-
-            const data = await getFoods({
+    const foodsQuery = useQuery({
+        queryKey: [
+            "foods",
+            {
+                search,
+                categoryId: categoryFilter
+                    ? Number(categoryFilter)
+                    : undefined,
+            },
+        ],
+        queryFn: () =>
+            getFoods({
                 search: search || undefined,
                 categoryId: categoryFilter
                     ? Number(categoryFilter)
                     : undefined,
-            });
+            }),
+    });
 
-            setFoods(data);
-            setLoadError("");
-        } catch (error) {
-            setLoadError(getErrorMessage(error, "Failed to load foods."));
-        } finally {
-            setLoading(false);
-        }
-    }
+    const categoriesQuery = useQuery<Category[]>({
+        queryKey: ["categories"],
+        queryFn: getCategories,
+    });
 
-    useEffect(() => {
-        getCategories()
-            .then(setCategories)
-            .catch(() => {
-            });
-    }, []);
+    const foods = foodsQuery.data ?? [];
+    const categories = categoriesQuery.data ?? [];
 
-    useEffect(() => {
-        const timeout = setTimeout(loadFoods, 300);
-        return () => clearTimeout(timeout);
-    }, [search, categoryFilter]);
+    const loading =
+        foodsQuery.isPending || categoriesQuery.isPending;
+
+    const loadError =
+        foodsQuery.error || categoriesQuery.error
+            ? getErrorMessage(
+                  foodsQuery.error || categoriesQuery.error,
+                  "Failed to load foods."
+              )
+            : "";
 
     function openCreateModal() {
         setEditingFood(null);
@@ -69,121 +87,201 @@ export default function FoodsPage() {
         setIsModalOpen(true);
     }
 
+    function handleSaved() {
+        setIsModalOpen(false);
+
+        queryClient.invalidateQueries({
+            queryKey: ["foods"],
+        });
+    }
+
     return (
-        <div>
-            <div className="mb-6 flex items-center justify-between">
-                <h1 className="text-2xl font-bold">Foods</h1>
+        <div className="min-h-full bg-stone-50 px-4 py-6 sm:px-6 sm:py-8">
+            <div className="mx-auto w-full max-w-7xl">
+                {/* Header */}
+                <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h1 className="text-2xl font-bold tracking-tight text-stone-900">
+                            Foods
+                        </h1>
 
-                <button
-                    onClick={openCreateModal}
-                    className="rounded bg-orange-600 px-4 py-2 text-white text-sm font-medium hover:bg-orange-700"
-                >
-                    + Add Food
-                </button>
-            </div>
+                        <p className="mt-1 text-sm text-stone-500">
+                            Manage the food items available for ordering.
+                        </p>
+                    </div>
 
-            <div className="mb-4 flex gap-3">
-                <input
-                    type="text"
-                    placeholder="Search by name..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="border rounded px-3 py-2 text-sm w-64"
+                    <Button
+                        type="button"
+                        onClick={openCreateModal}
+                    >
+                        + Add Food
+                    </Button>
+                </div>
+
+                {/* Error */}
+                <Alert
+                    type="error"
+                    message={loadError}
                 />
 
-                <select
-                    value={categoryFilter}
-                    onChange={(e) => setCategoryFilter(e.target.value)}
-                    className="border rounded px-3 py-2 text-sm"
-                >
-                    <option value="">All categories</option>
-                    {categories.map((c) => (
-                        <option key={c.id} value={c.id}>
-                            {c.name}
-                        </option>
-                    ))}
-                </select>
-            </div>
+                {/* Filters */}
+                <div className="mb-5 rounded-2xl border border-stone-200 bg-white p-4 shadow-[0_8px_30px_rgba(0,0,0,0.04)] sm:p-5">
+                    <div className="grid gap-4 sm:grid-cols-[1fr_auto]">
+                        <Input
+                            type="text"
+                            label="Search foods"
+                            placeholder="Search by name..."
+                            value={search}
+                            onChange={(event) =>
+                                setSearch(event.target.value)
+                            }
+                        />
 
-            <Alert type="error" message={loadError} />
+                        <div className="w-full sm:min-w-48">
+                            <label
+                                htmlFor="category-filter"
+                                className="mb-1.5 block text-sm font-medium text-stone-800"
+                            >
+                                Category
+                            </label>
 
-            <div className="border rounded-lg overflow-hidden">
-                <table className="w-full text-sm">
-                    <thead className="bg-gray-50 text-left">
-                        <tr>
-                            <th className="p-3">Name</th>
-                            <th className="p-3">Category</th>
-                            <th className="p-3">Price</th>
-                            <th className="p-3">Status</th>
-                            <th className="p-3"></th>
-                        </tr>
-                    </thead>
+                            <select
+                                id="category-filter"
+                                value={categoryFilter}
+                                onChange={(event) =>
+                                    setCategoryFilter(event.target.value)
+                                }
+                                className="h-10 w-full rounded-lg border border-stone-200 bg-white px-3 text-sm text-stone-900 transition-colors focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+                            >
+                                <option value="">
+                                    All categories
+                                </option>
 
-                    <tbody>
-                        {loading && (
-                            <tr>
-                                <td className="p-3" colSpan={5}>
-                                    Loading...
-                                </td>
-                            </tr>
-                        )}
+                                {categories.map((category) => (
+                                    <option
+                                        key={category.id}
+                                        value={category.id}
+                                    >
+                                        {category.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+                </div>
 
-                        {!loading && foods.length === 0 && (
-                            <tr>
-                                <td className="p-3 text-gray-500" colSpan={5}>
-                                    No foods found.
-                                </td>
-                            </tr>
-                        )}
+                {/* Food table */}
+                <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
+                    <div className="overflow-x-auto">
+                        <table className="w-full min-w-[700px] text-sm">
+                            <thead className="border-b border-stone-200 bg-stone-50 text-left">
+                                <tr>
+                                    <th className="px-5 py-3 font-semibold text-stone-700">
+                                        Name
+                                    </th>
 
-                        {!loading &&
-                            foods.map((food) => (
-                                <tr key={food.id} className="border-t">
-                                    <td className="p-3 font-medium">
-                                        {food.name}
-                                    </td>
-                                    <td className="p-3">
-                                        {food.category?.name ?? "—"}
-                                    </td>
-                                    <td className="p-3">₱{food.price}</td>
-                                    <td className="p-3">
-                                        <span
-                                            className={`rounded-full px-2 py-1 text-xs font-medium ${
-                                                food.isAvailable
-                                                    ? "bg-green-100 text-green-700"
-                                                    : "bg-gray-200 text-gray-600"
-                                            }`}
-                                        >
-                                            {food.isAvailable
-                                                ? "Available"
-                                                : "Unavailable"}
-                                        </span>
-                                    </td>
-                                    <td className="p-3 text-right">
-                                        <button
-                                            onClick={() => openEditModal(food)}
-                                            className="text-orange-600 hover:underline"
-                                        >
-                                            Edit
-                                        </button>
-                                    </td>
+                                    <th className="px-5 py-3 font-semibold text-stone-700">
+                                        Category
+                                    </th>
+
+                                    <th className="px-5 py-3 font-semibold text-stone-700">
+                                        Price
+                                    </th>
+
+                                    <th className="px-5 py-3 font-semibold text-stone-700">
+                                        Status
+                                    </th>
+
+                                    <th className="px-5 py-3 text-right font-semibold text-stone-700">
+                                        Action
+                                    </th>
                                 </tr>
-                            ))}
-                    </tbody>
-                </table>
-            </div>
+                            </thead>
 
-            {isModalOpen && (
-                <FoodFormModal
-                    food={editingFood}
-                    categories={categories}
-                    onClose={() => setIsModalOpen(false)}
-                    onSaved={() => {
-                        setIsModalOpen(false);
-                        loadFoods();
-                    }}
-                />
-            )}
+                            <tbody>
+                                {loading && (
+                                    <tr>
+                                        <td
+                                            colSpan={5}
+                                            className="px-5 py-8 text-center text-sm text-stone-500"
+                                        >
+                                            Loading foods...
+                                        </td>
+                                    </tr>
+                                )}
+
+                                {!loading && foods.length === 0 && (
+                                    <tr>
+                                        <td
+                                            colSpan={5}
+                                            className="px-5 py-8 text-center text-sm text-stone-500"
+                                        >
+                                            No foods found.
+                                        </td>
+                                    </tr>
+                                )}
+
+                                {!loading &&
+                                    foods.map((food) => (
+                                        <tr
+                                            key={food.id}
+                                            className="border-t border-stone-100 transition-colors hover:bg-stone-50"
+                                        >
+                                            <td className="px-5 py-4 font-medium text-stone-900">
+                                                {food.name}
+                                            </td>
+
+                                            <td className="px-5 py-4 text-stone-600">
+                                                {food.category?.name ?? "—"}
+                                            </td>
+
+                                            <td className="px-5 py-4 font-medium text-stone-900">
+                                                ₱{food.price}
+                                            </td>
+
+                                            <td className="px-5 py-4">
+                                                <span
+                                                    className={[
+                                                        "inline-flex rounded-full px-2.5 py-1 text-xs font-medium",
+                                                        food.isAvailable
+                                                            ? "bg-green-100 text-green-700"
+                                                            : "bg-stone-100 text-stone-600",
+                                                    ].join(" ")}
+                                                >
+                                                    {food.isAvailable
+                                                        ? "Available"
+                                                        : "Unavailable"}
+                                                </span>
+                                            </td>
+
+                                            <td className="px-5 py-4 text-right">
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        openEditModal(food)
+                                                    }
+                                                    className="font-medium text-orange-600 transition-colors hover:text-orange-700 hover:underline"
+                                                >
+                                                    Edit
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {/* Modal */}
+                {isModalOpen && (
+                    <FoodFormModal
+                        food={editingFood}
+                        categories={categories}
+                        onClose={() => setIsModalOpen(false)}
+                        onSaved={handleSaved}
+                    />
+                )}
+            </div>
         </div>
     );
 }
@@ -201,12 +299,15 @@ function FoodFormModal({
 }) {
     const isEditing = Boolean(food);
 
+    const [submitError, setSubmitError] = useState("");
+
     const {
         register,
         handleSubmit,
-        formState: { errors, isSubmitting },
-    } = useForm<FoodFormInput, any, FoodForm>({
+        formState: { errors },
+    } = useForm<FoodFormInput, undefined, FoodForm>({
         resolver: zodResolver(foodSchema),
+
         defaultValues: food
             ? {
                   name: food.name,
@@ -226,28 +327,36 @@ function FoodFormModal({
               },
     });
 
-    const [submitError, setSubmitError] = useState("");
-
-    async function onSubmit(data: FoodForm) {
-        setSubmitError("");
-
-        try {
+    const saveMutation = useMutation({
+        mutationFn: async (data: FoodForm) => {
             if (isEditing && food) {
-                await updateFood(food.id, {
-                    ...data,
-                    imageUrl: data.imageUrl || undefined,
-                });
-            } else {
-                await createFood({
+                return updateFood(food.id, {
                     ...data,
                     imageUrl: data.imageUrl || undefined,
                 });
             }
 
+            return createFood({
+                ...data,
+                imageUrl: data.imageUrl || undefined,
+            });
+        },
+
+        onSuccess: () => {
+            setSubmitError("");
             onSaved();
-        } catch (error) {
-            setSubmitError(getErrorMessage(error, "Failed to save food."));
-        }
+        },
+
+        onError: (error) => {
+            setSubmitError(
+                getErrorMessage(error, "Failed to save food.")
+            );
+        },
+    });
+
+    function onSubmit(data: FoodForm) {
+        setSubmitError("");
+        saveMutation.mutate(data);
     }
 
     return (
@@ -255,117 +364,126 @@ function FoodFormModal({
             title={isEditing ? "Edit Food" : "Add Food"}
             onClose={onClose}
         >
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <Alert type="error" message={submitError} />
+            <form
+                onSubmit={handleSubmit(onSubmit)}
+                className="space-y-5"
+            >
+                <Alert
+                    type="error"
+                    message={submitError}
+                />
+
+                <Input
+                    label="Name"
+                    placeholder="Food name"
+                    error={errors.name?.message}
+                    {...register("name")}
+                />
 
                 <div>
-                    <label className="block text-sm font-medium mb-1">
-                        Name
-                    </label>
-                    <input
-                        {...register("name")}
-                        className="border rounded w-full p-2"
-                    />
-                    {errors.name && (
-                        <p className="text-red-500 text-sm">
-                            {errors.name.message}
-                        </p>
-                    )}
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium mb-1">
+                    <label
+                        htmlFor="description"
+                        className="mb-1.5 block text-sm font-medium text-stone-800"
+                    >
                         Description
                     </label>
+
                     <textarea
-                        {...register("description")}
+                        id="description"
                         rows={3}
-                        className="border rounded w-full p-2"
+                        placeholder="Describe the food..."
+                        {...register("description")}
+                        className="w-full resize-none rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 transition-colors focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20"
                     />
+
                     {errors.description && (
-                        <p className="text-red-500 text-sm">
+                        <p className="mt-1 text-xs text-red-600">
                             {errors.description.message}
                         </p>
                     )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium mb-1">
-                            Price (₱)
-                        </label>
-                        <input
-                            type="number"
-                            step="0.01"
-                            {...register("price")}
-                            className="border rounded w-full p-2"
-                        />
-                        {errors.price && (
-                            <p className="text-red-500 text-sm">
-                                {errors.price.message}
-                            </p>
-                        )}
-                    </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <Input
+                        type="number"
+                        step="0.01"
+                        label="Price (₱)"
+                        error={errors.price?.message}
+                        {...register("price")}
+                    />
 
                     <div>
-                        <label className="block text-sm font-medium mb-1">
+                        <label
+                            htmlFor="food-category"
+                            className="mb-1.5 block text-sm font-medium text-stone-800"
+                        >
                             Category
                         </label>
+
                         <select
+                            id="food-category"
                             {...register("categoryId")}
-                            className="border rounded w-full p-2"
+                            className="h-10 w-full rounded-lg border border-stone-200 bg-white px-3 text-sm text-stone-900 transition-colors focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20"
                         >
-                            <option value="">Select...</option>
-                            {categories.map((c) => (
-                                <option key={c.id} value={c.id}>
-                                    {c.name}
+                            <option value="">
+                                Select category...
+                            </option>
+
+                            {categories.map((category) => (
+                                <option
+                                    key={category.id}
+                                    value={category.id}
+                                >
+                                    {category.name}
                                 </option>
                             ))}
                         </select>
+
                         {errors.categoryId && (
-                            <p className="text-red-500 text-sm">
+                            <p className="mt-1 text-xs text-red-600">
                                 {errors.categoryId.message}
                             </p>
                         )}
                     </div>
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium mb-1">
-                        Image URL (optional)
-                    </label>
-                    <input
-                        {...register("imageUrl")}
-                        className="border rounded w-full p-2"
-                    />
-                </div>
+                <Input
+                    label="Image URL (optional)"
+                    placeholder="https://..."
+                    error={errors.imageUrl?.message}
+                    {...register("imageUrl")}
+                />
 
                 {isEditing && (
-                    <label className="flex items-center gap-2 text-sm">
+                    <label className="flex cursor-pointer items-center gap-2 text-sm text-stone-700">
                         <input
                             type="checkbox"
                             {...register("isAvailable")}
+                            className="h-4 w-4 rounded border-stone-300 text-orange-500 focus:ring-orange-500"
                         />
+
                         Available for ordering
                     </label>
                 )}
 
-                <div className="flex justify-end gap-2 pt-2">
-                    <button
+                <div className="flex justify-end gap-3 border-t border-stone-200 pt-5">
+                    <Button
                         type="button"
+                        variant="secondary"
                         onClick={onClose}
-                        className="px-4 py-2 rounded border text-sm"
+                        disabled={saveMutation.isPending}
                     >
                         Cancel
-                    </button>
+                    </Button>
 
-                    <button
+                    <Button
                         type="submit"
-                        disabled={isSubmitting}
-                        className="px-4 py-2 rounded bg-orange-600 text-white text-sm font-medium hover:bg-orange-700 disabled:opacity-50"
+                        isLoading={saveMutation.isPending}
                     >
-                        {isSubmitting ? "Saving..." : "Save"}
-                    </button>
+                        {saveMutation.isPending
+                            ? "Saving..."
+                            : "Save"}
+                    </Button>
                 </div>
             </form>
         </Modal>
