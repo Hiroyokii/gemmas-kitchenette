@@ -7,7 +7,7 @@ interface AlertProps {
 
 const STYLES: Record<AlertType, string> = {
     error: "border-red-200 bg-red-50 text-red-700",
-    success: "border-leaf-200 bg-leaf-50 text-leaf-700",
+    success: "border-green-200 bg-green-50 text-green-700",
     info: "border-gold-100 bg-gold-50 text-gold-600",
 };
 

@@ -1,14 +1,19 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+
 import { useForm, useFieldArray } from "react-hook-form";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { getFoods } from "../../services/food.service";
 import { getIngredients } from "../../services/ingredient.service";
 import { getRecipe, updateRecipe } from "../../services/recipe.service";
+
 import type { Food } from "../../types/Food";
 import type { Ingredient } from "../../types/Ingredient";
+
 import { getErrorMessage } from "../../utils/getErrorMessage";
 
-import Alert from "../../components/admin/Alert";
+import Alert from "../../components/ui/Alert";
+import Button from "../../components/ui/Button";
 
 interface RecipeRow {
     ingredientId: number | "";
@@ -20,14 +25,27 @@ interface RecipeFormValues {
 }
 
 export default function RecipesPage() {
-    const [foods, setFoods] = useState<Food[]>([]);
-    const [ingredients, setIngredients] = useState<Ingredient[]>([]);
-    const [selectedFoodId, setSelectedFoodId] = useState<number | "">("");
+    const queryClient = useQueryClient();
 
-    const [loadingRecipe, setLoadingRecipe] = useState(false);
-    const [loadError, setLoadError] = useState("");
+    const [selectedFoodId, setSelectedFoodId] = useState<number | "">("");
     const [saveError, setSaveError] = useState("");
     const [saveSuccess, setSaveSuccess] = useState("");
+
+    const foodsQuery = useQuery<Food[]>({
+        queryKey: ["foods"],
+        queryFn: () => getFoods(),
+    });
+
+    const ingredientsQuery = useQuery<Ingredient[]>({
+        queryKey: ["ingredients"],
+        queryFn: getIngredients,
+    });
+
+    const recipeQuery = useQuery({
+        queryKey: ["recipes", selectedFoodId],
+        queryFn: () => getRecipe(selectedFoodId as number),
+        enabled: selectedFoodId !== "",
+    });
 
     const {
         control,
@@ -36,7 +54,9 @@ export default function RecipesPage() {
         reset,
         formState: { isSubmitting },
     } = useForm<RecipeFormValues>({
-        defaultValues: { rows: [] },
+        defaultValues: {
+            rows: [],
+        },
     });
 
     const { fields, append, remove } = useFieldArray({
@@ -45,44 +65,62 @@ export default function RecipesPage() {
     });
 
     useEffect(() => {
-        getFoods().then(setFoods).catch(() => {});
-        getIngredients().then(setIngredients).catch(() => {});
-    }, []);
-
-    useEffect(() => {
-        if (!selectedFoodId) {
-            reset({ rows: [] });
+        if (!selectedFoodId || !recipeQuery.data) {
             return;
         }
 
-        async function loadRecipe() {
-            setLoadingRecipe(true);
-            setLoadError("");
-            setSaveSuccess("");
+        reset({
+            rows: recipeQuery.data.map((item) => ({
+                ingredientId: item.ingredientId,
+                quantity: Number(item.quantity),
+            })),
+        });
+    }, [selectedFoodId, recipeQuery.data, reset]);  
 
-            try {
-                const recipe = await getRecipe(selectedFoodId as number);
-
-                reset({
-                    rows: recipe.map((item) => ({
-                        ingredientId: item.ingredientId,
-                        quantity: Number(item.quantity),
-                    })),
-                });
-            } catch (error) {
-                setLoadError(
-                    getErrorMessage(error, "Failed to load recipe.")
-                );
-            } finally {
-                setLoadingRecipe(false);
+    const saveMutation = useMutation({
+        mutationFn: (data: RecipeFormValues) => {
+            if (!selectedFoodId) {
+                throw new Error("Please select a food.");
             }
+
+            return updateRecipe(selectedFoodId, {
+                ingredients: data.rows.map((row) => ({
+                    ingredientId: row.ingredientId as number,
+                    quantity: Number(row.quantity),
+                })),
+            });
+        },
+
+        onSuccess: () => {
+            setSaveError("");
+            setSaveSuccess("Recipe saved successfully.");
+
+            queryClient.invalidateQueries({
+                queryKey: ["recipes", selectedFoodId],
+            });
+        },
+
+        onError: (error) => {
+            setSaveSuccess("");
+            setSaveError(
+                getErrorMessage(error, "Failed to save recipe.")
+            );
+        },
+    });
+
+    function handleFoodChange(value: string) {
+        const foodId = value ? Number(value) : "";
+
+        setSelectedFoodId(foodId);
+        setSaveError("");
+        setSaveSuccess("");
+
+        if (!foodId) {
+            reset({ rows: [] });
         }
+    }
 
-        loadRecipe();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedFoodId]);
-
-    async function onSubmit(data: RecipeFormValues) {
+    function onSubmit(data: RecipeFormValues) {
         setSaveError("");
         setSaveSuccess("");
 
@@ -96,151 +134,284 @@ export default function RecipesPage() {
         }
 
         const ingredientIds = data.rows.map((row) => row.ingredientId);
+
         const hasDuplicates =
             new Set(ingredientIds).size !== ingredientIds.length;
 
         if (hasDuplicates) {
-            setSaveError("Each ingredient can only appear once in a recipe.");
+            setSaveError(
+                "Each ingredient can only appear once in a recipe."
+            );
             return;
         }
 
-        if (data.rows.some((row) => !row.ingredientId || !row.quantity)) {
-            setSaveError("Every row needs an ingredient and a quantity.");
+        if (
+            data.rows.some(
+                (row) => !row.ingredientId || !row.quantity
+            )
+        ) {
+            setSaveError(
+                "Every row needs an ingredient and a quantity."
+            );
             return;
         }
 
-        try {
-            await updateRecipe(selectedFoodId as number, {
-                ingredients: data.rows.map((row) => ({
-                    ingredientId: row.ingredientId as number,
-                    quantity: Number(row.quantity),
-                })),
-            });
-
-            setSaveSuccess("Recipe saved.");
-        } catch (error) {
-            setSaveError(getErrorMessage(error, "Failed to save recipe."));
-        }
+        saveMutation.mutate(data);
     }
 
-    return (
-        <div>
-            <h1 className="text-2xl font-bold mb-6">Recipes</h1>
+    const foods = foodsQuery.data ?? [];
+    const ingredients = ingredientsQuery.data ?? [];
 
-            <div className="mb-6 max-w-sm">
-                <label className="block text-sm font-medium mb-1">
+    const isLoadingRecipe =
+        selectedFoodId !== "" && recipeQuery.isPending;
+
+    const isLoadingInitialData =
+        foodsQuery.isPending || ingredientsQuery.isPending;
+
+    return (
+        <div className="min-w-0 px-6 py-6 lg:px-8 lg:py-8">
+            {/* Header */}
+            <div className="mb-6">
+                <h1 className="text-2xl font-bold text-ink-900">
+                    Recipes
+                </h1>
+
+                <p className="mt-1 text-sm text-ink-500">
+                    Manage the ingredients and quantities used for each food.
+                </p>
+            </div>
+
+            {/* Food selector */}
+            <div className="mb-6 max-w-md rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+                <label
+                    htmlFor="food"
+                    className="mb-1.5 block text-sm font-medium text-ink-800"
+                >
                     Food
                 </label>
+
                 <select
+                    id="food"
                     value={selectedFoodId}
-                    onChange={(e) =>
-                        setSelectedFoodId(
-                            e.target.value ? Number(e.target.value) : ""
-                        )
+                    onChange={(event) =>
+                        handleFoodChange(event.target.value)
                     }
-                    className="border rounded w-full p-2"
+                    disabled={isLoadingInitialData}
+                    className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-ink-900 transition-colors focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20 disabled:cursor-not-allowed disabled:bg-stone-50"
                 >
-                    <option value="">Select a food...</option>
+                    <option value="">
+                        {isLoadingInitialData
+                            ? "Loading foods..."
+                            : "Select a food..."}
+                    </option>
+
                     {foods.map((food) => (
                         <option key={food.id} value={food.id}>
                             {food.name}
                         </option>
                     ))}
                 </select>
-                <p className="mt-1 text-xs text-gray-500">
+
+                <p className="mt-2 text-xs text-ink-500">
                     Every recipe ingredient must already exist under
                     Ingredients.
                 </p>
+
+                {foodsQuery.isError && (
+                    <p className="mt-2 text-xs text-red-600">
+                        Failed to load foods.
+                    </p>
+                )}
+
+                {ingredientsQuery.isError && (
+                    <p className="mt-2 text-xs text-red-600">
+                        Failed to load ingredients.
+                    </p>
+                )}
             </div>
 
-            {!selectedFoodId && (
-                <p className="text-gray-500">
-                    Select a food above to view or edit its recipe.
-                </p>
+            {/* Empty state */}
+            {selectedFoodId === "" && (
+                <div className="rounded-2xl border border-stone-200 bg-white p-8 text-center shadow-sm">
+                    <p className="text-sm text-ink-500">
+                        Select a food above to view or edit its recipe.
+                    </p>
+                </div>
             )}
 
-            {selectedFoodId !== "" && loadingRecipe && (
-                <p>Loading recipe...</p>
+            {/* Recipe loading */}
+            {isLoadingRecipe && (
+                <div className="rounded-2xl border border-stone-200 bg-white p-8 text-center shadow-sm">
+                    <p className="text-sm text-ink-500">
+                        Loading recipe...
+                    </p>
+                </div>
             )}
 
-            <Alert type="error" message={loadError} />
+            {/* Recipe loading error */}
+            {selectedFoodId !== "" && recipeQuery.isError && (
+                <Alert
+                    type="error"
+                    message={getErrorMessage(
+                        recipeQuery.error,
+                        "Failed to load recipe."
+                    )}
+                />
+            )}
 
-            {selectedFoodId !== "" && !loadingRecipe && (
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                    <Alert type="error" message={saveError} />
-                    <Alert type="success" message={saveSuccess} />
-
-                    <div className="border rounded-lg divide-y">
-                        {fields.length === 0 && (
-                            <p className="p-4 text-gray-500 text-sm">
-                                No ingredients added yet.
-                            </p>
-                        )}
-
-                        {fields.map((field, index) => (
-                            <div
-                                key={field.id}
-                                className="flex items-center gap-3 p-3"
-                            >
-                                <select
-                                    {...register(
-                                        `rows.${index}.ingredientId`,
-                                        { valueAsNumber: true }
-                                    )}
-                                    className="border rounded p-2 flex-1"
-                                >
-                                    <option value="">
-                                        Select ingredient...
-                                    </option>
-                                    {ingredients.map((ing) => (
-                                        <option key={ing.id} value={ing.id}>
-                                            {ing.name} ({ing.unit?.name})
-                                        </option>
-                                    ))}
-                                </select>
-
-                                <input
-                                    type="number"
-                                    step="0.01"
-                                    placeholder="Quantity"
-                                    {...register(`rows.${index}.quantity`, {
-                                        valueAsNumber: true,
-                                    })}
-                                    className="border rounded p-2 w-32"
-                                />
-
-                                <button
-                                    type="button"
-                                    onClick={() => remove(index)}
-                                    className="text-red-600 hover:underline text-sm"
-                                >
-                                    Remove
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-
-                    <button
-                        type="button"
-                        onClick={() =>
-                            append({ ingredientId: "", quantity: 0 })
-                        }
-                        className="text-orange-600 text-sm font-medium hover:underline"
+            {/* Recipe editor */}
+            {selectedFoodId !== "" &&
+                !recipeQuery.isPending &&
+                !recipeQuery.isError && (
+                    <form
+                        onSubmit={handleSubmit(onSubmit)}
+                        className="max-w-4xl space-y-5"
                     >
-                        + Add ingredient row
-                    </button>
+                        <Alert
+                            type="error"
+                            message={saveError}
+                        />
 
-                    <div>
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="px-4 py-2 rounded bg-orange-600 text-white text-sm font-medium hover:bg-orange-700 disabled:opacity-50"
-                        >
-                            {isSubmitting ? "Saving..." : "Save Recipe"}
-                        </button>
-                    </div>
-                </form>
-            )}
+                        <Alert
+                            type="success"
+                            message={saveSuccess}
+                        />
+
+                        <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+                            {/* Card header */}
+                            <div className="border-b border-stone-200 px-5 py-4">
+                                <h2 className="text-base font-semibold text-ink-900">
+                                    Recipe Ingredients
+                                </h2>
+
+                                <p className="mt-1 text-xs text-ink-500">
+                                    Set the quantity required for one serving
+                                    of this food.
+                                </p>
+                            </div>
+
+                            {/* Rows */}
+                            <div className="divide-y divide-stone-100">
+                                {fields.length === 0 && (
+                                    <div className="px-5 py-8 text-center">
+                                        <p className="text-sm text-ink-500">
+                                            No ingredients added yet.
+                                        </p>
+                                    </div>
+                                )}
+
+                                {fields.map((field, index) => (
+                                    <div
+                                        key={field.id}
+                                        className="grid gap-3 px-5 py-4 sm:grid-cols-[minmax(0,1fr)_140px_auto] sm:items-end"
+                                    >
+                                        {/* Ingredient */}
+                                        <div className="min-w-0">
+                                            <label
+                                                htmlFor={`ingredient-${field.id}`}
+                                                className="mb-1.5 block text-xs font-medium text-ink-700"
+                                            >
+                                                Ingredient
+                                            </label>
+
+                                            <select
+                                                id={`ingredient-${field.id}`}
+                                                {...register(
+                                                    `rows.${index}.ingredientId`,
+                                                    {
+                                                        valueAsNumber: true,
+                                                    }
+                                                )}
+                                                className="w-full min-w-0 rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-ink-900 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+                                            >
+                                                <option value="">
+                                                    Select ingredient...
+                                                </option>
+
+                                                {ingredients.map((ingredient) => (
+                                                    <option
+                                                        key={ingredient.id}
+                                                        value={ingredient.id}
+                                                    >
+                                                        {ingredient.name}{" "}
+                                                        ({ingredient.unit?.name})
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        {/* Quantity */}
+                                        <div>
+                                            <label
+                                                htmlFor={`quantity-${field.id}`}
+                                                className="mb-1.5 block text-xs font-medium text-ink-700"
+                                            >
+                                                Quantity per serving
+                                            </label>
+
+                                            <input
+                                                id={`quantity-${field.id}`}
+                                                type="number"
+                                                min="0"
+                                                step="0.01"
+                                                placeholder="Quantity"
+                                                {...register(
+                                                    `rows.${index}.quantity`,
+                                                    {
+                                                        valueAsNumber: true,
+                                                    }
+                                                )}
+                                                className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-ink-900 placeholder:text-ink-400 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+                                            />
+                                        </div>
+
+                                        {/* Remove */}
+                                        <Button
+                                            type="button"
+                                            variant="danger"
+                                            size="sm"
+                                            onClick={() => remove(index)}
+                                        >
+                                            Remove
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Add row */}
+                            <div className="border-t border-stone-200 px-5 py-4">
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() =>
+                                        append({
+                                            ingredientId: "",
+                                            quantity: 0,
+                                        })
+                                    }
+                                >
+                                    + Add ingredient
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* Save */}
+                        <div className="flex justify-end">
+                            <Button
+                                type="submit"
+                                size="md"
+                                isLoading={
+                                    isSubmitting || saveMutation.isPending
+                                }
+                            >
+                                {saveMutation.isPending
+                                    ? "Saving..."
+                                    : "Save Recipe"}
+                            </Button>
+                        </div>
+                    </form>
+                )}
         </div>
     );
 }
