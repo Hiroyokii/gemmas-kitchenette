@@ -344,8 +344,8 @@ export async function getAllOrdersService(
     limit: number
 ) {
     const { orders, total } = await findAllOrders(
-        page, 
-        limit,
+        page,
+        limit
     );
 
     return {
@@ -354,7 +354,7 @@ export async function getAllOrdersService(
             page,
             limit,
             total,
-            totalPage: Math.ceil(total / limit),
+            totalPages: Math.ceil(total / limit),
         },
     };
 }

@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import type { Request, Response, NextFunction } from "express";
 import type { ZodType } from "zod";
 
 export function validate(
@@ -10,8 +10,7 @@ export function validate(
         res: Response,
         next: NextFunction
     ) => {
-        const result =
-            schema.safeParse(req[source]);
+        const result = schema.safeParse(req[source]);
 
         if (!result.success) {
             return res.status(400).json({
@@ -19,7 +18,11 @@ export function validate(
             });
         }
 
-        req[source] = result.data;
+        if (source === "query") {
+            Object.assign(req.query, result.data);
+        } else {
+            req[source] = result.data;
+        }
 
         next();
     };
