@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 
 import { getMyOrders } from "../../services/order.service";
@@ -14,23 +14,19 @@ import Button from "../../components/ui/Button";
 import Icon from "../../components/ui/Icon";
 
 export default function OrderHistoryPage() {
-    const [orders, setOrders] = useState<Order[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const ordersQuery = useQuery<Order[]>({
+        queryKey: ["my-orders"],
+        queryFn: getMyOrders,
+    });
     const navigate = useNavigate();
-
-    useEffect(() => {
-        getMyOrders()
-            .then(setOrders)
-            .catch((err) => setError(getErrorMessage(err, "Failed to load your orders.")))
-            .finally(() => setLoading(false));
-    }, []);
+    const orders = ordersQuery.data ?? [];
+    const loading = ordersQuery.isPending;
 
     return (
         <div>
             <PageHeader title="My Orders" />
 
-            <Alert type="error" message={error} />
+            <Alert type="error" message={ordersQuery.error ? getErrorMessage(ordersQuery.error, "Failed to load your orders.") : ""} />
 
             {loading && (
                 <div className="flex justify-center py-16">
@@ -38,7 +34,7 @@ export default function OrderHistoryPage() {
                 </div>
             )}
 
-            {!loading && !error && orders.length === 0 && (
+            {!loading && !ordersQuery.error && orders.length === 0 && (
                 <EmptyState
                     icon={<Icon name="ticket" className="h-6 w-6" />}
                     title="No orders yet"

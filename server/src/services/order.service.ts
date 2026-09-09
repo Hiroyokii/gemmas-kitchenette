@@ -7,7 +7,8 @@ import {
     findOrdersByCustomer, 
     findAllOrders, 
     findOrderById, 
-    updateOrderStatus 
+    updateOrderStatus,
+    findPaymentForOrder,
 } from "../repositories/order.repository.js";
 import { findDailyMenuById, decreaseRemainingServings } from "../repositories/dailyMenu.repository.js";
 
@@ -235,6 +236,10 @@ export async function submitPaymentReferenceService(
             "Payment is already verified."
         );
 
+    if (order.status !== "PENDING") {
+        throw new BadRequestError("Payment references can only be submitted while an order is pending.");
+    }
+
     return prisma.payment.update({ 
         where: { 
             id: order.payment.id 
@@ -243,7 +248,7 @@ export async function submitPaymentReferenceService(
             referenceNumber: referenceNumber.trim(), 
             status: "PENDING", 
             rejectionReason: null 
-        } 
+        }
     });
 }
 
@@ -251,23 +256,20 @@ export async function verifyPaymentService(
     orderId: number, 
     adminId: number
 ) {
-    const payment = await prisma.payment.findUnique({ 
-        where: { orderId } 
-    });
-
-    if (!payment) throw new NotFoundError("Payment not found.");
-
-    if (payment.method !== "GCASH") 
-        throw new BadRequestError(
-            "Only GCash payments require verification."
-        );
-
-    if (!payment.referenceNumber) 
-        throw new BadRequestError(
-            "Customer has not submitted a GCash reference number."
-        );
-
     return prisma.$transaction(async (tx) => {
+        const payment = await findPaymentForOrder(tx, orderId);
+
+        if (!payment) throw new NotFoundError("Payment not found.");
+        if (payment.method !== "GCASH") {
+            throw new BadRequestError("Only GCash payments require verification.");
+        }
+        if (payment.order.status !== "PENDING") {
+            throw new BadRequestError("Only pending orders can have their payment verified.");
+        }
+        if (payment.status !== "PENDING" || !payment.referenceNumber) {
+            throw new BadRequestError("A pending GCash payment reference is required for verification.");
+        }
+
         await tx.payment.update({ 
             where: { 
                 id: payment.id 
@@ -304,30 +306,30 @@ export async function verifyPaymentService(
 
 export async function rejectPaymentService(
     orderId: number, 
-    reason?: string
+    reason: string
 ) {
-    const payment = await prisma.payment.findUnique({ 
-        where: { 
-            orderId 
-        } 
-    });
+    return prisma.$transaction(async (tx) => {
+        const payment = await findPaymentForOrder(tx, orderId);
+        if (!payment) throw new NotFoundError("Payment not found.");
+        if (payment.method !== "GCASH") {
+            throw new BadRequestError("Only GCash payments can be rejected.");
+        }
+        if (payment.order.status !== "PENDING") {
+            throw new BadRequestError("Only pending orders can have their payment rejected.");
+        }
+        if (payment.status !== "PENDING" || !payment.referenceNumber) {
+            throw new BadRequestError("A pending GCash payment reference is required for rejection.");
+        }
 
-    if (!payment) throw new NotFoundError("Payment not found.");
-
-    if (payment.method !== "GCASH") 
-        throw new BadRequestError(
-            "Only GCash payments can be rejected."
-        );
-    
-    return prisma.payment.update({ 
-        where: { 
-            id: payment.id 
-        }, 
-        data: { 
-            status: "REJECTED", 
-            rejectionReason: reason?.trim() || "Payment could not be verified.", 
-            verifiedAt: null, verifiedById: null 
-        } 
+        return tx.payment.update({
+            where: { id: payment.id },
+            data: {
+                status: "REJECTED",
+                rejectionReason: reason.trim(),
+                verifiedAt: null,
+                verifiedById: null,
+            },
+        });
     });
 }
 

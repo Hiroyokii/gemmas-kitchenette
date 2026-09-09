@@ -56,6 +56,7 @@ export async function findOrdersByCustomer(
             customerId,
         },
         include: {
+            payment: true,
             orderItems: {
                 include: {
                     dailyMenu: {
@@ -128,5 +129,15 @@ export async function updateOrderStatus(
                     lastName: true 
                 } }, 
                 ...orderInclude },
+    });
+}
+
+export async function findPaymentForOrder(
+    tx: Prisma.TransactionClient,
+    orderId: number
+) {
+    return tx.payment.findUnique({
+        where: { orderId },
+        include: { order: true },
     });
 }

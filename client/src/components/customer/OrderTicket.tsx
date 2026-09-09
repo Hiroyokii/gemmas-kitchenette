@@ -2,6 +2,9 @@ import type { Order } from "../../types/Order";
 import Badge from "../ui/Badge";
 import Icon from "../ui/Icon";
 import { ORDER_STATUS_META } from "../../utils/orderStatus";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { submitPaymentReference } from "../../services/order.service";
 
 interface OrderTicketProps {
     order: Order;
@@ -9,6 +12,15 @@ interface OrderTicketProps {
 
 export default function OrderTicket({ order }: OrderTicketProps) {
     const status = ORDER_STATUS_META[order.status];
+    const queryClient = useQueryClient();
+    const [referenceNumber, setReferenceNumber] = useState("");
+    const referenceMutation = useMutation({
+        mutationFn: () => submitPaymentReference(order.id, referenceNumber.trim()),
+        onSuccess: () => {
+            setReferenceNumber("");
+            queryClient.invalidateQueries({ queryKey: ["my-orders"] });
+        },
+    });
 
     return (
         <div className="ticket flex flex-col sm:flex-row">
@@ -55,6 +67,23 @@ export default function OrderTicket({ order }: OrderTicketProps) {
                     <Icon name="mapPin" className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                     {order.deliveryAddress}
                 </div>
+
+                {order.payment && (
+                    <div className="mt-3 rounded-lg bg-ink-50 px-3 py-2 text-xs text-ink-600">
+                        <span className="font-semibold text-ink-800">{order.payment.method === "GCASH" ? "GCash (simulated)" : "Cash on Delivery"}</span>
+                        <span className="mx-1">·</span>
+                        <span>{order.payment.status.replace(/_/g, " ")}</span>
+                        {order.payment.referenceNumber && <p className="mt-1 font-mono">Reference: {order.payment.referenceNumber}</p>}
+                        {order.payment.rejectionReason && <p className="mt-1 text-red-600">{order.payment.rejectionReason}</p>}
+                        {order.payment.method === "GCASH" && order.status === "PENDING" && order.payment.status !== "VERIFIED" && (
+                            <div className="mt-2 flex flex-wrap gap-2">
+                                <input value={referenceNumber} onChange={(event) => setReferenceNumber(event.target.value)} placeholder="Submit a corrected reference" className="min-w-0 flex-1 rounded border border-stone-200 bg-white px-2 py-1" />
+                                <button type="button" disabled={referenceNumber.trim().length < 4 || referenceMutation.isPending} onClick={() => referenceMutation.mutate()} className="rounded bg-brand-500 px-2 py-1 font-medium text-white disabled:opacity-50">{referenceMutation.isPending ? "Sending…" : "Submit"}</button>
+                            </div>
+                        )}
+                        {referenceMutation.error && <p className="mt-2 text-red-600">Could not submit the reference. Please check it and try again.</p>}
+                    </div>
+                )}
 
                 <div className="mt-3 flex items-center justify-between border-t border-dashed border-ink-200 pt-3">
                     <span className="text-sm font-medium text-ink-600">Total</span>

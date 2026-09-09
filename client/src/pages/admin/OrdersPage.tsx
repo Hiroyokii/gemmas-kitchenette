@@ -8,6 +8,8 @@ import {
 
 import {
     getAllOrders,
+    verifyPayment,
+    rejectPayment,
     updateOrderStatus,
 } from "../../services/order.service";
 
@@ -24,6 +26,8 @@ import Button from "../../components/ui/Button";
 import Spinner from "../../components/ui/Spinner";
 import EmptyState from "../../components/ui/EmptyState";
 import Icon from "../../components/ui/Icon";
+import Modal from "../../components/ui/Modal";
+import Input from "../../components/ui/Input";
 
 const ALLOWED_TRANSITIONS: Record<
     OrderStatus,
@@ -52,6 +56,8 @@ export default function OrdersPage() {
 
     const [page, setPage] = useState(1);
     const [actionError, setActionError] = useState("");
+    const [rejectingOrderId, setRejectingOrderId] = useState<number | null>(null);
+    const [rejectionReason, setRejectionReason] = useState("");
 
     const ordersQuery = useQuery<{
         orders: Order[];
@@ -59,6 +65,18 @@ export default function OrdersPage() {
     }>({
         queryKey: ["orders", page],
         queryFn: () => getAllOrders(page, 10),
+    });
+
+    const paymentMutation = useMutation({
+        mutationFn: ({ orderId, action, reason }: { orderId: number; action: "verify" | "reject"; reason?: string }) =>
+            action === "verify" ? verifyPayment(orderId) : rejectPayment(orderId, reason!.trim()),
+        onSuccess: () => {
+            setActionError("");
+            setRejectingOrderId(null);
+            setRejectionReason("");
+            queryClient.invalidateQueries({ queryKey: ["orders"] });
+        },
+        onError: (error) => setActionError(getErrorMessage(error, "Failed to update GCash payment.")),
     });
 
     const updateMutation = useMutation({
@@ -173,6 +191,10 @@ export default function OrdersPage() {
                                     </th>
 
                                     <th className="px-5 py-3 text-left font-medium text-ink-500">
+                                        Payment
+                                    </th>
+
+                                    <th className="px-5 py-3 text-left font-medium text-ink-500">
                                         Placed
                                     </th>
 
@@ -184,10 +206,12 @@ export default function OrdersPage() {
 
                             <tbody>
                                 {orders.map((order) => {
-                                    const nextStatuses =
-                                        ALLOWED_TRANSITIONS[
-                                            order.status
-                                        ];
+                                    const nextStatuses = ALLOWED_TRANSITIONS[order.status].filter(
+                                        (nextStatus) =>
+                                            nextStatus !== "CONFIRMED" ||
+                                            order.payment?.method !== "GCASH" ||
+                                            order.payment.status === "VERIFIED"
+                                    );
 
                                     const isUpdating =
                                         updateMutation.isPending &&
@@ -282,6 +306,28 @@ export default function OrdersPage() {
                                                         " "
                                                     )}
                                                 </span>
+                                            </td>
+
+                                            <td className="px-5 py-4 align-top">
+                                                {order.payment ? (
+                                                    <div className="space-y-1 text-xs">
+                                                        <p className="font-medium text-ink-800">
+                                                            {order.payment.method === "GCASH" ? "GCash (simulated)" : "Cash on Delivery"}
+                                                        </p>
+                                                        <p className={[
+                                                            "font-semibold",
+                                                            order.payment.status === "VERIFIED" ? "text-green-700" : order.payment.status === "REJECTED" ? "text-red-700" : "text-yellow-700",
+                                                        ].join(" ")}>{order.payment.status.replace(/_/g, " ")}</p>
+                                                        {order.payment.referenceNumber && <p className="font-mono text-ink-500">Ref: {order.payment.referenceNumber}</p>}
+                                                        {order.payment.rejectionReason && <p className="max-w-44 text-red-600">{order.payment.rejectionReason}</p>}
+                                                        {order.payment.method === "GCASH" && order.payment.status === "PENDING" && order.payment.referenceNumber && (
+                                                            <div className="flex gap-2 pt-1">
+                                                                <button type="button" disabled={paymentMutation.isPending} onClick={() => paymentMutation.mutate({ orderId: order.id, action: "verify" })} className="rounded bg-green-600 px-2 py-1 font-medium text-white hover:bg-green-700 disabled:opacity-50">Verify</button>
+                                                                <button type="button" disabled={paymentMutation.isPending} onClick={() => setRejectingOrderId(order.id)} className="rounded border border-red-200 px-2 py-1 font-medium text-red-700 hover:bg-red-50 disabled:opacity-50">Reject</button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ) : "—"}
                                             </td>
 
                                             {/* Date */}
@@ -409,6 +455,16 @@ export default function OrdersPage() {
                         </Button>
                     </div>
                 )}
+
+            {rejectingOrderId !== null && (
+                <Modal title="Reject simulated GCash payment" onClose={() => { setRejectingOrderId(null); setRejectionReason(""); }}>
+                    <div className="space-y-4">
+                        <p className="text-sm text-ink-600">Give the customer a short reason so they can submit a corrected payment reference.</p>
+                        <Input label="Rejection reason" value={rejectionReason} onChange={(event) => setRejectionReason(event.target.value)} placeholder="e.g. Reference number could not be verified" />
+                        <div className="flex justify-end gap-2"><Button variant="secondary" onClick={() => setRejectingOrderId(null)}>Cancel</Button><Button disabled={rejectionReason.trim().length < 2} isLoading={paymentMutation.isPending} onClick={() => paymentMutation.mutate({ orderId: rejectingOrderId, action: "reject", reason: rejectionReason })}>Reject payment</Button></div>
+                    </div>
+                </Modal>
+            )}
         </div>
     );
 }

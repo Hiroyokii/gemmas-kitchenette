@@ -58,7 +58,7 @@ export async function verifyPayment(
 
 export async function rejectPayment(
     id: number, 
-    reason?: string
+    reason: string
 ): Promise<Order> {
   const response = await api.patch(`/orders/${id}/payment/reject`, { reason });
 
@@ -70,5 +70,13 @@ export async function submitReview(
 ): Promise<unknown> {
   const response = await api.post("/reviews", data);
   
+  return response.data;
+}
+
+export async function submitPaymentReference(
+    id: number,
+    referenceNumber: string
+): Promise<unknown> {
+  const response = await api.patch(`/orders/${id}/payment/reference`, { referenceNumber });
   return response.data;
 }

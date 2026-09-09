@@ -24,6 +24,13 @@ export interface Order {
     total: number;
     deliveryAddress: string;
     createdAt: string;
+    payment?: {
+        method: "COD" | "GCASH";
+        status: "NOT_APPLICABLE" | "PENDING" | "VERIFIED" | "REJECTED";
+        referenceNumber?: string | null;
+        rejectionReason?: string | null;
+        verifiedAt?: string | null;
+    } | null;
     customer: {
         id: number;
         firstName: string;
