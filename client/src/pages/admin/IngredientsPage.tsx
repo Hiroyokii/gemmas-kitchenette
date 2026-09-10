@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
 
 import {
     ingredientSchema,
@@ -14,8 +15,10 @@ import {
     createIngredient,
     updateIngredient,
 } from "../../services/ingredient.service";
+import { getExpirationAlerts } from "../../services/purchase.service";
 
 import type { Ingredient, Unit } from "../../types/Ingredient";
+import type { ExpirationAlert } from "../../services/purchase.service";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 
 import Modal from "../../components/ui/Modal";
@@ -32,6 +35,10 @@ export default function IngredientsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingIngredient, setEditingIngredient] =
         useState<Ingredient | null>(null);
+    const expirationAlertsQuery = useQuery<ExpirationAlert[]>({
+        queryKey: ["expiration-alerts"],
+        queryFn: getExpirationAlerts,
+    });
 
     async function loadIngredients() {
         try {
@@ -117,11 +124,22 @@ export default function IngredientsPage() {
             </div>
 
             <Alert type="error" message={loadError} />
+            <Alert
+                type="error"
+                message={expirationAlertsQuery.error
+                    ? getErrorMessage(
+                        expirationAlertsQuery.error,
+                        "Failed to load expiration alerts."
+                    )
+                    : ""}
+            />
+
+            <ExpirationAlerts alerts={expirationAlertsQuery.data ?? []} />
 
             {/* Ingredients Table */}
             <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
                 <div className="overflow-x-auto">
-                    <table className="w-full min-w-[700px] text-sm">
+                    <table className="w-full min-w-[850px] text-sm">
                         <thead className="border-b border-stone-200 bg-stone-50">
                             <tr className="text-left">
                                 <th className="px-6 py-4 font-semibold text-ink-800">
@@ -144,6 +162,10 @@ export default function IngredientsPage() {
                                     Cost / Unit
                                 </th>
 
+                                <th className="px-6 py-4 font-semibold text-ink-800">
+                                    Expiration
+                                </th>
+
                                 <th className="px-6 py-4 text-right font-semibold text-ink-800">
                                     Action
                                 </th>
@@ -155,7 +177,7 @@ export default function IngredientsPage() {
                                 <tr>
                                     <td
                                         className="px-6 py-10 text-center text-ink-500"
-                                        colSpan={6}
+                                        colSpan={7}
                                     >
                                         Loading ingredients...
                                     </td>
@@ -166,7 +188,7 @@ export default function IngredientsPage() {
                                 <tr>
                                     <td
                                         className="px-6 py-10 text-center text-ink-500"
-                                        colSpan={6}
+                                        colSpan={7}
                                     >
                                         No ingredients yet.
                                     </td>
@@ -219,7 +241,13 @@ export default function IngredientsPage() {
                                             </td>
 
                                             <td className="px-6 py-4 font-medium text-ink-800">
-                                                ₱{ingredient.costPerUnit}
+                                                {ingredient.latestPurchaseUnitCost == null
+                                                    ? "No purchases yet"
+                                                    : `₱${Number(ingredient.latestPurchaseUnitCost).toFixed(2)} / ${ingredient.unit?.name ?? "unit"}`}
+                                            </td>
+
+                                            <td className="px-6 py-4">
+                                                <ExpirationStatus ingredient={ingredient} />
                                             </td>
 
                                             <td className="px-6 py-4 text-right">
@@ -289,13 +317,11 @@ function IngredientFormModal({
                   name: ingredient.name,
                   unitId: ingredient.unitId,
                   minimumStock: ingredient.minimumStock,
-                  costPerUnit: ingredient.costPerUnit,
               }
             : {
                   name: "",
                   unitId: undefined,
                   minimumStock: 0,
-                  costPerUnit: 0,
               },
     });
 
@@ -368,7 +394,7 @@ function IngredientFormModal({
                     )}
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
                     <Input
                         label="Minimum Stock"
                         type="number"
@@ -376,15 +402,11 @@ function IngredientFormModal({
                         error={errors.minimumStock?.message}
                         {...register("minimumStock")}
                     />
-
-                    <Input
-                        label="Cost per Unit (₱)"
-                        type="number"
-                        step="0.01"
-                        error={errors.costPerUnit?.message}
-                        {...register("costPerUnit")}
-                    />
                 </div>
+
+                <p className="rounded-lg bg-stone-50 px-3 py-2.5 text-xs leading-relaxed text-ink-500">
+                    Cost per unit is automatically based on the most recent purchase for this ingredient.
+                </p>
 
                 {isEditing && (
                     <div className="rounded-lg bg-stone-50 px-3 py-2.5">
@@ -414,5 +436,76 @@ function IngredientFormModal({
                 </div>
             </form>
         </Modal>
+    );
+}
+
+function ExpirationStatus({ ingredient }: { ingredient: Ingredient }) {
+    if (!ingredient.expirationStatus || !ingredient.expirationDate) {
+        return <span className="text-sm text-ink-500">No active batch</span>;
+    }
+
+    const styles = {
+        EXPIRED: "bg-red-50 text-red-700",
+        EXPIRING_SOON: "bg-orange-50 text-orange-700",
+        SAFE: "bg-green-50 text-green-700",
+    };
+
+    const labels = {
+        EXPIRED: "Expired",
+        EXPIRING_SOON: "Expiring soon",
+        SAFE: "Safe",
+    };
+
+    return (
+        <div className="space-y-1">
+            <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${styles[ingredient.expirationStatus]}`}>
+                {labels[ingredient.expirationStatus]}
+            </span>
+            <p className="text-xs text-ink-500">
+                {new Date(ingredient.expirationDate).toLocaleDateString()}
+            </p>
+        </div>
+    );
+}
+
+function ExpirationAlerts({ alerts }: { alerts: ExpirationAlert[] }) {
+    const expired = alerts.filter((alert) => alert.status === "EXPIRED");
+    const expiringSoon = alerts.filter((alert) => alert.status === "EXPIRING_SOON");
+
+    return (
+        <section className="mb-6 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+            <div>
+                <h2 className="font-semibold text-ink-900">Expiration Alerts</h2>
+                <p className="mt-1 text-sm text-ink-500">Active inventory batches that need attention.</p>
+            </div>
+
+            <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                <ExpirationAlertList title="Expired" alerts={expired} tone="red" />
+                <ExpirationAlertList title="Expiring Soon" alerts={expiringSoon} tone="orange" />
+            </div>
+        </section>
+    );
+}
+
+function ExpirationAlertList({ title, alerts, tone }: { title: string; alerts: ExpirationAlert[]; tone: "red" | "orange" }) {
+    const headingClass = tone === "red" ? "text-red-700" : "text-orange-700";
+
+    return (
+        <div className="rounded-xl bg-stone-50 p-4">
+            <h3 className={`text-sm font-semibold ${headingClass}`}>{title}</h3>
+            {alerts.length === 0 ? (
+                <p className="mt-2 text-sm text-ink-500">None.</p>
+            ) : (
+                <ul className="mt-3 space-y-2 text-sm">
+                    {alerts.map((alert) => (
+                        <li key={alert.id} className="rounded-lg bg-white px-3 py-2 text-ink-700">
+                            <span className="font-medium text-ink-900">{alert.ingredientName}</span> — {alert.remainingQuantity} {alert.unit} — {tone === "red"
+                                ? `Expired ${new Date(alert.expirationDate).toLocaleDateString()}`
+                                : `Expires ${new Date(alert.expirationDate).toLocaleDateString()}${alert.daysRemaining === 0 ? " (today)" : ` (${alert.daysRemaining} day${alert.daysRemaining === 1 ? "" : "s"} left)`}`}
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </div>
     );
 }

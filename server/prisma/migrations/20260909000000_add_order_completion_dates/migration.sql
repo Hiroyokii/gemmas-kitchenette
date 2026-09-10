@@ -1,0 +1,2 @@
+ALTER TABLE "Order" ADD COLUMN "completedAt" TIMESTAMP(3);
+ALTER TABLE "Order" ADD COLUMN "cancelledAt" TIMESTAMP(3);

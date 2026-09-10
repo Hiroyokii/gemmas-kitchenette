@@ -35,7 +35,9 @@ export async function createPurchaseItems(
             purchaseId,
             ingredientId: item.ingredientId,
             quantity: item.quantity,
+            remainingQuantity: item.quantity,
             unitCost: item.unitCost,
+            expirationDate: item.expirationDate,
         })),
     });
 }
@@ -81,5 +83,23 @@ export async function getPurchases() {
         orderBy: {
             createdAt: "desc",
         },
+    });
+}
+
+export async function getExpirationAlertBatches(
+    today: Date,
+    warningEnd: Date
+) {
+    return prisma.purchaseItem.findMany({
+        where: {
+            remainingQuantity: { gt: 0 },
+            expirationDate: { lte: warningEnd },
+        },
+        include: {
+            ingredient: {
+                include: { unit: true },
+            },
+        },
+        orderBy: { expirationDate: "asc" },
     });
 }

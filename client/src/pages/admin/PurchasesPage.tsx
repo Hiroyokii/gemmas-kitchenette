@@ -23,6 +23,7 @@ interface PurchaseRow {
     ingredientId: number | "";
     quantity: number;
     unitCost: number;
+    expirationDate: string;
 }
 
 interface PurchaseFormValues {
@@ -64,6 +65,11 @@ export default function PurchasesPage() {
         queryClient.invalidateQueries({
             queryKey: ["ingredients"],
         });
+
+        queryClient.invalidateQueries({
+            queryKey: ["expiration-alerts"],
+        });
+
     }
 
     return (
@@ -165,6 +171,10 @@ export default function PurchasesPage() {
                                                 Unit Cost
                                             </th>
 
+                                            <th className="px-6 py-3 font-semibold text-ink-700">
+                                                Expiration Date
+                                            </th>
+
                                             <th className="px-6 py-3 text-right font-semibold text-ink-700">
                                                 Subtotal
                                             </th>
@@ -191,6 +201,12 @@ export default function PurchasesPage() {
                                                     {Number(
                                                         item.unitCost
                                                     ).toFixed(2)}
+                                                </td>
+
+                                                <td className="px-6 py-4 text-ink-600">
+                                                    {item.expirationDate
+                                                        ? new Date(item.expirationDate).toLocaleDateString()
+                                                        : "Not recorded"}
                                                 </td>
 
                                                 <td className="px-6 py-4 text-right font-medium text-ink-800">
@@ -247,6 +263,7 @@ function PurchaseFormModal({
                     ingredientId: "",
                     quantity: 0,
                     unitCost: 0,
+                    expirationDate: "",
                 },
             ],
         },
@@ -277,6 +294,7 @@ function PurchaseFormModal({
                     ingredientId: row.ingredientId as number,
                     quantity: Number(row.quantity),
                     unitCost: Number(row.unitCost),
+                    expirationDate: row.expirationDate,
                 })),
             }),
 
@@ -309,10 +327,11 @@ function PurchaseFormModal({
                     !row.ingredientId ||
                     !row.quantity ||
                     !row.unitCost
+                    || !row.expirationDate
             )
         ) {
             setSubmitError(
-                "Every row needs an ingredient, quantity, and cost."
+                "Every row needs an ingredient, quantity, cost, and expiration date."
             );
             return;
         }
@@ -355,7 +374,7 @@ function PurchaseFormModal({
                                 key={field.id}
                                 className="border-b border-stone-100 p-4 last:border-0"
                             >
-                                <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(160px,1fr)_110px_130px_auto] sm:items-end">
+                                <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(160px,1fr)_110px_130px_150px_auto] sm:items-end">
                                     {/* Ingredient */}
                                     <div>
                                         <label
@@ -416,6 +435,13 @@ function PurchaseFormModal({
                                         )}
                                     />
 
+                                    <Input
+                                        label="Expiration Date"
+                                        type="date"
+                                        min={new Date().toISOString().slice(0, 10)}
+                                        {...register(`rows.${index}.expirationDate`)}
+                                    />
+
                                     {/* Unit Cost */}
                                     <Input
                                         label="Unit Cost"
@@ -453,6 +479,7 @@ function PurchaseFormModal({
                             ingredientId: "",
                             quantity: 0,
                             unitCost: 0,
+                            expirationDate: "",
                         })
                     }
                     className="text-sm font-medium text-orange-600 transition-colors hover:text-orange-700 hover:underline"

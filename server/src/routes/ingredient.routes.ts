@@ -24,7 +24,7 @@ router.get(
 router.get(
     "/",
     authenticate,
-    authorize("ADMIN"),
+    authorize("ADMIN", "STAFF"),
     getIngredients
 );
 

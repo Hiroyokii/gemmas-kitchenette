@@ -6,6 +6,8 @@ export const purchaseItemSchema = z.object({
     quantity: z.number().positive(),
 
     unitCost: z.number().positive(),
+
+    expirationDate: z.coerce.date(),
 });
 
 export const createPurchaseSchema = z.object({

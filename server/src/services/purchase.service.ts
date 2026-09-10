@@ -1,6 +1,6 @@
 import { prisma } from "../lib/prisma.js";
 
-import { createPurchase, createPurchaseItems, getPurchases } from "../repositories/purchase.repository.js";
+import { createPurchase, createPurchaseItems, getExpirationAlertBatches, getPurchases } from "../repositories/purchase.repository.js";
 import { increaseIngredientStock, findIngredientById } from "../repositories/purchase.repository.js";
 
 import type { CreatePurchaseInput } from "../schemas/purchase.schema.js";
@@ -54,4 +54,49 @@ export async function createPurchaseService(
 
 export async function getPurchasesServices() {
     return getPurchases();
+}
+
+const EXPIRATION_WARNING_DAYS = 3;
+
+function startOfToday() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return today;
+}
+
+function getExpirationStatus(daysRemaining: number) {
+    if (daysRemaining < 0) {
+        return "EXPIRED" as const;
+    }
+
+    if (daysRemaining <= EXPIRATION_WARNING_DAYS) {
+        return "EXPIRING_SOON" as const;
+    }
+
+    return "SAFE" as const;
+}
+
+export async function getExpirationAlertsService() {
+    const today = startOfToday();
+    const warningEnd = new Date(today);
+    warningEnd.setDate(warningEnd.getDate() + EXPIRATION_WARNING_DAYS);
+    const batches = await getExpirationAlertBatches(today, warningEnd);
+
+    return batches.map((batch) => {
+        const expirationDate = new Date(batch.expirationDate!);
+        expirationDate.setHours(0, 0, 0, 0);
+        const daysRemaining = Math.round(
+            (expirationDate.getTime() - today.getTime()) / 86_400_000
+        );
+
+        return {
+            id: batch.id,
+            ingredientName: batch.ingredient.name,
+            remainingQuantity: batch.remainingQuantity,
+            unit: batch.ingredient.unit.name,
+            expirationDate: batch.expirationDate,
+            daysRemaining,
+            status: getExpirationStatus(daysRemaining),
+        };
+    });
 }

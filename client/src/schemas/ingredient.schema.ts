@@ -12,9 +12,6 @@ export const ingredientSchema = z.object({
         .number()
         .nonnegative("Minimum stock can't be negative."),
 
-    costPerUnit: z.coerce
-        .number()
-        .nonnegative("Cost can't be negative."),
 });
 
 export type IngredientFormInput = z.input<typeof ingredientSchema>;

@@ -7,8 +7,6 @@ export const createIngredientSchema = z.object({
 
     minimumStock: z.number().nonnegative(),
 
-    costPerUnit: z.number().nonnegative(),
-
 });
 
 export type CreateIngredientInput = z.infer<typeof createIngredientSchema>;

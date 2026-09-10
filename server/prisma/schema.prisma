@@ -50,8 +50,7 @@ model User {
   orders           Order[]
   refreshTokens    RefreshToken[]
   reviews          Review[]
-  verifiedPayments Payment[]        @relation("PaymentVerifier")
-  spoilageRecords  SpoilageRecord[]
+  verifiedPayments Payment[]      @relation("PaymentVerifier")
 }
 
 model RefreshToken {
@@ -127,7 +126,6 @@ model Ingredient {
 
   purchaseItems     PurchaseItem[]
   recipeIngredients RecipeIngredient[]
-  spoilageRecords   SpoilageRecord[]
 }
 
 model Purchase {
@@ -155,6 +153,12 @@ model PurchaseItem {
   quantity Decimal @db.Decimal(10, 2)
 
   unitCost Decimal @db.Decimal(10, 2)
+
+  remainingQuantity Decimal @db.Decimal(10, 2)
+
+  expirationDate DateTime?
+
+  @@index([expirationDate])
 }
 
 model RecipeIngredient {
@@ -222,6 +226,8 @@ model Order {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  completedAt DateTime?
+  cancelledAt DateTime?
 
   orderItems OrderItem[]
   payment    Payment?
@@ -283,23 +289,4 @@ model Review {
   updatedAt DateTime @updatedAt
 
   @@index([foodId])
-}
-
-model SpoilageRecord {
-  id Int @id @default(autoincrement())
-
-  ingredientId Int
-  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
-
-  quantity Decimal @db.Decimal(10, 2)
-  unitCost Decimal @db.Decimal(10, 2)
-
-  reason String
-  notes  String?
-
-  recordedById Int
-  recordedBy   User     @relation(fields: [recordedById], references: [id])
-  createdAt    DateTime @default(now())
-
-  @@index([ingredientId])
 }

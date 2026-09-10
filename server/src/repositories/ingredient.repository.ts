@@ -38,6 +38,19 @@ export async function getIngredients() {
         },
         include: {
             unit: true,
+            purchaseItems: {
+                select: {
+                    unitCost: true,
+                    remainingQuantity: true,
+                    expirationDate: true,
+                    purchase: {
+                        select: { createdAt: true },
+                    },
+                },
+                orderBy: {
+                    purchase: { createdAt: "desc" },
+                },
+            },
         },
         orderBy: {
             name: "asc",
@@ -61,7 +74,6 @@ export async function createIngredient(
         name: string;
         unitId: number;
         minimumStock: number;
-        costPerUnit: number;
     }
 ) {
     return prisma.ingredient.create({
@@ -70,6 +82,10 @@ export async function createIngredient(
             ...data,
 
             currentStock: 0,
+
+            // Ingredient cost is displayed from the latest PurchaseItem.
+            // Keep this existing required field only as a legacy fallback.
+            costPerUnit: 0,
 
             isActive: true,
 
@@ -101,7 +117,6 @@ export async function updateIngredient(
         name: string;
         unitId: number;
         minimumStock: number;
-        costPerUnit: number;
     }
 ) {
     return prisma.ingredient.update({

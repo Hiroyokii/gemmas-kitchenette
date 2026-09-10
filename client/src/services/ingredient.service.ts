@@ -5,7 +5,6 @@ export interface IngredientInput {
     name: string;
     unitId: number;
     minimumStock: number;
-    costPerUnit: number;
 }
 
 export async function getIngredients(): Promise<Ingredient[]> {
