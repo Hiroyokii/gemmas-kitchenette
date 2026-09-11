@@ -1,37 +1,56 @@
 # Gemma's Kitchenette
 
-A web-based Food Management and Ordering System built for **Gemma's Kitchenette**, a local carinderia in Tanza, Cavite.
+A web-based **Food Management and Ordering System** developed for **Gemma's Kitchenette**, a local carinderia in Punta I, Tanza, Cavite.
 
-The system helps manage daily food preparation, ingredient inventory, customer orders, and order processing through a centralized web application.
+The system provides a centralized platform for managing daily food preparation, menu availability, ingredient inventory, purchases, customer orders, and sales monitoring.
+
+## Overview
+
+Gemma's Kitchenette currently handles customer orders and business operations through manual processes. This system was developed to help organize these activities through a web-based application.
+
+The system supports three user roles:
+
+- **Customer** – browses the daily menu, places orders, and tracks orders.
+- **Staff** – assists with order processing and daily operations.
+- **Admin** – manages foods, recipes, inventory, purchases, menus, users, orders, and reports.
 
 ## Features
 
 ### Customer
 
 - User registration and login
-- Browse the daily menu
+- Browse today's menu
+- View food details
+- View food ratings and reviews
 - Add food to cart
 - Place pickup or delivery orders
+- Choose Cash on Delivery (COD) or simulated GCash payment
 - Track order status
 - View order history
 - View order details
+- Submit feedback and ratings for completed orders
 
 ### Admin
 
 - Dashboard
 - Food management
+- Food category management
 - Recipe management
-- Ingredient inventory
+- Ingredient inventory management
 - Purchase recording
 - Daily menu preparation
 - Order management
+- Order history
 - Sales reports
 - Inventory monitoring
+- Expiration monitoring
+- Spoilage and waste tracking
 - User management
 
 ### Staff
 
-- View and manage customer orders
+- View customer orders
+- Process orders
 - Update order status
 - Monitor daily food preparation
 - View ingredient inventory
@@ -39,86 +58,18 @@ The system helps manage daily food preparation, ingredient inventory, customer o
 
 ## Order Management
 
-The system allows staff and administrators to manage orders throughout the ordering process.
+The system manages customer orders throughout the order processing workflow.
 
-Order statuses include:
+### Order Status
 
-- Confirmed
-- Preparing
-- Out for delivery
-- Completed
-- Cancelled
-
-## Inventory Management
-
-The inventory module helps monitor the ingredients used in daily food preparation.
-
-The system supports:
-
-- Ingredient management
-- Stock monitoring
-- Minimum stock levels
-- Unit management
-- Purchase recording
-- Stock adjustments
-- Ingredient usage tracking
-- Inventory deduction based on orders
-
-## Food and Menu Management
-
-Administrators can manage the foods available in the system and prepare the daily menu.
-
-Features include:
-
-- Food categories
-- Food management
-- Recipe management
-- Ingredient-to-recipe relationships
-- Daily menu preparation
-- Food availability management
-- Prepared serving tracking
-
-## User Roles
-
-The system has three main user roles:
-
-| Role     | Description                                             |
-| -------- | ------------------------------------------------------- |
-| Customer | Browses the menu and places orders                      |
-| Staff    | Handles orders and assists with daily operations        |
-| Admin    | Manages the system, inventory, menu, users, and reports |
-
-## Technology Stack
-
-### Frontend
-
-- React
-- TypeScript
-- Vite
-- Axios
-- Zod
-- Tailwind / CSS
-
-### Backend
-
-- Node.js
-- Express.js
-- TypeScript
-- Zod
-- JWT Authentication
-- bcrypt
-- crypto
-
-### Database
-
-- PostgreSQL
-- Prisma ORM
-
-### Development Tools
-
-- Claude
-- ChatGPT
-- Visual Studio Code
-- Git
-- GitHub
-- Docker
+```text
+PENDING
+   ↓
+CONFIRMED
+   ↓
+PREPARING
+   ↓
+OUT_FOR_DELIVERY
+   ↓
+COMPLETED
+```
