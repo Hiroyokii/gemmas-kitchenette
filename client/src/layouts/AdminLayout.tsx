@@ -11,6 +11,7 @@ const NAV_LINKS = [
     { to: "/admin/recipes", label: "Recipes", icon: "book" },
     { to: "/admin/menu", label: "Daily Menu", icon: "calendar" },
     { to: "/admin/purchases", label: "Purchases", icon: "bag" },
+    { to: "/admin/spoilage", label: "Spoilage", icon: "bag" },
     { to: "/admin/orders", label: "Orders", icon: "list" },
     { to: "/admin/reports", label: "Reports", icon: "chart" },
 ] as const;

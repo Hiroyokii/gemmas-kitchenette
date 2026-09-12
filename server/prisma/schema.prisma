@@ -50,7 +50,8 @@ model User {
   orders           Order[]
   refreshTokens    RefreshToken[]
   reviews          Review[]
-  verifiedPayments Payment[]      @relation("PaymentVerifier")
+  verifiedPayments Payment[]        @relation("PaymentVerifier")
+  SpoilageRecord   SpoilageRecord[]
 }
 
 model RefreshToken {
@@ -126,6 +127,7 @@ model Ingredient {
 
   purchaseItems     PurchaseItem[]
   recipeIngredients RecipeIngredient[]
+  spoilageRecords   SpoilageRecord[]
 }
 
 model Purchase {
@@ -158,7 +160,38 @@ model PurchaseItem {
 
   expirationDate DateTime?
 
+  spoilageRecords SpoilageRecord[]
+
   @@index([expirationDate])
+}
+
+enum SpoilageReason {
+  EXPIRED
+  SPOILED
+  WASTE
+}
+
+model SpoilageRecord {
+  id Int @id @default(autoincrement())
+
+  ingredientId Int
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+
+  purchaseItemId Int?
+  purchaseItem   PurchaseItem? @relation(fields: [purchaseItemId], references: [id])
+
+  quantity Decimal        @db.Decimal(10, 2)
+  unitCost Decimal        @db.Decimal(10, 2)
+  reason   SpoilageReason
+  notes    String?
+
+  recordedById Int?
+  recordedBy   User?     @relation(fields: [recordedById], references: [id])
+  recordedAt   DateTime  @default(now())
+
+  @@index([ingredientId])
+  @@index([purchaseItemId])
+  @@index([recordedAt])
 }
 
 model RecipeIngredient {
@@ -224,8 +257,8 @@ model Order {
 
   status OrderStatus @default(PENDING)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   completedAt DateTime?
   cancelledAt DateTime?
 

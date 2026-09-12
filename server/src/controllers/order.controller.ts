@@ -2,6 +2,7 @@ import { OrderStatus } from "../generated/prisma/index.js";
 import type { PaginationInput } from "../schemas/pagination.schema.js";
 import {
     createOrderService,
+    getOrderByIdForCustomerService,
     getMyOrdersService,
     getAllOrdersService,
     updateOrderStatusService,
@@ -35,6 +36,15 @@ export const getMyOrders = asyncHandler(async (req, res) => {
     );
 
     res.status(200).json(orders);
+});
+
+export const getOrderByIdForCustomer = asyncHandler(async (req, res) => {
+    const order = await getOrderByIdForCustomerService(
+        Number(req.params.id),
+        req.user!.userId
+    );
+
+    res.status(200).json(order);
 });
 
 export const getAllOrders = asyncHandler(async (req, res) => {

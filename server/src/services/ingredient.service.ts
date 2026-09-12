@@ -10,44 +10,19 @@ import {
 
 import { ConflictError } from "../errors/ConflictError.js";
 import { NotFoundError } from "../errors/NotFoundError.js";
+import { processExpiredBatchesService } from "./spoilage.service.js";
 
 
 export async function getIngredientsService() {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const warningEnd = new Date(today);
-    warningEnd.setDate(warningEnd.getDate() + 3);
+    await processExpiredBatchesService();
     const ingredients = await getIngredients();
 
     return ingredients.map(({ purchaseItems, ...ingredient }) => {
-        const nextExpiringBatch = purchaseItems
-            .filter((item) =>
-                Number(item.remainingQuantity) > 0 && item.expirationDate
-            )
-            .sort((left, right) =>
-                left.expirationDate!.getTime() - right.expirationDate!.getTime()
-            )[0];
-
-        let expirationStatus: "SAFE" | "EXPIRING_SOON" | "EXPIRED" | null = null;
-
-        if (nextExpiringBatch?.expirationDate) {
-            const expirationDate = new Date(nextExpiringBatch.expirationDate);
-            expirationDate.setHours(0, 0, 0, 0);
-
-            expirationStatus = expirationDate < today
-                ? "EXPIRED"
-                : expirationDate <= warningEnd
-                    ? "EXPIRING_SOON"
-                    : "SAFE";
-        }
-
         return {
             ...ingredient,
             latestPurchaseUnitCost: purchaseItems[0]
                 ? Number(purchaseItems[0].unitCost)
                 : null,
-            expirationDate: nextExpiringBatch?.expirationDate ?? null,
-            expirationStatus,
         };
     });
 }

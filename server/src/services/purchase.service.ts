@@ -6,6 +6,7 @@ import { increaseIngredientStock, findIngredientById } from "../repositories/pur
 import type { CreatePurchaseInput } from "../schemas/purchase.schema.js";
 
 import { NotFoundError } from "../errors/NotFoundError.js";
+import { processExpiredBatchesService } from "./spoilage.service.js";
 
 export async function createPurchaseService(
     data: CreatePurchaseInput,
@@ -77,12 +78,18 @@ function getExpirationStatus(daysRemaining: number) {
 }
 
 export async function getExpirationAlertsService() {
+    await processExpiredBatchesService();
     const today = startOfToday();
     const warningEnd = new Date(today);
     warningEnd.setDate(warningEnd.getDate() + EXPIRATION_WARNING_DAYS);
     const batches = await getExpirationAlertBatches(today, warningEnd);
+    const expiredRecords = await prisma.spoilageRecord.findMany({
+        where: { reason: "EXPIRED" },
+        include: { ingredient: { include: { unit: true } }, purchaseItem: true },
+        orderBy: { recordedAt: "desc" },
+    });
 
-    return batches.map((batch) => {
+    const activeAlerts = batches.map((batch) => {
         const expirationDate = new Date(batch.expirationDate!);
         expirationDate.setHours(0, 0, 0, 0);
         const daysRemaining = Math.round(
@@ -99,4 +106,17 @@ export async function getExpirationAlertsService() {
             status: getExpirationStatus(daysRemaining),
         };
     });
+
+    return [
+        ...expiredRecords.map((record) => ({
+            id: record.purchaseItemId,
+            ingredientName: record.ingredient.name,
+            remainingQuantity: record.quantity,
+            unit: record.ingredient.unit.name,
+            expirationDate: record.purchaseItem?.expirationDate ?? record.recordedAt,
+            daysRemaining: -1,
+            status: "EXPIRED" as const,
+        })),
+        ...activeAlerts,
+    ];
 }

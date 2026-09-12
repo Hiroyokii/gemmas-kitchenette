@@ -13,6 +13,4 @@ export interface Ingredient {
     latestPurchaseUnitCost?: number | null;
     currentStock: number;
     isActive: boolean;
-    expirationDate?: string | null;
-    expirationStatus?: "SAFE" | "EXPIRING_SOON" | "EXPIRED" | null;
 }

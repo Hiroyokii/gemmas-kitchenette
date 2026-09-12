@@ -73,6 +73,32 @@ export async function findOrdersByCustomer(
     });
 }
 
+export async function findOrderByIdForCustomer(
+    id: number,
+    customerId: number
+) {
+    return prisma.order.findFirst({
+        where: { id, customerId },
+        include: {
+            customer: {
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                    phoneNumber: true,
+                },
+            },
+            payment: true,
+            orderItems: {
+                include: {
+                    dailyMenu: { include: { food: true } },
+                },
+            },
+        },
+    });
+}
+
 export async function findAllOrders(
     page: number, 
     limit: number
@@ -119,7 +145,9 @@ export async function updateOrderStatus(
             id: orderId 
         },
         data: { 
-            status 
+            status,
+            completedAt: status === "COMPLETED" ? new Date() : undefined,
+            cancelledAt: status === "CANCELLED" ? new Date() : undefined,
         },
         include: { 
             customer: { 

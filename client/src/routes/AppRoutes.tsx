@@ -10,6 +10,7 @@ import RegisterPage from "../pages/auth/RegisterPage";
 import HomePage from "../pages/customer/HomePage";
 import CartPage from "../pages/customer/CartPage";
 import OrderHistoryPage from "../pages/customer/OrderHistoryPage";
+import OrderStatusPage from "../pages/customer/OrderStatusPage";
 
 import DashboardPage from "../pages/admin/DashboardPage";
 import FoodsPage from "../pages/admin/FoodsPage";
@@ -19,6 +20,7 @@ import RecipesPage from "../pages/admin/RecipesPage";
 import DailyMenuPage from "../pages/admin/DailyMenuPage";
 import OrdersPage from "../pages/admin/OrdersPage";
 import ReportsPage from "../pages/admin/ReportsPage";
+import SpoilagePage from "../pages/admin/SpoilagePage";
 
 import ProtectedRoute from "../components/ProtectedRoute";
 import PublicRoute from "../components/PublicRoute";
@@ -70,6 +72,11 @@ export default function AppRoutes() {
                             path="orders"
                             element={<OrderHistoryPage />}
                         />
+
+                        <Route
+                            path="orders/:orderId/status"
+                            element={<OrderStatusPage />}
+                        />
                     </Route>
                 </Route>
 
@@ -100,6 +107,11 @@ export default function AppRoutes() {
                         <Route
                             path="purchases"
                             element={<PurchasesPage />}
+                        />
+
+                        <Route
+                            path="spoilage"
+                            element={<SpoilagePage />}
                         />
 
                         <Route

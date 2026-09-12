@@ -5,6 +5,7 @@ import { ORDER_STATUS_META } from "../../utils/orderStatus";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { submitPaymentReference } from "../../services/order.service";
+import { Link } from "react-router-dom";
 
 interface OrderTicketProps {
     order: Order;
@@ -91,6 +92,13 @@ export default function OrderTicket({ order }: OrderTicketProps) {
                         ₱{Number(order.total).toFixed(2)}
                     </span>
                 </div>
+
+                <Link
+                    to={`/orders/${order.id}/status`}
+                    className="mt-3 inline-flex text-sm font-medium text-orange-600 transition-colors hover:text-orange-700"
+                >
+                    Track order <Icon name="chevronRight" className="ml-1 h-4 w-4" />
+                </Link>
             </div>
         </div>
     );

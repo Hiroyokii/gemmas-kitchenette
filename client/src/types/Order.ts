@@ -24,6 +24,8 @@ export interface Order {
     total: number;
     deliveryAddress: string;
     createdAt: string;
+    completedAt?: string | null;
+    cancelledAt?: string | null;
     payment?: {
         method: "COD" | "GCASH";
         status: "NOT_APPLICABLE" | "PENDING" | "VERIFIED" | "REJECTED";
@@ -35,6 +37,8 @@ export interface Order {
         id: number;
         firstName: string;
         lastName: string;
+        email?: string;
+        phoneNumber?: string;
     };
     orderItems: OrderItem[];
 }

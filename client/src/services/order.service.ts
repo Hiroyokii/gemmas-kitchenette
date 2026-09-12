@@ -30,6 +30,12 @@ export async function getMyOrders(): Promise<Order[]> {
   return response.data;
 }
 
+export async function getOrderById(orderId: number): Promise<Order> {
+  const response = await api.get(`/orders/${orderId}`);
+
+  return response.data;
+}
+
 export async function getAllOrders(
   page: number,
   limit: number

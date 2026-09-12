@@ -5,6 +5,7 @@ import {
     createOrder, 
     createOrderItems, 
     findOrdersByCustomer, 
+    findOrderByIdForCustomer,
     findAllOrders, 
     findOrderById, 
     updateOrderStatus,
@@ -339,6 +340,19 @@ export async function getMyOrdersService(
     return findOrdersByCustomer(
         customerId
     );
+}
+
+export async function getOrderByIdForCustomerService(
+    orderId: number,
+    customerId: number
+) {
+    const order = await findOrderByIdForCustomer(orderId, customerId);
+
+    if (!order) {
+        throw new NotFoundError("Order not found.");
+    }
+
+    return order;
 }
 
 export async function getAllOrdersService(

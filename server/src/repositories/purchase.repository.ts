@@ -103,3 +103,33 @@ export async function getExpirationAlertBatches(
         orderBy: { expirationDate: "asc" },
     });
 }
+
+export async function consumeInventoryBatches(
+    tx: Prisma.TransactionClient,
+    ingredientId: number,
+    quantity: number
+) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const batches = await tx.purchaseItem.findMany({
+        where: {
+            ingredientId,
+            remainingQuantity: { gt: 0 },
+            OR: [{ expirationDate: null }, { expirationDate: { gte: today } }],
+        },
+        orderBy: [{ expirationDate: "asc" }, { purchase: { createdAt: "asc" } }],
+    });
+
+    let remaining = quantity;
+    for (const batch of batches) {
+        if (remaining <= 0) break;
+        const used = Math.min(remaining, Number(batch.remainingQuantity));
+        const updated = await tx.purchaseItem.updateMany({
+            where: { id: batch.id, remainingQuantity: { gte: used } },
+            data: { remainingQuantity: { decrement: used } },
+        });
+        if (updated.count === 0) return false;
+        remaining -= used;
+    }
+    return remaining === 0;
+}

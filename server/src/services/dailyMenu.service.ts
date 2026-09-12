@@ -15,10 +15,13 @@ import type { CreateDailyMenuInput } from "../schemas/dailyMenu.schema.js";
 import { NotFoundError } from "../errors/NotFoundError.js";
 import { ConflictError } from "../errors/ConflictError.js";
 import { BadRequestError } from "../errors/BadRequestError.js";
+import { consumeInventoryBatches } from "../repositories/purchase.repository.js";
+import { processExpiredBatchesService } from "./spoilage.service.js";
 
 export async function prepareDailyFood(
     data: CreateDailyMenuInput
 ) {
+    await processExpiredBatchesService();
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -80,6 +83,13 @@ export async function prepareDailyFood(
 
     return prisma.$transaction(async (tx) => {
         for (const item of required) {
+            const batchesUpdated = await consumeInventoryBatches(
+                tx, item.ingredientId, item.quantity
+            );
+            if (!batchesUpdated) {
+                const recipeIngredient = recipe.find(r => r.ingredientId === item.ingredientId)!;
+                throw new BadRequestError(`${recipeIngredient.ingredient.name} has insufficient usable batch inventory.`);
+            }
             const updatedRows = await decreaseIngredientStock(
                 tx,
                 item.ingredientId,

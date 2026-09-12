@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import { 
     createOrder, 
+    getOrderByIdForCustomer,
     getMyOrders, 
     updateOrderStatus, 
     getAllOrders, 
@@ -40,6 +41,13 @@ router.get(
     authenticate,
     authorize("CUSTOMER"),
     getMyOrders
+);
+
+router.get(
+    "/:id",
+    authenticate,
+    authorize("CUSTOMER"),
+    getOrderByIdForCustomer
 );
 
 router.post(

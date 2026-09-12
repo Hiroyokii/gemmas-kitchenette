@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
 import { useAuth } from "../../hooks/useAuth";
 import { getTodaySalesReport } from "../../services/report.service";
@@ -8,6 +9,7 @@ import { getErrorMessage } from "../../utils/getErrorMessage";
 
 import Alert from "../../components/ui/Alert";
 import { SalesSummary } from "./ReportsPage";
+import { getExpirationAlerts, type ExpirationAlert } from "../../services/purchase.service";
 
 const QUICK_LINKS = [
     { to: "/admin/menu", label: "Prepare today's menu" },
@@ -21,6 +23,8 @@ export default function DashboardPage() {
 
     const [report, setReport] = useState<SalesReport | null>(null);
     const [error, setError] = useState("");
+    const expirationQuery = useQuery({ queryKey: ["expiration-alerts"], queryFn: getExpirationAlerts });
+    const alerts = expirationQuery.data ?? [];
 
     useEffect(() => {
         getTodaySalesReport()
@@ -63,6 +67,7 @@ export default function DashboardPage() {
                         <SalesSummary report={report} />   
                     </div> 
                 )} 
+                <ExpirationAlerts alerts={alerts} error={expirationQuery.error ? getErrorMessage(expirationQuery.error, "Failed to load expiration alerts.") : ""} />
                 
                 {/* Quick Actions */} 
                 <div className="mt-6 rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] sm:p-6"> 
@@ -90,4 +95,14 @@ export default function DashboardPage() {
             </div> 
         </div> 
     ); 
+}
+
+function ExpirationAlerts({ alerts, error }: { alerts: ExpirationAlert[]; error: string }) {
+    const expired = alerts.filter((alert) => alert.status === "EXPIRED");
+    const soon = alerts.filter((alert) => alert.status === "EXPIRING_SOON");
+    return <section className="mt-6 rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] sm:p-6"><div><h2 className="text-lg font-semibold text-stone-900">Expiration alerts</h2><p className="mt-1 text-sm text-stone-500">Inventory batches that need attention.</p></div><Alert type="error" message={error} /><div className="mt-5 grid gap-4 lg:grid-cols-2"><AlertList title="Expired" alerts={expired} tone="red" /><AlertList title="Expiring soon" alerts={soon} tone="orange" /></div></section>;
+}
+
+function AlertList({ title, alerts, tone }: { title: string; alerts: ExpirationAlert[]; tone: "red" | "orange" }) {
+    return <div className="rounded-xl bg-stone-50 p-4"><h3 className={tone === "red" ? "font-semibold text-red-700" : "font-semibold text-orange-700"}>{title}</h3>{alerts.length === 0 ? <p className="mt-2 text-sm text-stone-500">None.</p> : <ul className="mt-3 space-y-2 text-sm">{alerts.map((alert, index) => <li key={`${alert.id}-${index}`} className="rounded-lg bg-white px-3 py-2 text-stone-700"><span className="font-medium text-stone-900">{alert.ingredientName}</span> — {alert.remainingQuantity} {alert.unit} — {tone === "red" ? "Expired" : "Expires"} {new Date(alert.expirationDate).toLocaleDateString()}</li>)}</ul>}</div>;
 }

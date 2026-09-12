@@ -12,6 +12,7 @@ import orderRoutes from "./routes/order.routes.js";
 import reportRoutes from "./routes/report.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
+import spoilageRoutes from "./routes/spoilage.routes.js";
 
 import { errorHandler } from "./middleware/error.middleware.js";
 
@@ -43,6 +44,7 @@ app.use("/orders", orderRoutes);
 app.use("/reports", reportRoutes);
 app.use("/categories", categoryRoutes);
 app.use("/reviews", reviewRoutes);
+app.use("/spoilage", spoilageRoutes);
 
 app.use(errorHandler);
 
