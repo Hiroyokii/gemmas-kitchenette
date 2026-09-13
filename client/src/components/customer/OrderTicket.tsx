@@ -42,7 +42,9 @@ export default function OrderTicket({ order }: OrderTicketProps) {
                         {new Date(order.createdAt).toLocaleString()}
                     </span>
 
-                    <Badge tone={status.tone}>{status.label}</Badge>
+                    <Badge tone="custom" className={status.badgeClassName}>
+                        {status.label}
+                    </Badge>
                 </div>
 
                 <ul className="space-y-1 text-sm text-ink-700">

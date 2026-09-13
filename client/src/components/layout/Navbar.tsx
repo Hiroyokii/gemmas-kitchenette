@@ -39,7 +39,7 @@ export default function Navbar() {
     return (
         <header className="sticky top-0 z-40 border-b border-stone-200 bg-white/90 shadow-[0_1px_20px_rgba(0,0,0,0.04)] backdrop-blur">
             {/* Top row: mobile controls (left) | centered logo | account area (right) */}
-            <div className="relative mx-auto flex h-36 max-w-9xl items-center justify-between px-4 sm:px-12">
+            <div className="relative mx-auto flex h-28 max-w-9xl items-center justify-between px-4 sm:px-12">
                 {/* Left: mobile menu toggle */}
                 <div className="flex items-center gap-2 md:hidden">
                     <button
@@ -60,7 +60,7 @@ export default function Navbar() {
                     className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 font-display text-lg font-semibold tracking-tight text-stone-900"
                     onClick={() => setIsMenuOpen(false)}
                 >
-                    <div className="mx-auto mb-6 w-64">
+                    <div className="mx-auto w-64">
                         <img
                             src="/gemmas-logo2.png"
                             alt="Gemma's Kitchenette"

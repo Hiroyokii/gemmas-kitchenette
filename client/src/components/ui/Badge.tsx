@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-type BadgeTone = "neutral" | "brand" | "leaf" | "gold" | "red";
+type BadgeTone = "neutral" | "brand" | "leaf" | "gold" | "red" | "custom";
 
 interface BadgeProps {
     tone?: BadgeTone;
@@ -14,6 +14,7 @@ const TONE_CLASSES: Record<BadgeTone, string> = {
     leaf: "bg-leaf-100 text-leaf-700",
     gold: "bg-gold-100 text-gold-600",
     red: "bg-red-100 text-red-700",
+    custom: "",
 };
 
 export default function Badge({ tone = "neutral", children, className = "" }: BadgeProps) {
