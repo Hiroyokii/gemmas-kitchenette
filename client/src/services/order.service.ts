@@ -6,7 +6,6 @@ export type PaymentStatus = "NOT_APPLICABLE" | "PENDING" | "VERIFIED" | "REJECTE
 
 export interface CreateOrderInput {
   items: { dailyMenuId: number; quantity: number }[];
-  deliveryAddress: string;
   paymentMethod: PaymentMethod;
 }
 

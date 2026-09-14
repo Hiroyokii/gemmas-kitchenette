@@ -97,10 +97,42 @@ export async function createOrderService(
         );
 
     return prisma.$transaction(async (tx) => {
+        const customer = await tx.user.findUnique({
+            where: { id: customerId },
+            select: {
+                block: true,
+                lot: true,
+                street: true,
+                landmark: true,
+            },
+        });
+
+        const savedAddress = customer
+            ? {
+                block: customer.block.trim(),
+                lot: customer.lot.trim(),
+                street: customer.street.trim(),
+                landmark: customer.landmark?.trim(),
+            }
+            : null;
+
+        if (!savedAddress?.block || !savedAddress.lot || !savedAddress.street) {
+            throw new BadRequestError(
+                "Please complete your saved delivery address before placing an order."
+            );
+        }
+
+        const deliveryAddress = [
+            `Block ${savedAddress.block}`,
+            `Lot ${savedAddress.lot}`,
+            savedAddress.street,
+            savedAddress.landmark,
+        ].filter((part): part is string => Boolean(part)).join(", ");
+
         const order = await createOrder(
             tx,
             customerId,
-            data.deliveryAddress,
+            deliveryAddress,
             total
         );
 

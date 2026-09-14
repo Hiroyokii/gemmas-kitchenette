@@ -25,6 +25,10 @@ type AuthUser = {
     id: number;
     firstName: string;
     lastName: string;
+    block: string;
+    lot: string;
+    street: string;
+    landmark: string | null;
     role: { name: string };
 }
 
@@ -73,6 +77,10 @@ async function issueTokens(
             id: user.id,
             firstName: user.firstName,
             lastName: user.lastName,
+            block: user.block,
+            lot: user.lot,
+            street: user.street,
+            landmark: user.landmark,
             role: user.role.name,
         },
     };
@@ -114,6 +122,10 @@ export async function registerUser(
         id: user.id,
         firstName: user.firstName,
         lastName: user.lastName,
+        block: user.block,
+        lot: user.lot,
+        street: user.street,
+        landmark: user.landmark,
         role: { name: customerRole.name },
     });
 } 

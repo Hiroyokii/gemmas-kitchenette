@@ -11,11 +11,6 @@ export const createOrderSchema = z.object({
         .array(orderItemSchema)
         .min(1, "Order must contain at least one item."),
 
-    deliveryAddress: z
-        .string()
-        .trim()
-        .min(5)
-        .max(255),
     paymentMethod: z
         .enum([
             "COD", 

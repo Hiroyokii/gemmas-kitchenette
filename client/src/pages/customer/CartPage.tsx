@@ -3,13 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 
 import { useCart } from "../../hooks/useCart";
+import { useAuth } from "../../hooks/useAuth";
 import { createOrder, submitPaymentReference, type PaymentMethod } from "../../services/order.service";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 
 import CartItemRow from "../../components/customer/CartItemRow";
 import PageHeader from "../../components/ui/PageHeader";
 import Card from "../../components/ui/Card";
-import Textarea from "../../components/ui/Textarea";
 import Button from "../../components/ui/Button";
 import Alert from "../../components/ui/Alert";
 import EmptyState from "../../components/ui/EmptyState";
@@ -18,10 +18,10 @@ import Icon from "../../components/ui/Icon";
 export default function CartPage() {
     const { cart, addToCart, decreaseQuantity, removeFromCart, clearCart, subtotal } =
         useCart();
+    const { user } = useAuth();
 
     const navigate = useNavigate();
 
-    const [deliveryAddress, setDeliveryAddress] = useState("");
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("COD");
     const [referenceNumber, setReferenceNumber] = useState("");
     const [error, setError] = useState("");
@@ -45,11 +45,6 @@ export default function CartPage() {
     async function handlePlaceOrder() {
         setError("");
 
-        if (deliveryAddress.trim().length < 5) {
-            setError("Enter a delivery address (at least 5 characters).");
-            return;
-        }
-
         if (paymentMethod === "GCASH" && referenceNumber.trim().length < 4) {
             setError("Enter the GCash reference number from your simulated payment.");
             return;
@@ -57,7 +52,6 @@ export default function CartPage() {
 
         orderMutation.mutate({
             items: cart.map((item) => ({ dailyMenuId: item.menu.id, quantity: item.quantity })),
-            deliveryAddress: deliveryAddress.trim(),
             paymentMethod,
         });
     }
@@ -113,13 +107,19 @@ export default function CartPage() {
                             </span>
                         </div>
 
-                        <Textarea
-                            label="Delivery address"
-                            placeholder="Block, Lot, Street, Landmark…"
-                            rows={3}
-                            value={deliveryAddress}
-                            onChange={(event) => setDeliveryAddress(event.target.value)}
-                        />
+                        <div className="rounded-xl border border-stone-200 bg-stone-50 p-3">
+                            <p className="text-sm font-medium text-ink-800">Delivery address</p>
+                            <p className="mt-1 text-xs text-ink-500">
+                                Your saved address will be used for this order.
+                            </p>
+                            <p className="mt-2 text-sm text-ink-700">
+                                {user
+                                    ? [`Block ${user.block}`, `Lot ${user.lot}`, user.street, user.landmark]
+                                        .filter(Boolean)
+                                        .join(", ")
+                                    : "Your saved address will be confirmed when you place the order."}
+                            </p>
+                        </div>
 
                         <fieldset className="space-y-2">
                             <legend className="text-sm font-medium text-ink-800">Payment method</legend>
