@@ -1,3 +1,4 @@
+import { Prisma } from "../generated/prisma/index.js";
 import { prisma } from "../lib/prisma.js";
 import { BadRequestError } from "../errors/BadRequestError.js";
 import { NotFoundError } from "../errors/NotFoundError.js";
@@ -16,9 +17,9 @@ export async function createReviewService(
                 customerId 
             } 
         },
-        include: { 
-            order: true, 
-            dailyMenu: true 
+        include: {
+            order: { select: { status: true } },
+            dailyMenu: { select: { foodId: true } },
         },
     });
 
@@ -34,15 +35,18 @@ export async function createReviewService(
             "This item has already been rated."
         );
 
-    return createReview({ 
-        ...data, 
-        customerId, 
-        foodId: (
-            await prisma.dailyMenu.findUniqueOrThrow({ 
-                where: { 
-                    id: orderItem.dailyMenuId 
-                } 
-            })
-        ).foodId 
-    });
+    try {
+        return await createReview({
+            ...data,
+            customerId,
+            foodId: orderItem.dailyMenu.foodId,
+        });
+    } catch (error) {
+        // The unique constraint is the final guard when two submissions race.
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+            throw new ConflictError("This item has already been rated.");
+        }
+
+        throw error;
+    }
 }

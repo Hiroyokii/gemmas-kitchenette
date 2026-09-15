@@ -3,7 +3,7 @@ import { authenticate } from "../middleware/auth.middleware.js";
 import { authorize } from "../middleware/authorize.middleware.js";
 import { validate } from "../middleware/validate.middleware.js";
 import { createReviewSchema } from "../schemas/review.schema.js";
-import { createReview } from "../repositories/review.repository.js";
+import { createReview } from "../controllers/review.controller.js";
 
 const router = Router();
 

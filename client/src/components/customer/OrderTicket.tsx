@@ -6,6 +6,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { submitPaymentReference } from "../../services/order.service";
 import { Link } from "react-router-dom";
+import Button from "../ui/Button";
+import ReviewModal from "./ReviewModal";
 
 interface OrderTicketProps {
     order: Order;
@@ -15,6 +17,10 @@ export default function OrderTicket({ order }: OrderTicketProps) {
     const status = ORDER_STATUS_META[order.status];
     const queryClient = useQueryClient();
     const [referenceNumber, setReferenceNumber] = useState("");
+    const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+    const reviewedItems = order.orderItems.filter((item) => item.review).length;
+    const isCompleted = order.status === "COMPLETED";
+    const hasUnreviewedItems = reviewedItems < order.orderItems.length;
     const referenceMutation = useMutation({
         mutationFn: () => submitPaymentReference(order.id, referenceNumber.trim()),
         onSuccess: () => {
@@ -46,6 +52,12 @@ export default function OrderTicket({ order }: OrderTicketProps) {
                         {status.label}
                     </Badge>
                 </div>
+
+                {isCompleted && order.completedAt && (
+                    <p className="-mt-1 mb-3 text-xs text-ink-400">
+                        Completed {new Date(order.completedAt).toLocaleString()}
+                    </p>
+                )}
 
                 <ul className="space-y-1 text-sm text-ink-700">
                     {order.orderItems.map((item) => (
@@ -95,13 +107,27 @@ export default function OrderTicket({ order }: OrderTicketProps) {
                     </span>
                 </div>
 
-                <Link
-                    to={`/orders/${order.id}/status`}
-                    className="mt-3 inline-flex text-sm font-medium text-orange-600 transition-colors hover:text-orange-700"
-                >
-                    Track order <Icon name="chevronRight" className="ml-1 h-4 w-4" />
-                </Link>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <Link
+                        to={`/orders/${order.id}/status`}
+                        className="inline-flex text-sm font-medium text-orange-600 transition-colors hover:text-orange-700"
+                    >
+                        View Order <Icon name="chevronRight" className="ml-1 h-4 w-4" />
+                    </Link>
+
+                    {isCompleted && (hasUnreviewedItems ? (
+                        <Button type="button" size="sm" onClick={() => setIsReviewModalOpen(true)}>
+                            {reviewedItems === 0 ? "Rate Your Order" : `Continue Reviewing (${reviewedItems}/${order.orderItems.length})`}
+                        </Button>
+                    ) : (
+                        <span className="text-sm font-medium text-emerald-700">✓ Reviewed</span>
+                    ))}
+                </div>
             </div>
+
+            {isReviewModalOpen && (
+                <ReviewModal order={order} onClose={() => setIsReviewModalOpen(false)} />
+            )}
         </div>
     );
 }

@@ -64,6 +64,7 @@ export async function findOrdersByCustomer(
                             food: true,
                         },
                     },
+                    review: true,
                 },
             },
         },
@@ -91,9 +92,7 @@ export async function findOrderByIdForCustomer(
             },
             payment: true,
             orderItems: {
-                include: {
-                    dailyMenu: { include: { food: true } },
-                },
+                include: orderInclude.orderItems.include,
             },
         },
     });

@@ -16,6 +16,12 @@ export interface OrderItem {
         id: number;
         food: Food;
     };
+    review?: {
+        id: number;
+        rating: number;
+        comment?: string | null;
+        createdAt: string;
+    } | null;
 }
 
 export interface Order {
