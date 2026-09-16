@@ -55,6 +55,7 @@ function ReviewItemForm({ item }: { item: OrderItem }) {
             setSubmitted(true);
             await Promise.all([
                 queryClient.invalidateQueries({ queryKey: ["my-orders"] }),
+                queryClient.invalidateQueries({ queryKey: ["today-menu"] }),
                 queryClient.invalidateQueries({ queryKey: ["food", item.dailyMenu.food.id] }),
                 queryClient.invalidateQueries({ queryKey: ["food-reviews", item.dailyMenu.food.id] }),
             ]);

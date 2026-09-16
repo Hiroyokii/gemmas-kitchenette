@@ -3,6 +3,7 @@ import { useCart } from "../../hooks/useCart";
 import Badge from "../ui/Badge";
 import Button from "../ui/Button";
 import Icon from "../ui/Icon";
+import StarRating from "../ui/StarRating";
 
 interface FoodCardProps { menu: DailyMenu; }
 
@@ -19,7 +20,7 @@ export default function FoodCard({ menu }: FoodCardProps) {
             {isSoldOut && <div className="absolute inset-0 flex items-center justify-center bg-stone-900/45"><span className="rounded-full bg-white px-3 py-1 text-xs font-bold uppercase tracking-wide text-stone-800">Sold out</span></div>}
         </div>
         <div className="flex flex-1 flex-col px-5 pb-5 pt-1">
-            <div className="flex items-start justify-between gap-3"><h3 className="min-w-0 font-display text-xl font-bold leading-tight text-stone-900">{menu.food.name}</h3><span className="shrink-0 font-mono text-lg font-bold text-orange-600">₱{Number(menu.food.price).toFixed(2)}</span></div>
+            <div className="flex items-start justify-between gap-3"><div className="min-w-0"><div className="flex flex-wrap items-baseline gap-x-2 gap-y-1"><h3 className="font-display text-xl font-bold leading-tight text-stone-900">{menu.food.name}</h3>{menu.food.reviewCount > 0 && menu.food.averageRating !== null ? <span className="inline-flex items-center gap-1 whitespace-nowrap text-sm font-semibold text-stone-600"><StarRating rating={menu.food.averageRating} className="text-sm" />{menu.food.averageRating.toFixed(1)} ({menu.food.reviewCount})</span> : <span className="text-xs font-medium text-stone-400">No reviews yet</span>}</div></div><span className="shrink-0 font-mono text-lg font-bold text-orange-600">₱{Number(menu.food.price).toFixed(2)}</span></div>
             <p className="mt-3 line-clamp-2 min-h-10 text-sm leading-5 text-stone-500">{menu.food.description}</p>
             <div className="mt-5 flex items-center justify-between gap-3 border-t border-stone-100 pt-4">
                 {!isSoldOut ? <Badge tone={isLowStock ? "gold" : "leaf"}>{isLowStock ? `${menu.remainingServings} left` : "Available"}</Badge> : <span className="text-sm text-stone-400">Come back tomorrow</span>}

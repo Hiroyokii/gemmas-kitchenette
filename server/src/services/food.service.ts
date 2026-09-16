@@ -8,6 +8,7 @@ import {
     findFoodById,
     updateFood
 } from "../repositories/food.repository.js";
+import { findFoodRatingSummaries } from "../repositories/review.repository.js";
 
 import { ConflictError } from "../errors/ConflictError.js";
 import { NotFoundError } from "../errors/NotFoundError.js";
@@ -43,10 +44,20 @@ export async function getFoodsService(
     search?: string,
     categoryId?: number
 ) {
-    return findFoods(
+    const foods = await findFoods(
         search,
         categoryId
     );
+
+    const ratings = await findFoodRatingSummaries(foods.map((food) => food.id));
+
+    return foods.map((food) => ({
+        ...food,
+        ...(ratings.get(food.id) ?? {
+            averageRating: null,
+            reviewCount: 0,
+        }),
+    }));
 }
 
 export async function updateFoodService(

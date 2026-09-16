@@ -17,6 +17,7 @@ import { ConflictError } from "../errors/ConflictError.js";
 import { BadRequestError } from "../errors/BadRequestError.js";
 import { consumeInventoryBatches } from "../repositories/purchase.repository.js";
 import { processExpiredBatchesService } from "./spoilage.service.js";
+import { findFoodRatingSummaries } from "../repositories/review.repository.js";
 
 export async function prepareDailyFood(
     data: CreateDailyMenuInput
@@ -126,7 +127,19 @@ export async function getTodayMenuService() {
     const end = new Date(start);
     end.setDate(end.getDate() + 1);
 
-    return findTodayMenu(start, end);
+    const menu = await findTodayMenu(start, end);
+    const ratings = await findFoodRatingSummaries(menu.map((item) => item.foodId));
+
+    return menu.map((item) => ({
+        ...item,
+        food: {
+            ...item.food,
+            ...(ratings.get(item.foodId) ?? {
+                averageRating: null,
+                reviewCount: 0,
+            }),
+        },
+    }));
 }
 
 export async function getTodayMenuForAdminService() {

@@ -11,5 +11,7 @@ export interface Food {
     imageUrl?: string | null;
     isAvailable: boolean;
     categoryId: number;
+    averageRating: number | null;
+    reviewCount: number;
     category?: Category;
 }
