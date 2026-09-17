@@ -19,6 +19,8 @@ export default function HomePage() {
   const menuQuery = useQuery({
     queryKey: ["today-menu"],
     queryFn: getTodayMenu,
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: true,
   });
 
   const menu = menuQuery.data ?? [];
@@ -158,4 +160,3 @@ function FoodGrid({ menu }: { menu: DailyMenu[] }) {
     </div>
   );
 }
-

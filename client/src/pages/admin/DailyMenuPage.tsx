@@ -184,9 +184,14 @@ export default function DailyMenuPage() {
                     onSaved={() => {
                         setIsModalOpen(false);
 
-                        queryClient.invalidateQueries({
-                            queryKey: ["daily-menu", "today"],
-                        });
+                        void Promise.all([
+                            queryClient.invalidateQueries({
+                                queryKey: ["daily-menu", "today"],
+                            }),
+                            queryClient.invalidateQueries({
+                                queryKey: ["today-menu"],
+                            }),
+                        ]);
                     }}
                 />
             )}

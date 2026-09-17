@@ -12,10 +12,25 @@ import EmptyState from "../../components/ui/EmptyState";
 import Button from "../../components/ui/Button";
 import Icon from "../../components/ui/Icon";
 
+const ACTIVE_ORDER_STATUSES = new Set<Order["status"]>([
+    "PENDING",
+    "CONFIRMED",
+    "PREPARING",
+    "OUT_FOR_DELIVERY",
+]);
+
 export default function OrderHistoryPage() {
     const ordersQuery = useQuery<Order[]>({
         queryKey: ["my-orders"],
         queryFn: getMyOrders,
+        refetchOnWindowFocus: true,
+        refetchInterval: (query) => (
+            query.state.data?.some((order) =>
+                ACTIVE_ORDER_STATUSES.has(order.status)
+            )
+                ? 7_500
+                : false
+        ),
     });
 
     const navigate = useNavigate();

@@ -90,9 +90,10 @@ export default function FoodsPage() {
     function handleSaved() {
         setIsModalOpen(false);
 
-        queryClient.invalidateQueries({
-            queryKey: ["foods"],
-        });
+        void Promise.all([
+            queryClient.invalidateQueries({ queryKey: ["foods"] }),
+            queryClient.invalidateQueries({ queryKey: ["today-menu"] }),
+        ]);
     }
 
     return (
