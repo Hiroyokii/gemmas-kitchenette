@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import type { ReactNode } from "react";
 
 interface ModalProps {
@@ -37,7 +38,7 @@ export default function Modal({
         };
     }, [onClose]);
 
-    return (
+    return createPortal(
         <div
             className="fixed inset-0 z-50 flex items-end justify-center bg-black/16 backdrop-blur-[2px] sm:items-center sm:p-4"
             onClick={onClose}
@@ -84,6 +85,7 @@ export default function Modal({
 
                 {children}
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
