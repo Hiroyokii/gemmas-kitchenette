@@ -2,7 +2,7 @@ import { prisma } from "../lib/prisma.js";
 
 import { decreaseIngredientStock} from "../repositories/ingredient.repository.js"
 import { findRecipeIngredients } from "../repositories/recipe.repository.js";
-import { findFoodById } from "../repositories/food.repository.js";
+import { findFoodById, findFoods } from "../repositories/food.repository.js";
 import { 
     findTodayMenu,
     findDailyMenuByFoodAndDate,
@@ -120,14 +120,22 @@ export async function prepareDailyFood(
     })
 }
 
-export async function getTodayMenuService() {
+export async function getTodayMenuService(
+    search?: string,
+    categoryId?: number,
+) {
     const start = new Date();
     start.setHours(0, 0, 0, 0);
 
     const end = new Date(start);
     end.setDate(end.getDate() + 1);
 
-    const menu = await findTodayMenu(start, end);
+    const availableFoods = await findFoods(search, categoryId, true);
+    const menu = await findTodayMenu(
+        start,
+        end,
+        availableFoods.map((food) => food.id),
+    );
     const ratings = await findFoodRatingSummaries(menu.map((item) => item.foodId));
 
     return menu.map((item) => ({

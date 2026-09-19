@@ -8,6 +8,7 @@ import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
 
 import HomePage from "../pages/customer/HomePage";
+import CustomerFoodsPage from "../pages/customer/FoodsPage";
 import CartPage from "../pages/customer/CartPage";
 import OrderHistoryPage from "../pages/customer/OrderHistoryPage";
 import OrderStatusPage from "../pages/customer/OrderStatusPage";
@@ -54,6 +55,11 @@ export default function AppRoutes() {
                     <Route
                         index
                         element={<HomePage />}
+                    />
+
+                    <Route
+                        path="foods"
+                        element={<CustomerFoodsPage />}
                     />
 
                     <Route

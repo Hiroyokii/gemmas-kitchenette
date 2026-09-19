@@ -33,7 +33,8 @@ export async function findFoodById(id: number) {
 
 export async function findFoods(
     search?: string,
-    categoryId?: number
+    categoryId?: number,
+    availableOnly = false,
 ) {
     return prisma.food.findMany({
         where: {
@@ -46,6 +47,10 @@ export async function findFoods(
 
             ...(categoryId && {
                 categoryId,
+            }),
+
+            ...(availableOnly && {
+                isAvailable: true,
             }),
         },
 

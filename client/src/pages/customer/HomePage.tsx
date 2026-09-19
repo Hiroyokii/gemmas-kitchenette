@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 
 import Alert from "../../components/ui/Alert";
 import EmptyState from "../../components/ui/EmptyState";
@@ -18,7 +19,7 @@ const TODAY_LABEL = new Date().toLocaleDateString(undefined, {
 export default function HomePage() {
   const menuQuery = useQuery({
     queryKey: ["today-menu"],
-    queryFn: getTodayMenu,
+    queryFn: () => getTodayMenu(),
     refetchInterval: 30_000,
     refetchOnWindowFocus: true,
   });
@@ -61,12 +62,12 @@ export default function HomePage() {
                 Order Now
               </a>
 
-              <a
-                href="#todays-menu"
+              <Link
+                to="/foods"
                 className="inline-flex h-11 items-center justify-center rounded-lg border border-orange-200 bg-white px-5 text-sm font-semibold text-orange-700 transition-colors hover:bg-orange-50"
               >
-                View Today's Menu
-              </a>
+                View Full Menu
+              </Link>
             </div>
           </div>
 

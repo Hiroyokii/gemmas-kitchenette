@@ -44,7 +44,8 @@ export async function createDailyMenu(
 
 export async function findTodayMenu(
     start: Date,
-    end: Date
+    end: Date,
+    foodIds?: number[],
 ) {
     return prisma.dailyMenu.findMany({
         where: {
@@ -55,6 +56,11 @@ export async function findTodayMenu(
             remainingServings: {
                 gt: 0,
             },
+            ...(foodIds && {
+                foodId: {
+                    in: foodIds,
+                },
+            }),
         },
         include: {
             food: {

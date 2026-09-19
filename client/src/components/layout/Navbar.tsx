@@ -5,7 +5,10 @@ import { useAuth } from "../../hooks/useAuth";
 import { useCart } from "../../hooks/useCart";
 import Icon from "../ui/Icon";
 
-const NAV_LINKS = [{ to: "/", label: "Menu", end: true }];
+const NAV_LINKS = [
+    { to: "/", label: "Menu", end: true },
+    { to: "/foods", label: "Foods" },
+];
 
 const ICON_BUTTON_CLASS =
     "flex h-10 w-10 items-center justify-center rounded-xl border border-stone-200 bg-white text-stone-700 transition-colors hover:border-orange-300 hover:text-orange-600";

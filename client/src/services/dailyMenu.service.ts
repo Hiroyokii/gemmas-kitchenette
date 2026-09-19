@@ -1,9 +1,13 @@
 import api from "../api/axios";
 import type { DailyMenu } from "../types/DailyMenu";
 
-export async function getTodayMenu(): Promise<DailyMenu[]> {
+export async function getTodayMenu(params?: {
+    search?: string;
+    categoryId?: number;
+}): Promise<DailyMenu[]> {
     const response = await api.get(
-        "/daily-menu/today"
+        "/daily-menu/today",
+        { params },
     );
 
     return response.data;
