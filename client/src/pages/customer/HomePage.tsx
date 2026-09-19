@@ -10,11 +10,7 @@ import { getTodayMenu } from "../../services/dailyMenu.service";
 import type { DailyMenu } from "../../types/DailyMenu";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 
-const TODAY_LABEL = new Date().toLocaleDateString(undefined, {
-  weekday: "long",
-  month: "long",
-  day: "numeric",
-});
+const MENU_PREVIEW_LIMIT = 4;
 
 export default function HomePage() {
   const menuQuery = useQuery({
@@ -25,6 +21,7 @@ export default function HomePage() {
   });
 
   const menu = menuQuery.data ?? [];
+  const previewMenu = menu.slice(0, MENU_PREVIEW_LIMIT);
 
 
   return (
@@ -80,20 +77,23 @@ export default function HomePage() {
 
       {/* Menu Section */}
       <section id="todays-menu" className="scroll-mt-8">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+        <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-orange-600">
-              {TODAY_LABEL}
-            </p>
-
-            <h2 className="mt-1 font-display text-3xl font-bold tracking-tight text-stone-900">
+            <h2 className="font-display text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl">
               Today’s Menu
             </h2>
 
             <p className="mt-2 text-sm text-stone-500">
-              A comforting selection, prepared fresh for today.
+              Freshly prepared today.
             </p>
           </div>
+
+          <Link
+            to="/foods"
+            className="text-sm font-semibold text-orange-600 transition-colors hover:text-orange-700"
+          >
+            View all →
+          </Link>
         </div>
 
         <Alert
@@ -109,7 +109,7 @@ export default function HomePage() {
         />
 
         {menuQuery.isPending && (
-          <div className="flex justify-center py-16">
+          <div className="flex justify-center py-12">
             <Spinner label="Loading today's menu…" />
           </div>
         )}
@@ -125,7 +125,18 @@ export default function HomePage() {
           )}
 
         {!menuQuery.isPending && menu.length > 0 && (
-          <FoodGrid menu={menu} />
+          <FoodGrid menu={previewMenu} />
+        )}
+
+        {!menuQuery.isPending && menu.length > 0 && (
+          <div className="mt-5 flex justify-center sm:justify-start">
+            <Link
+              to="/foods"
+              className="inline-flex h-10 items-center justify-center rounded-lg border border-orange-200 bg-white px-4 text-sm font-semibold text-orange-700 transition-colors hover:bg-orange-50"
+            >
+              View Full Menu
+            </Link>
+          </div>
         )}
       </section>
     </div>
@@ -134,9 +145,9 @@ export default function HomePage() {
 
 function FoodGrid({ menu }: { menu: DailyMenu[] }) {
   return (
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
       {menu.map((item) => (
-        <FoodCard key={item.id} menu={item} />
+        <FoodCard key={item.id} menu={item} compact />
       ))}
     </div>
   );
