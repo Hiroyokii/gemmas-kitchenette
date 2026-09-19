@@ -25,75 +25,55 @@ export default function HomePage() {
   });
 
   const menu = menuQuery.data ?? [];
-  const heroImage = menu.find((item) => item.food.imageUrl)?.food.imageUrl;
+
 
   return (
     <div className="space-y-14 pb-8">
       {/* Hero Section */}
-      <section className="relative overflow-hidden rounded-3xl border border-orange-100 bg-gradient-to-br from-orange-50 via-stone-50 to-amber-100/70 px-6 py-9 sm:px-10 sm:py-12 lg:px-14 lg:py-6">
+      <section
+        className="relative overflow-hidden rounded-3xl border border-orange-100 bg-cover bg-center px-6 py-9 sm:px-10 sm:py-12 lg:px-14 lg:py-6"
+        style={{ backgroundImage: "url('/gemmas-hero.png')" }}
+      >
+        {/* Left-to-right gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-200 via-orange-50/90 to-transparent" />
+
+        {/* Decorative blur */}
         <div className="absolute -left-16 -top-20 h-52 w-52 rounded-full bg-orange-200/35 blur-3xl" />
 
-        <div className="relative grid items-center gap-10 lg:grid-cols-[1.05fr_.95fr]">
-          <div className="max-w-xl">
-            <img
-              src="/gemmas-logo2.png"
-              alt="Gemma's Kitchenette"
-              className="mb-7 h-12 w-auto object-contain object-left sm:h-14"
-            />
+        <div className="relative max-w-2xl">
+          <img
+            src="/gemmas-logo2.png"
+            alt="Gemma's Kitchenette"
+            className="mb-7 h-12 w-auto object-contain object-left sm:h-14"
+          />
 
-            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-orange-600">
-              Made fresh with care
-            </p>
+          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.16em] text-orange-600">
+            Made fresh with care
+          </p>
 
-            <h1 className="font-display text-4xl font-bold leading-tight tracking-tight text-stone-900 sm:text-5xl">
-              Home-cooked goodness, made for you.
-            </h1>
+          <h1 className="font-display text-4xl font-bold leading-tight tracking-tight text-stone-900 sm:text-5xl">
+            Home-cooked goodness, made for you.
+          </h1>
 
-            <p className="mt-5 max-w-lg text-base leading-7 text-stone-600 sm:text-lg">
-              Freshly prepared food and comforting favorites from Gemma’s
-              Kitchenette.
-            </p>
+          <p className="mt-5 max-w-lg text-base leading- text-stone-600 sm:text-lg">
+            Freshly prepared food and comforting favorites from Gemma’s
+            Kitchenette.
+          </p>
 
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a
-                href="#todays-menu"
-                className="inline-flex h-11 items-center justify-center rounded-lg bg-orange-500 px-5 text-sm font-semibold text-white transition-colors hover:bg-orange-600"
-              >
-                Order Now
-              </a>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <a
+              href="#todays-menu"
+              className="inline-flex h-11 items-center justify-center rounded-lg bg-orange-500 px-5 text-sm font-semibold text-white transition-colors hover:bg-orange-600"
+            >
+              Order Now
+            </a>
 
-              <Link
-                to="/foods"
-                className="inline-flex h-11 items-center justify-center rounded-lg border border-orange-200 bg-white px-5 text-sm font-semibold text-orange-700 transition-colors hover:bg-orange-50"
-              >
-                View Full Menu
-              </Link>
-            </div>
-          </div>
-
-          <div className="relative mx-auto w-full max-w-md lg:max-w-none">
-            <div className="absolute -inset-4 rounded-[2.25rem] bg-orange-300/25 blur-2xl" />
-
-            <div className="relative aspect-[5/4] overflow-hidden rounded-[2rem] border-8 border-white bg-stone-200 shadow-xl">
-              {heroImage ? (
-                <img
-                  src={heroImage}
-                  alt="Freshly prepared food from Gemma's Kitchenette"
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-full flex-col items-center justify-center bg-gradient-to-br from-orange-200 to-amber-100 text-center">
-                  <Icon
-                    name="bowl"
-                    className="h-16 w-16 text-orange-600"
-                  />
-
-                  <p className="mt-3 font-display text-lg font-semibold text-stone-700">
-                    Fresh from Gemma’s kitchen
-                  </p>
-                </div>
-              )}
-            </div>
+            <Link
+              to="/foods"
+              className="inline-flex h-11 items-center justify-center rounded-lg border border-orange-200 bg-white px-5 text-sm font-semibold text-orange-700 transition-colors hover:bg-orange-50"
+            >
+              View Full Menu
+            </Link>
           </div>
         </div>
       </section>
