@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 
 import Alert from "../../components/ui/Alert";
 import Button from "../../components/ui/Button";
@@ -12,8 +12,6 @@ import { getTodayMenu } from "../../services/dailyMenu.service";
 import type { DailyMenu } from "../../types/DailyMenu";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 
-const MENU_PREVIEW_LIMIT = 4;
-
 export default function HomePage() {
   const navigate = useNavigate();
 
@@ -25,7 +23,6 @@ export default function HomePage() {
   });
 
   const menu = menuQuery.data ?? [];
-  const previewMenu = menu.slice(0, MENU_PREVIEW_LIMIT);
 
   return (
     <div className="space-y-14 pb-8">
@@ -116,7 +113,8 @@ export default function HomePage() {
           </svg>
         </button>
       </div>
-
+      
+      {/* how it works section */}
       <section id="how-it-works" className="bg-white py-14 sm:py-16 lg:py-1">
         <div className="mx-auto grid max-w-9xl grid-cols-1 gap-14 px-6 sm:grid-cols-2 sm:gap-12 lg:grid-cols-4 lg:gap-16 lg:px-9">
 
@@ -193,79 +191,90 @@ export default function HomePage() {
       </section>
 
       {/* Menu Section */}
-      <section id="todays-menu" className="scroll-mt-8">
-        <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h2 className="font-display text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl">
-              Today’s Menu
+      <section id="todays-menu" className="scroll-mt-8 py-20 sm:py-24 lg:py-36">
+        <div className="mx-auto grid max-w-[1600px] grid-cols-1 items-center gap-14 px-6 lg:grid-cols-[0.85fr_2fr] lg:gap-16 lg:px-10">
+
+          {/* Left Content */}
+          <div className="max-w-lg">
+            <p className="mb-4 text-sm font-bold uppercase tracking-[0.2em] text-[#C28A00]">
+              Today’s menu
+            </p>
+
+            <h2 className="font-display text-5xl font-bold leading-[0.95] tracking-[-0.04em] text-stone-900 sm:text-6xl lg:text-7xl">
+              Fresh food,
+              <br />
+              made for you.
             </h2>
 
-            <p className="mt-2 text-sm text-stone-500">
-              Freshly prepared today.
+            <p className="mt-6 max-w-md text-base leading-7 text-stone-500 sm:text-lg">
+              Freshly prepared meals and comforting favorites from Gemma’s
+              Kitchenette, available today.
             </p>
+
+            <div className="mt-9">
+              <Button
+                size="lg"
+                variant="secondary"
+                onClick={() => navigate("/foods")}
+              >
+                View Full Menu
+              </Button>
+            </div>
           </div>
 
-          <Link
-            to="/foods"
-            className="text-sm font-semibold text-[#C28A00] transition-colors hover:text-[#9F7000]"
-          >
-            View all →
-          </Link>
-        </div>
-
-        <Alert
-          type="error"
-          message={
-            menuQuery.error
-              ? getErrorMessage(
-                  menuQuery.error,
-                  "Failed to load today's menu.",
-                )
-              : ""
-          }
-        />
-
-        {menuQuery.isPending && (
-          <div className="flex justify-center py-12">
-            <Spinner label="Loading today's menu…" />
-          </div>
-        )}
-
-        {!menuQuery.isPending &&
-          !menuQuery.error &&
-          menu.length === 0 && (
-            <EmptyState
-              icon={<Icon name="bowl" className="h-6 w-6" />}
-              title="Nothing prepared yet today"
-              description="Check back a little later — the kitchen posts the menu once cooking starts."
+          {/* Right Food Slider */}
+          <div className="min-w-0">
+            <Alert
+              type="error"
+              message={
+                menuQuery.error
+                  ? getErrorMessage(
+                      menuQuery.error,
+                      "Failed to load today's menu.",
+                    )
+                  : ""
+              }
             />
-          )}
 
-        {!menuQuery.isPending && menu.length > 0 && (
-          <FoodGrid menu={previewMenu} />
-        )}
+            {menuQuery.isPending && (
+              <div className="flex justify-center py-16">
+                <Spinner label="Loading today's menu…" />
+              </div>
+            )}
 
-        {!menuQuery.isPending && menu.length > 0 && (
-          <div className="mt-5 flex justify-center sm:justify-start">
-            <Button
-              variant="secondary"
-              onClick={() => navigate("/foods")}
-            >
-              View Full Menu
-            </Button>
+            {!menuQuery.isPending &&
+              !menuQuery.error &&
+              menu.length === 0 && (
+                <EmptyState
+                  icon={<Icon name="bowl" className="h-6 w-6" />}
+                  title="Nothing prepared yet today"
+                  description="Check back a little later — the kitchen posts the menu once cooking starts."
+                />
+              )}
+
+            {!menuQuery.isPending && menu.length > 0 && (
+              <FoodSlider menu={menu} />
+            )}
           </div>
-        )}
+        </div>
       </section>
     </div>
   );
 }
 
-function FoodGrid({ menu }: { menu: DailyMenu[] }) {
+function FoodSlider({ menu }: { menu: DailyMenu[] }) {
   return (
-    <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-      {menu.map((item) => (
-        <FoodCard key={item.id} menu={item} compact />
-      ))}
+    <div className="relative">
+      <div className="flex gap-5 overflow-x-auto pb- snap-x snap-mandatory">
+        {menu.map((item) => (
+          <div
+            key={item.id}
+            className="w-[300px] shrink-0 snap-start sm:w-[75vw] md:w-[55vw] lg:w-[420px] xl:w-[450px]"
+          >
+            <FoodCard menu={item} compact />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
