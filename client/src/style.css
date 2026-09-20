@@ -21,3 +21,20 @@ html {
   background-color: rgba(0, 0, 0, 0.4);
 }
 
+@font-face {
+  font-family: "Sharp Sans Display";
+  src: url("/fonts/SharpSansDisplayNo1-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-display {
+  font-family: "Sharp Sans Display", sans-serif;
+  font-weight: 700;
+}
+
+.font-editorial {
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+}
