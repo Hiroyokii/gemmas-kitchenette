@@ -31,7 +31,7 @@ export default function HomePage() {
     <div className="space-y-14 pb-8">
       {/* Hero Section */}
       <section
-        className="relative overflow-hidden rounded-3xl bg-cover bg-center px-6 py-9 sm:px-10 sm:py-12 lg:px-14 lg:py-12"
+        className="relative overflow-hidden rounded-3xl bg-cover bg-center px-6 py-9 sm:px-10 sm:py-12 lg:px-14 lg:py-18"
         style={{ backgroundImage: "url('/gemmas-hero.png')" }}
       >
         {/* Left-to-right gradient overlay */}
@@ -84,6 +84,111 @@ export default function HomePage() {
               View Full Menu
             </Button>
           </div>
+        </div>
+      </section>
+
+      <div className="relative z-10 -mt-20 flex justify-center">
+        <button
+          type="button"
+          onClick={() =>
+            document
+              .getElementById("how-it-works")
+              ?.scrollIntoView({ 
+                behavior: "smooth",
+                block: "center", })
+          }
+          aria-label="Scroll to learn more"
+          className="flex h-16 w-16 items-center justify-center rounded-full border border-stone-200 bg-white text-[#FFB800] shadow-md transition-all hover:-translate-y-1 hover:shadow-lg"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            className="h-5 w-5"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="m6 9 6 6 6-6"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <section id="how-it-works" className="bg-white py-14 sm:py-16 lg:py-1">
+        <div className="mx-auto grid max-w-9xl grid-cols-1 gap-14 px-6 sm:grid-cols-2 sm:gap-12 lg:grid-cols-4 lg:gap-16 lg:px-9">
+
+          {/* Order Online */}
+          <div className="flex flex-col items-center text-center">
+            <img
+              src="/gifs/online-order1.gif"
+              alt="Order online"
+              className="mb-6 h-28 w-28 object-contain"
+            />
+
+            <h3 className="text-xl font-bold uppercase tracking-wide text-stone-600">
+              Order Online
+            </h3>
+
+            <p className="mt-3 max-w-xs text-base leading-6 text-stone-600">
+              Select from our menu and easily place your order online from home.
+            </p>
+          </div>
+
+          {/* We Cook For You */}
+          <div className="flex flex-col items-center text-center">
+            <img
+              src="/gifs/frying-pan1.gif"
+              alt="We cook for you"
+              className="mb-6 h-28 w-28 object-contain"
+            />
+
+            <h3 className="text-lg font-bold uppercase tracking-wide text-stone-600">
+              We Cook For You
+            </h3>
+
+            <p className="mt-3 max-w-xs text-base leading-6 text-stone-600">
+              Our chefs prepare your meals using fresh, authentic ingredients.
+            </p>
+          </div>
+
+          {/* Delivery */}
+          <div className="flex flex-col items-center text-center">
+            <img
+              src="/gifs/door1.gif"
+              alt="Delivery to your doorstep"
+              className="mb-6 h-28 w-28 object-contain"
+            />
+
+            <h3 className="text-lg font-bold uppercase tracking-wide text-stone-600">
+              We Deliver To Your Doorstep
+            </h3>
+
+            <p className="mt-3 max-w-xs text-base leading-6 text-stone-600">
+              Your order will be delivered to your doorstep on your selected
+              delivery day.
+            </p>
+          </div>
+
+          {/* Heat and Eat */}
+          <div className="flex flex-col items-center text-center">
+            <img
+              src="/gifs/microwave1.gif"
+              alt="Easy heat and eat"
+              className="mb-6 h-28 w-28 object-contain"
+            />
+
+            <h3 className="text-lg font-bold uppercase tracking-wide text-stone-600">
+              Easy Heat and Eat
+            </h3>
+
+            <p className="mt-3 max-w-xs text-base leading-6 text-stone-600">
+              Simply, Heat and Eat!
+            </p>
+          </div>
+
         </div>
       </section>
 
