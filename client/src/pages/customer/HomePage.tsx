@@ -32,7 +32,7 @@ export default function HomePage() {
         style={{ backgroundImage: "url('/gemmas-hero.png')" }}
       >
         {/* Left-to-right gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-orange-100 from-20% via-orange-100 via-40% via-orange-200/50 via-80% to-transparent to-100%" />
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-50 from-20% via-orange-100 via-40% via-orange-200/50 via-90% to-transparent to-100%" />
 
         {/* Decorative blur */}
         <div className="absolute -left-16 -top-20 h-52 w-52 rounded-full bg-orange-200/35 blur-3xl" />
@@ -89,7 +89,7 @@ export default function HomePage() {
           type="button"
           onClick={() =>
             document
-              .getElementById("how-it-works")
+              .getElementById("todays-menu")
               ?.scrollIntoView({ 
                 behavior: "smooth",
                 block: "center", })
@@ -143,7 +143,7 @@ export default function HomePage() {
               className="mb-6 h-28 w-28 object-contain"
             />
 
-            <h3 className="text-lg font-bold uppercase tracking-wide text-stone-600">
+            <h3 className="text-xl font-bold uppercase tracking-wide text-stone-600">
               We Cook For You
             </h3>
 
@@ -160,8 +160,8 @@ export default function HomePage() {
               className="mb-6 h-28 w-28 object-contain"
             />
 
-            <h3 className="text-lg font-bold uppercase tracking-wide text-stone-600">
-              We Deliver To Your Doorstep
+            <h3 className="text-xl font-bold uppercase tracking-wide text-stone-600">
+              Right To Your Doorstep
             </h3>
 
             <p className="mt-3 max-w-xs text-base leading-6 text-stone-600">
@@ -178,7 +178,7 @@ export default function HomePage() {
               className="mb-6 h-28 w-28 object-contain"
             />
 
-            <h3 className="text-lg font-bold uppercase tracking-wide text-stone-600">
+            <h3 className="text-xl font-bold uppercase tracking-wide text-stone-600">
               Easy Heat and Eat
             </h3>
 
@@ -200,7 +200,7 @@ export default function HomePage() {
               Today’s menu
             </p>
 
-            <h2 className="font-display text-5xl font-bold leading-[0.95] tracking-[-0.04em] text-stone-900 sm:text-6xl lg:text-7xl">
+            <h2 className="font-display text-5xl font-bold leading-[0.95] tracking-[-0.04em] text-stone-900 sm:text-6xl lg:text-6xl">
               Fresh food,
               <br />
               made for you.

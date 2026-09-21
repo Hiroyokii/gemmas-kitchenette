@@ -38,3 +38,8 @@ html {
   font-family: Georgia, "Times New Roman", serif;
   font-style: italic;
 }
+
+@keyframes cart-drawer-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}

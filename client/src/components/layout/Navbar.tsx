@@ -3,6 +3,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../hooks/useAuth";
 import { useCart } from "../../hooks/useCart";
+import { useCartDrawer } from "../../hooks/useCartDrawer";
 import Icon from "../ui/Icon";
 
 const NAV_LINKS = [
@@ -25,6 +26,7 @@ const PRIMARY_BUTTON_CLASS =
 export default function Navbar() {
     const { user, logout } = useAuth();
     const { itemCount } = useCart();
+    const { openCart } = useCartDrawer();
     const navigate = useNavigate();
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -38,7 +40,7 @@ export default function Navbar() {
     function linkClass({ isActive }: { isActive: boolean }) {
         return `text-sm font-medium transition-colors ${
             isActive
-                ? "text-orange-600"
+                ? "text-[#C28A00]"
                 : "text-stone-500 hover:text-stone-900"
         }`;
     }
@@ -87,7 +89,7 @@ export default function Navbar() {
                     {/* Desktop account area */}
                     <div className="hidden items-center gap-3 md:flex">
                         {user?.role === "CUSTOMER" && (
-                            <CartButton itemCount={itemCount} />
+                            <CartButton itemCount={itemCount} onClick={openCart} />
                         )}
 
                         {isAdminOrStaff(user?.role) && (
@@ -127,14 +129,14 @@ export default function Navbar() {
                     {/* Mobile cart */}
                     <div className="flex items-center gap-2 md:hidden">
                         {user?.role === "CUSTOMER" && (
-                            <CartButton itemCount={itemCount} />
+                            <CartButton itemCount={itemCount} onClick={openCart} />
                         )}
                     </div>
                 </div>
             </header>
 
             {/* Desktop sticky navigation */}
-            <nav className="sticky top-0 z-40 hidden items-center justify-center gap-6 border-b border-stone-200 bg-white/95 py-3 shadow-sm backdrop-blur md:flex">
+            <nav className="sticky top-0 z-40 hidden items-center justify-center gap-6 border-b border-stone-200 bg-white/95 py-4 shadow-sm backdrop-blur md:flex">
                 {NAV_LINKS.map((link) => (
                     <NavLink
                         key={link.to}
@@ -242,23 +244,24 @@ function AuthButtons() {
     );
 }
 
-function CartButton({ itemCount }: { itemCount: number }) {
+function CartButton({ itemCount, onClick }: { itemCount: number; onClick: () => void }) {
     return (
-        <Link
-            to="/cart"
+        <button
+            type="button"
+            onClick={onClick}
             aria-label={`Cart, ${itemCount} item${
                 itemCount === 1 ? "" : "s"
             }`}
-            className={ICON_BUTTON_CLASS}
+            className={`${ICON_BUTTON_CLASS} relative`}
         >
             <Icon name="cart" className="h-5 w-5" />
 
             {itemCount > 0 && (
-                <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-500 px-1 font-mono text-[11px] font-semibold text-white">
+                <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#FFB800] px-1 font-mono text-[11px] font-semibold text-white">
                     {itemCount}
                 </span>
             )}
-        </Link>
+        </button>
     );
 }
 
