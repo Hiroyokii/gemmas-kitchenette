@@ -9,11 +9,11 @@ export default function CartSummaryBar() {
   if (itemCount === 0 || isCartOpen) return null;
 
   return (
-    <div className="fixed inset-x-0 bottom-4 z-50 px-4 sm:bottom-6">
+    <div className="fixed inset-x-0 bottom-4 z-50 px-4 md:bottom-6 md:px-6">
       <button
         type="button"
         onClick={openCart}
-        className="mx-auto flex w-full max-w-xl items-center gap-4 rounded-2xl bg-[#FFB800] px-5 py-4 text-left text-white shadow-[0_16px_36px_rgba(194,65,12,0.34)] transition transition hover:bg-[#E6A600]  sm:px-6"
+        className="mx-auto flex w-full max-w-xl items-center gap-4 rounded-2xl bg-[#FFB800] px-5 py-4 text-left text-stone-900 shadow-[0_16px_36px_rgba(194,65,12,0.34)] transition hover:bg-[#E6A600] md:px-6"
       >
         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/15">
           <Icon name="cart" className="h-5 w-5" />
@@ -22,7 +22,7 @@ export default function CartSummaryBar() {
           <strong>
             {itemCount} item{itemCount === 1 ? "" : "s"}
           </strong>
-          <span className="text-sm text-orange-100">View cart</span>
+          <span className="text-sm text-stone-700">View cart</span>
         </span>
         <span className="flex items-center gap-2 font-mono text-lg font-bold">
           ₱{subtotal.toFixed(2)}

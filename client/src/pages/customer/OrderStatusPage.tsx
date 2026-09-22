@@ -54,7 +54,7 @@ function formatPrice(value: number) {
 function OrderTimeline({ order }: { order: Order }) {
   if (order.status === "CANCELLED") {
     return (
-      <Card className="border-red-200 bg-red-50/50 p-5 sm:p-6">
+      <Card className="border-red-200 bg-red-50/50 p-5 md:p-6">
         <div className="flex items-start gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
             <Icon name="warning" className="h-5 w-5" />
@@ -81,7 +81,7 @@ function OrderTimeline({ order }: { order: Order }) {
   const currentIndex = TIMELINE_STEPS.findIndex((step) => step.status === order.status);
 
   return (
-    <Card className="p-5 sm:p-6">
+    <Card className="p-5 md:p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="font-display text-xl font-semibold text-ink-900">Order status</h2>
@@ -97,7 +97,7 @@ function OrderTimeline({ order }: { order: Order }) {
         </Badge>
       </div>
 
-      <ol className="mt-6 grid grid-cols-5 gap-1 sm:gap-2" aria-label="Order progress">
+      <ol className="mt-6 grid grid-cols-5 gap-1 md:gap-2" aria-label="Order progress">
         {TIMELINE_STEPS.map((step, index) => {
           const isCurrent = index === currentIndex;
           const isComplete =
@@ -125,7 +125,7 @@ function OrderTimeline({ order }: { order: Order }) {
                 {isComplete ? <Icon name="check" className="h-4 w-4" /> : index + 1}
               </span>
               <span
-                className={`mt-2 block text-[10px] font-medium leading-3 sm:text-xs ${
+                className={`mt-2 block text-[10px] font-medium leading-3 md:text-xs ${
                   isCurrent
                     ? "text-orange-700"
                     : isComplete
@@ -358,7 +358,7 @@ export default function OrderStatusPage() {
         description={`Placed ${formatDate(order.createdAt)}`}
       />
 
-      <Card className="mb-6 border-orange-100 bg-orange-50/50 p-5 sm:p-6">
+      <Card className="mb-6 border-orange-100 bg-orange-50/50 p-5 md:p-6">
         <p className="font-display text-xl font-semibold text-ink-900">
           Thank you for your order!
         </p>
@@ -378,7 +378,7 @@ export default function OrderStatusPage() {
         </div>
       </div>
 
-      <div className="mt-8 flex flex-col-reverse gap-3 border-t border-stone-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mt-8 flex flex-col-reverse gap-3 border-t border-stone-200 pt-6 md:flex-row md:items-center md:justify-between">
         <Button variant="secondary" onClick={() => navigate("/orders")}>
           Back to Orders
         </Button>

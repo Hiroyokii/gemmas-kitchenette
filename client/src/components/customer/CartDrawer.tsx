@@ -67,10 +67,6 @@ export default function CartDrawer() {
     };
   }, [closeCart, isCartOpen]);
 
-  useEffect(() => {
-    if (cart.length === 0) setIsCheckingOut(false);
-  }, [cart.length]);
-
   function handleClose() {
     setIsCheckingOut(false);
     setError("");
@@ -96,22 +92,23 @@ export default function CartDrawer() {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[100] flex justify-end"
+      className="fixed inset-0 z-[100] flex items-end justify-center lg:items-stretch lg:justify-end"
       role="presentation"
     >
       <button
         type="button"
         aria-label="Close cart"
         onClick={handleClose}
-        className="absolute inset-0 cursor-default bg-stone-950/45 backdrop-blur-[1px]"
+        className="absolute inset-0 cursor-default bg-black/30 backdrop-blur-[2px]"
       />
       <aside
         role="dialog"
         aria-modal="true"
         aria-label={isCheckingOut ? "Checkout" : "Your cart"}
-        className="relative flex h-full w-full max-w-xl flex-col bg-white shadow-[-12px_0_40px_rgba(28,25,23,0.18)] animate-[cart-drawer-in_220ms_ease-out]"
+        className="fixed bottom-0 flex max-h-[90dvh] w-full flex-col rounded-t-3xl bg-white shadow-[0_-12px_40px_rgba(28,25,23,0.18)] animate-[cart-drawer-mobile-in_250ms_ease-out] md:max-w-2xl lg:inset-y-0 lg:right-0 lg:h-full lg:max-h-none lg:max-w-xl lg:rounded-none lg:shadow-[-12px_0_40px_rgba(28,25,23,0.18)] lg:animate-[cart-drawer-in_220ms_ease-out]"
       >
-        <header className="flex items-center justify-between border-b border-stone-100 px-5 py-5 sm:px-8">
+        <header className="relative flex shrink-0 items-center justify-between border-b border-stone-100 px-5 pb-4 pt-7 md:px-8 md:py-5">
+          <span className="absolute left-1/2 top-3 h-1 w-10 -translate-x-1/2 rounded-full bg-stone-300 lg:hidden" aria-hidden="true" />
           <div>
             <h2 className="mt-1 font-display text-2xl font-bold text-stone-900">
               {isCheckingOut ? "Checkout" : "Your Cart"}
@@ -127,7 +124,7 @@ export default function CartDrawer() {
           </button>
         </header>
 
-        <div className="flex-1 overflow-y-auto px-5 py-2 sm:px-8">
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-2 md:px-8">
           {cart.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center pb-20 text-center">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#FFB800]/15 text-[#FFB800]">
@@ -167,15 +164,18 @@ export default function CartDrawer() {
         </div>
 
         {cart.length > 0 && (
-          <footer className="border-t border-stone-200 bg-white px-5 py-5 sm:px-8">
+          <footer className="shrink-0 border-t border-stone-200 bg-white px-5 py-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] md:px-8 md:pb-5">
             <div className="mb-4 flex items-center justify-between text-base font-semibold text-stone-800">
               <span>
-                Subtotal · {itemCount} item{itemCount === 1 ? "" : "s"}
+                Subtotal
               </span>
               <span className="font-mono text-xl font-bold">
                 ₱{subtotal.toFixed(2)}
               </span>
             </div>
+            <p className="mb-4 text-xs leading-5 text-stone-500">
+              {itemCount} item{itemCount === 1 ? "" : "s"} · Delivery fees, if any, are confirmed at checkout.
+            </p>
             <Alert type="error" message={error} />
             {isCheckingOut ? (
               <div className="grid gap-3">

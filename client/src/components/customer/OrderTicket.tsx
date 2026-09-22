@@ -30,10 +30,10 @@ export default function OrderTicket({ order }: OrderTicketProps) {
     });
 
     return (
-        <div className="ticket flex flex-col sm:flex-row">
-            <div className="ticket-stub flex shrink-0 flex-row items-center justify-between gap-3 bg-ink-50/60 px-4 py-3 sm:w-28 sm:flex-col sm:justify-center sm:gap-1 sm:py-4">
-                <span className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-ink-400 sm:flex-col sm:gap-0.5">
-                    <Icon name="ticket" className="h-3.5 w-3.5 sm:hidden" />
+        <div className="ticket flex flex-col md:flex-row">
+            <div className="ticket-stub flex shrink-0 flex-row items-center justify-between gap-3 bg-ink-50/60 px-4 py-3 md:w-28 md:flex-col md:justify-center md:gap-1 md:py-4">
+                <span className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-ink-400 md:flex-col md:gap-0.5">
+                    <Icon name="ticket" className="h-3.5 w-3.5 md:hidden" />
                     Order
                 </span>
                 <span className="font-mono text-lg font-semibold text-ink-900">
@@ -41,7 +41,7 @@ export default function OrderTicket({ order }: OrderTicketProps) {
                 </span>
             </div>
 
-            <div className="flex-1 p-4 sm:p-5">
+            <div className="flex-1 p-4 md:p-5">
                 <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                     <span className="flex items-center gap-1.5 text-xs text-ink-400">
                         <Icon name="clock" className="h-3.5 w-3.5" />

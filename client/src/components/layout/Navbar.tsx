@@ -49,9 +49,9 @@ export default function Navbar() {
         <>
             {/* Header */}
             <header className="border-b border-stone-200 bg-white/90 shadow-[0_1px_20px_rgba(0,0,0,0.04)] backdrop-blur">
-                <div className="relative mx-auto flex h-26 max-w-9xl items-center justify-between px-4 sm:px-12">
+                <div className="relative mx-auto flex h-26 max-w-9xl items-center justify-between px-4 md:px-8 lg:px-12">
                     {/* Mobile menu button */}
-                    <div className="flex items-center gap-2 md:hidden">
+                    <div className="flex items-center gap-2 lg:hidden">
                         <button
                             type="button"
                             onClick={() => setIsMenuOpen((open) => !open)}
@@ -69,7 +69,7 @@ export default function Navbar() {
                     </div>
 
                     {/* Desktop spacer */}
-                    <div className="hidden md:block" />
+                    <div className="hidden lg:block" />
 
                     {/* Logo */}
                     <Link
@@ -87,7 +87,7 @@ export default function Navbar() {
                     </Link>
 
                     {/* Desktop account area */}
-                    <div className="hidden items-center gap-3 md:flex">
+                    <div className="hidden items-center gap-3 lg:flex">
                         {user?.role === "CUSTOMER" && (
                             <CartButton itemCount={itemCount} onClick={openCart} />
                         )}
@@ -127,7 +127,7 @@ export default function Navbar() {
                     </div>
 
                     {/* Mobile cart */}
-                    <div className="flex items-center gap-2 md:hidden">
+                    <div className="flex items-center gap-2 lg:hidden">
                         {user?.role === "CUSTOMER" && (
                             <CartButton itemCount={itemCount} onClick={openCart} />
                         )}
@@ -136,7 +136,7 @@ export default function Navbar() {
             </header>
 
             {/* Desktop sticky navigation */}
-            <nav className="sticky top-0 z-40 hidden items-center justify-center gap-6 border-b border-stone-200 bg-white/95 py-4 shadow-sm backdrop-blur md:flex">
+            <nav className="sticky top-0 z-40 hidden items-center justify-center gap-6 border-b border-stone-200 bg-white/95 py-4 shadow-sm backdrop-blur lg:flex">
                 {NAV_LINKS.map((link) => (
                     <NavLink
                         key={link.to}
@@ -157,7 +157,7 @@ export default function Navbar() {
 
             {/* Mobile dropdown */}
             {isMenuOpen && (
-                <div className="border-b border-stone-200 bg-white px-4 py-4 shadow-[0_8px_30px_rgba(0,0,0,0.06)] md:hidden">
+                <div className="border-b border-stone-200 bg-white px-4 py-4 shadow-[0_8px_30px_rgba(0,0,0,0.06)] lg:hidden">
                     <nav className="flex flex-col gap-3">
                         {NAV_LINKS.map((link) => (
                             <NavLink

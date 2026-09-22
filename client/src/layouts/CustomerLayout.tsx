@@ -9,11 +9,10 @@ import { CartDrawerProvider } from "../providers/CartDrawerProvider";
 export default function CustomerLayout() {
     return (
         <CartDrawerProvider>
-            {/* Adjust percentage as needed: 0.9 = 90%, 0.85 = 85% */}
-            <div className="min-h-screen flex flex-col [zoom:0.9]">
+            <div className="min-h-screen flex flex-col">
                 <Navbar />
 
-                <main className="flex-1 container mx-auto p-9 pb-28">
+                <main className="container mx-auto flex-1 px-4 py-6 pb-28 md:px-6 md:py-8 lg:px-9 lg:py-10">
                     <Outlet />
                 </main>
 

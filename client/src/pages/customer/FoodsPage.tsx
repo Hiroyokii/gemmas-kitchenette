@@ -75,7 +75,7 @@ export default function FoodsPage() {
     return (
         <div className="space-y-7 pb-8">
             <div>
-                <h1 className="font-display text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">
+                <h1 className="font-display text-3xl font-bold tracking-tight text-stone-900 md:text-4xl">
                     Foods
                 </h1>
                 <p className="mt-2 text-base text-stone-600">
@@ -83,7 +83,7 @@ export default function FoodsPage() {
                 </p>
             </div>
 
-            <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-[0_8px_30px_rgba(0,0,0,0.04)] sm:p-5">
+            <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-[0_8px_30px_rgba(0,0,0,0.04)] md:p-5">
                 <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_16rem]">
                     <Input
                         type="search"
@@ -155,7 +155,7 @@ export default function FoodsPage() {
                 !categoriesQuery.isPending &&
                 !error &&
                 foods.length > 0 && (
-                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                    <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5 lg:grid-cols-4">
                         {foods.map((item) => (
                             <FoodCard key={item.id} menu={item} />
                         ))}
