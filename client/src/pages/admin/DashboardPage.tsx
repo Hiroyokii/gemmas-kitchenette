@@ -34,73 +34,73 @@ export default function DashboardPage() {
             );
     }, []);
 
-    return ( 
-        <div className="min-h-full bg-stone-50 px-4 py-6 sm:px-6 sm:py-8"> 
-            <div className="mx-auto w-full max-w-7xl"> 
-                {/* Header */} 
-                <div className="mb-6"> 
-                    <h1 className="text-3xl font-bold tracking-tight text-stone-900"> 
-                        Welcome, {user?.firstName} 
-                    </h1> 
-                        
-                    <p className="mt-2 text-sm leading-6 text-stone-500"> 
-                        Here's today at a glance. 
-                    </p> 
-                </div> 
-                
-                {/* Error */} 
-                <Alert type="error" message={error} /> 
-                
-                {/* Sales Summary */} 
-                {report && ( 
-                    <div className="mt-6 rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] sm:p-6"> 
-                        <div className="mb-5"> 
-                            <h2 className="text-lg font-semibold text-stone-900"> 
-                                Today's sales 
-                            </h2> 
-                            
-                            <p className="mt-1 text-sm text-stone-500"> 
-                                A quick overview of your sales performance today. 
-                            </p> 
-                        </div> 
-                        
-                        <SalesSummary report={report} />   
-                    </div> 
-                )} 
+    return (
+        <div className="min-h-full bg-stone-50 px-4 py-6 md:px-6 md:py-8">
+            <div className="mx-auto w-full max-w-7xl">
+                {/* Header */}
+                <div className="mb-6">
+                    <h1 className="text-3xl font-bold tracking-tight text-stone-900">
+                        Welcome, {user?.firstName}
+                    </h1>
+
+                    <p className="mt-2 text-sm leading-6 text-stone-500">
+                        Here's today at a glance.
+                    </p>
+                </div>
+
+                {/* Error */}
+                <Alert type="error" message={error} />
+
+                {/* Sales Summary */}
+                {report && (
+                    <div className="mt-6 rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] md:p-6">
+                        <div className="mb-5">
+                            <h2 className="text-lg font-semibold text-stone-900">
+                                Today's sales
+                            </h2>
+
+                            <p className="mt-1 text-sm text-stone-500">
+                                A quick overview of your sales performance today.
+                            </p>
+                        </div>
+
+                        <SalesSummary report={report} />
+                    </div>
+                )}
                 <ExpirationAlerts alerts={alerts} error={expirationQuery.error ? getErrorMessage(expirationQuery.error, "Failed to load expiration alerts.") : ""} />
-                
-                {/* Quick Actions */} 
-                <div className="mt-6 rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] sm:p-6"> 
-                    <div className="mb-5"> 
-                        <h2 className="text-lg font-semibold text-stone-900"> 
-                            Quick actions 
-                        </h2> 
-                        
-                        <p className="mt-1 text-sm text-stone-500"> 
-                            Common tasks you can access quickly. 
-                        </p> 
-                    </div> 
-                    
-                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"> 
-                        {QUICK_LINKS.map((link) => ( 
-                            <Link 
-                                key={link.to} 
-                                to={link.to} 
-                                className="rounded-xl border border-orange-200 bg-white px-4 py-3 text-sm font-semibold text-orange-600 transition-colors hover:border-orange-300 hover:bg-orange-50 hover:text-orange-700 active:bg-orange-100" > 
-                                    {link.label} 
-                            </Link> 
-                        ))} 
-                    </div> 
-                </div> 
-            </div> 
-        </div> 
-    ); 
+
+                {/* Quick Actions */}
+                <div className="mt-6 rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] md:p-6">
+                    <div className="mb-5">
+                        <h2 className="text-lg font-semibold text-stone-900">
+                            Quick actions
+                        </h2>
+
+                        <p className="mt-1 text-sm text-stone-500">
+                            Common tasks you can access quickly.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                        {QUICK_LINKS.map((link) => (
+                            <Link
+                                key={link.to}
+                                to={link.to}
+                                className="rounded-xl border border-orange-200 bg-white px-4 py-3 text-sm font-semibold text-orange-600 transition-colors hover:border-orange-300 hover:bg-orange-50 hover:text-orange-700 active:bg-orange-100" >
+                                    {link.label}
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 }
 
 function ExpirationAlerts({ alerts, error }: { alerts: ExpirationAlert[]; error: string }) {
     const expired = alerts.filter((alert) => alert.status === "EXPIRED");
     const soon = alerts.filter((alert) => alert.status === "EXPIRING_SOON");
-    return <section className="mt-6 rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] sm:p-6"><div><h2 className="text-lg font-semibold text-stone-900">Expiration alerts</h2><p className="mt-1 text-sm text-stone-500">Inventory batches that need attention.</p></div><Alert type="error" message={error} /><div className="mt-5 grid gap-4 lg:grid-cols-2"><AlertList title="Expired" alerts={expired} tone="red" /><AlertList title="Expiring soon" alerts={soon} tone="orange" /></div></section>;
+    return <section className="mt-6 rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] md:p-6"><div><h2 className="text-lg font-semibold text-stone-900">Expiration alerts</h2><p className="mt-1 text-sm text-stone-500">Inventory batches that need attention.</p></div><Alert type="error" message={error} /><div className="mt-5 grid gap-4 lg:grid-cols-2"><AlertList title="Expired" alerts={expired} tone="red" /><AlertList title="Expiring soon" alerts={soon} tone="orange" /></div></section>;
 }
 
 function AlertList({ title, alerts, tone }: { title: string; alerts: ExpirationAlert[]; tone: "red" | "orange" }) {

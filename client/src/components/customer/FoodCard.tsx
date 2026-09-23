@@ -59,7 +59,7 @@ export default function FoodCard({ menu }: FoodCardProps) {
                         className={[
                             "absolute right-2 top-2 rounded-full px-2.5 py-1",
                             "text-[10px] font-bold shadow-sm backdrop-blur-sm",
-                            "sm:right-3 sm:top-3 sm:px-3 sm:py-1.5 sm:text-xs",
+                            "md:right-3 md:top-3 md:px-3 md:py-1.5 md:text-xs",
                             isLowStock
                                 ? "bg-[#FFB800] text-stone-900"
                                 : "bg-white/95 text-stone-800",
@@ -84,14 +84,14 @@ export default function FoodCard({ menu }: FoodCardProps) {
             {/* Card Content */}
             <div
                 className={[
-                    "flex flex-1 flex-col p-3 sm:p-5",
+                    "flex min-w-0 flex-1 flex-col p-3 md:p-4 lg:p-5",
                 ].join(" ")}
             >
                 {/* Food Name */}
                 <h3
                     className={[
                         "font-display font-bold leading-tight text-stone-900",
-                        "min-h-[1rem] line-clamp-2 text-base sm:min-h-[1rem] sm:text-xl",
+                        "min-w-0 min-h-[1rem] line-clamp-2 text-base md:text-lg lg:text-xl",
                     ].join(" ")}
                 >
                     {menu.food.name}
@@ -100,13 +100,13 @@ export default function FoodCard({ menu }: FoodCardProps) {
                 {/* Rating */}
                 {menu.food.reviewCount > 0 &&
                 menu.food.averageRating !== null ? (
-                    <div className="mt-1.5 flex min-h-4 items-center gap-1 sm:mt-2 sm:min-h-5 sm:gap-1.5">
+                    <div className="mt-1.5 flex min-h-4 min-w-0 items-center gap-1 md:mt-2 md:min-h-5 md:gap-1.5">
                         <StarRating
                             rating={menu.food.averageRating}
-                            className="text-xs sm:text-sm"
+                            className="text-xs md:text-sm"
                         />
 
-                        <span className="text-xs font-bold text-stone-800 sm:text-sm">
+                        <span className="text-xs font-bold text-stone-800 md:text-sm">
                             {menu.food.averageRating.toFixed(1)}
                         </span>
 
@@ -115,28 +115,28 @@ export default function FoodCard({ menu }: FoodCardProps) {
                         </span>
                     </div>
                 ) : (
-                    <span className="mt-1.5 flex min-h-4 items-center text-xs font-medium text-stone-400 sm:mt-2 sm:min-h-5 sm:text-sm">
+                    <span className="mt-1.5 flex min-h-4 items-center text-xs font-medium text-stone-400 md:mt-2 md:min-h-5 md:text-sm">
                         No reviews yet
                     </span>
                 )}
 
                 {/* Description */}
                 <p
-                    className="mt-2 min-h-[2.5rem] line-clamp-2 text-xs leading-5 text-stone-600 sm:text-sm sm:leading-relaxed"
+                    className="mt-2 min-h-[2.5rem] line-clamp-2 text-xs leading-5 text-stone-600 md:text-sm md:leading-relaxed"
                 >
                     {menu.food.description}
                 </p>
 
                 {/* Bottom Section */}
-                <div className="mt-auto pt-3 sm:pt-4">
-                    <div className="flex items-end justify-between gap-2">
+                <div className="mt-auto pt-3 md:pt-4">
+                    <div className="flex flex-wrap items-end justify-between gap-2">
                         {/* Price */}
                         <div>
-                            <p className="hidden text-xs font-semibold uppercase tracking-wider text-stone-400 sm:block">
+                            <p className="hidden text-xs font-semibold uppercase tracking-wider text-stone-400 md:block">
                                 From
                             </p>
 
-                            <p className="font-mono text-base font-bold text-black sm:mt-0.5 sm:text-xl">
+                            <p className="font-mono text-base font-bold text-black md:text-lg lg:mt-0.5 lg:text-xl">
                                 ₱{Number(menu.food.price).toFixed(2)}
                             </p>
                         </div>
@@ -147,7 +147,7 @@ export default function FoodCard({ menu }: FoodCardProps) {
                                 size="sm"
                                 disabled={isSoldOut}
                                 onClick={() => addToCart(menu)}
-                                className="h-9 w-18 rounded-lg bg-[#FFB800] p-0 text-stone-900 hover:bg-[#E6A600] active:bg-[#CC9400] disabled:bg-[#FFD966] sm:h-10 sm:w-22 sm:rounded-xl"
+                                className="h-9 w-18 shrink-0 rounded-lg bg-[#FFB800] p-0 text-stone-900 hover:bg-[#E6A600] active:bg-[#CC9400] disabled:bg-[#FFD966] md:h-9 md:w-20 lg:h-10 lg:w-22 lg:rounded-xl"
                                 aria-label={`Add ${menu.food.name} to cart`}
                             >
                                 <p className="flex-1 text-sm font-display font-bold leading-tight text-stone-900">
@@ -156,26 +156,26 @@ export default function FoodCard({ menu }: FoodCardProps) {
 
                                 <Icon
                                     name="plus"
-                                    className="h-4 w-4 sm:h-5 sm:w-5"
+                                    className="h-4 w-4 md:h-4 md:w-4 lg:h-5 lg:w-5"
                                 />
                             </Button>
                         ) : (
-                            <div className="flex items-center gap-1 rounded-lg border border-stone-200 bg-stone-50 p-1 sm:gap-2 sm:rounded-xl sm:p-1.5">
+                            <div className="flex shrink-0 items-center gap-1 rounded-lg border border-stone-200 bg-stone-50 p-1 md:gap-1.5 lg:gap-2 lg:rounded-xl lg:p-1.5">
                                 <button
                                     type="button"
                                     onClick={() =>
                                         decreaseQuantity(menu.id)
                                     }
                                     aria-label={`Remove one ${menu.food.name}`}
-                                    className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-stone-700 shadow-sm transition-colors hover:bg-stone-100 sm:h-8 sm:w-8 sm:rounded-lg"
+                                    className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-stone-700 shadow-sm transition-colors hover:bg-stone-100 lg:h-8 lg:w-8 lg:rounded-lg"
                                 >
                                     <Icon
                                         name="minus"
-                                        className="h-3.5 w-3.5 sm:h-4 sm:w-4"
+                                        className="h-3.5 w-3.5 lg:h-4 lg:w-4"
                                     />
                                 </button>
 
-                                <span className="w-4 text-center font-mono text-xs font-bold text-stone-800 sm:w-6 sm:text-sm">
+                                <span className="w-4 text-center font-mono text-xs font-bold text-stone-800 lg:w-6 lg:text-sm">
                                     {quantityInCart}
                                 </span>
 
@@ -184,11 +184,11 @@ export default function FoodCard({ menu }: FoodCardProps) {
                                     onClick={() => addToCart(menu)}
                                     disabled={!canIncrease}
                                     aria-label={`Add one ${menu.food.name}`}
-                                    className="flex h-7 w-7 items-center justify-center rounded-md bg-[#FFB800] text-stone-900 shadow-sm transition-colors hover:bg-[#E6A600] disabled:cursor-not-allowed disabled:bg-[#FFD966] disabled:opacity-60 sm:h-8 sm:w-8 sm:rounded-lg"
+                                    className="flex h-7 w-7 items-center justify-center rounded-md bg-[#FFB800] text-stone-900 shadow-sm transition-colors hover:bg-[#E6A600] disabled:cursor-not-allowed disabled:bg-[#FFD966] disabled:opacity-60 lg:h-8 lg:w-8 lg:rounded-lg"
                                 >
                                     <Icon
                                         name="plus"
-                                        className="h-3.5 w-3.5 sm:h-4 sm:w-4"
+                                        className="h-3.5 w-3.5 lg:h-4 lg:w-4"
                                     />
                                 </button>
                             </div>

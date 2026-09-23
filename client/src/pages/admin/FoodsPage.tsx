@@ -97,10 +97,10 @@ export default function FoodsPage() {
     }
 
     return (
-        <div className="min-h-full bg-stone-50 px-4 py-6 sm:px-6 sm:py-8">
+        <div className="min-h-full bg-stone-50 px-4 py-6 md:px-6 md:py-8">
             <div className="mx-auto w-full max-w-7xl">
                 {/* Header */}
-                <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight text-stone-900">
                             Foods
@@ -126,8 +126,8 @@ export default function FoodsPage() {
                 />
 
                 {/* Filters */}
-                <div className="mb-5 rounded-2xl border border-stone-200 bg-white p-4 shadow-[0_8px_30px_rgba(0,0,0,0.04)] sm:p-5">
-                    <div className="grid gap-4 sm:grid-cols-[1fr_auto]">
+                <div className="mb-5 rounded-2xl border border-stone-200 bg-white p-4 shadow-[0_8px_30px_rgba(0,0,0,0.04)] md:p-5">
+                    <div className="grid gap-4 md:grid-cols-[1fr_auto]">
                         <Input
                             type="text"
                             label="Search foods"
@@ -138,7 +138,7 @@ export default function FoodsPage() {
                             }
                         />
 
-                        <div className="w-full sm:min-w-48">
+                        <div className="w-full md:min-w-48">
                             <label
                                 htmlFor="category-filter"
                                 className="mb-1.5 block text-sm font-medium text-stone-800"
@@ -404,7 +404,7 @@ function FoodFormModal({
                     )}
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-4 md:grid-cols-2">
                     <Input
                         type="number"
                         step="0.01"

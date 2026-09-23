@@ -45,7 +45,7 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="min-h-screen bg-stone-50 px-4 pt-6 pb-10 sm:py-8">
+        <div className="min-h-screen bg-stone-50 px-4 pt-6 pb-10 md:py-8">
         <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-md items-center justify-center">
             <div className="w-full">
 
@@ -66,7 +66,7 @@ export default function LoginPage() {
                 <form
                 
                     onSubmit={handleSubmit(onSubmit)}
-                    className="rounded-2xl border border-stone-200 bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] sm:p-8"
+                    className="rounded-2xl border border-stone-200 bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] md:p-8"
                 >
                     <div className="mb-8 text-center">
                

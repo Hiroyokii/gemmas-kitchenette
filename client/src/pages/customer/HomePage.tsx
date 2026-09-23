@@ -28,11 +28,19 @@ export default function HomePage() {
     <div className="space-y-14 pb-8">
       {/* Hero Section */}
       <section
-        className="relative overflow-hidden rounded-3xl bg-cover bg-center px-4 py-8 text-center md:px-8 md:py-10 md:text-left lg:px-14 lg:py-18"
-        style={{ backgroundImage: "url('/gemmas-hero.png')" }}
-      >
+          className="
+              relative overflow-hidden rounded-3xl
+              bg-orange-50
+              bg-cover bg-center
+              px-4 py-8
+              text-center
+              md:bg-[url('/hero.png')]
+              md:px-8 md:py-10 md:text-left
+              lg:px-14 lg:py-18
+            "
+          >
         {/* Left-to-right gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-orange-50 from-20% via-orange-100 via-40% via-orange-200/50 via-90% to-transparent to-100%" />
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-50 from-20% via-orange-100 via-40% via-orange-200/50 via-100% to-transparent to-100%" />
 
         {/* Decorative blur */}
         <div className="absolute -left-16 -top-20 h-52 w-52 rounded-full bg-orange-200/35 blur-3xl" />
@@ -51,7 +59,7 @@ export default function HomePage() {
           <h1 className="font-display text-4xl leading-[0.95] tracking-[-0.03em] text-stone-900 md:text-5xl lg:text-7xl">
             Home-cooked goodness,
             <br />
-            <span className="font-editorial font-normal text-[#C28A00]">
+            <span className="font-editorial font-normal text-[#FFB800]">
               made just for you.
             </span>
           </h1>
@@ -115,22 +123,19 @@ export default function HomePage() {
       </div>
       
       {/* how it works section */}
-      <section id="how-it-works" className="bg-white py-8 md:py-12 lg:py-16">
-        <div className="mx-auto grid max-w-9xl grid-cols-2 gap-3 px-1 md:grid-cols-4 md:gap-8 md:px-4 lg:gap-16 lg:px-9">
-
+      <section id="how-it-works" className="bg-white py-2 md:py-12 lg:py-6">
+        <div className="mx-auto grid max-w-9xl grid-cols-2 gap-4 px-2 md:grid-cols-4 md:gap-8 md:px-4 lg:gap-16 lg:px-9">
           {/* Order Online */}
           <div className="flex min-h-40 flex-col items-center px-3 py-4 text-center md:min-h-0 md:px-0 md:py-0">
             <img
               src="/gifs/online-order1.gif"
               alt="Order online"
-              className="mb-3 h-14 w-14 object-contain md:mb-5 md:h-20 md:w-20 lg:mb-6 lg:h-28 lg:w-28"
+              className="mb-3 h-20 w-20 object-contain md:mb-5 md:h-20 md:w-20 lg:mb-6 lg:h-28 lg:w-28"
             />
-
-            <h3 className="text-sm font-bold uppercase tracking-wide text-stone-600 md:text-base lg:text-xl">
+            <h3 className="text-base font-bold uppercase tracking-wide text-stone-600 md:text-base lg:text-xl">
               Order Online
             </h3>
-
-            <p className="mt-2 max-w-xs text-xs leading-4 text-stone-600 md:mt-3 md:text-sm md:leading-5 lg:text-base lg:leading-6">
+            <p className="mt-2 max-w-xs text-sm leading-5 text-stone-600 md:mt-3 md:text-sm md:leading-5 lg:text-base lg:leading-6">
               Select from our menu and easily place your order online from home.
             </p>
           </div>
@@ -140,14 +145,12 @@ export default function HomePage() {
             <img
               src="/gifs/frying-pan1.gif"
               alt="We cook for you"
-              className="mb-3 h-14 w-14 object-contain md:mb-5 md:h-20 md:w-20 lg:mb-6 lg:h-28 lg:w-28"
+              className="mb-3 h-20 w-20 object-contain md:mb-5 md:h-20 md:w-20 lg:mb-6 lg:h-28 lg:w-28"
             />
-
-            <h3 className="text-sm font-bold uppercase tracking-wide text-stone-600 md:text-base lg:text-xl">
+            <h3 className="text-base font-bold uppercase tracking-wide text-stone-600 md:text-base lg:text-xl">
               We Cook For You
             </h3>
-
-            <p className="mt-2 max-w-xs text-xs leading-4 text-stone-600 md:mt-3 md:text-sm md:leading-5 lg:text-base lg:leading-6">
+            <p className="mt-2 max-w-xs text-sm leading-5 text-stone-600 md:mt-3 md:text-sm md:leading-5 lg:text-base lg:leading-6">
               Our chefs prepare your meals using fresh, authentic ingredients.
             </p>
           </div>
@@ -157,16 +160,13 @@ export default function HomePage() {
             <img
               src="/gifs/door1.gif"
               alt="Delivery to your doorstep"
-              className="mb-3 h-14 w-14 object-contain md:mb-5 md:h-20 md:w-20 lg:mb-6 lg:h-28 lg:w-28"
+              className="mb-3 h-20 w-20 object-contain md:mb-5 md:h-20 md:w-20 lg:mb-6 lg:h-28 lg:w-28"
             />
-
-            <h3 className="text-sm font-bold uppercase tracking-wide text-stone-600 md:text-base lg:text-xl">
+            <h3 className="text-base font-bold uppercase tracking-wide text-stone-600 md:text-base lg:text-xl">
               Right To Your Doorstep
             </h3>
-
-            <p className="mt-2 max-w-xs text-xs leading-4 text-stone-600 md:mt-3 md:text-sm md:leading-5 lg:text-base lg:leading-6">
-              Your order will be delivered to your doorstep on your selected
-              delivery day.
+            <p className="mt-2 max-w-xs text-sm leading-5 text-stone-600 md:mt-3 md:text-sm md:leading-5 lg:text-base lg:leading-6">
+              Your order will be delivered to your doorstep on your selected delivery day.
             </p>
           </div>
 
@@ -175,24 +175,21 @@ export default function HomePage() {
             <img
               src="/gifs/microwave1.gif"
               alt="Easy heat and eat"
-              className="mb-3 h-14 w-14 object-contain md:mb-5 md:h-20 md:w-20 lg:mb-6 lg:h-28 lg:w-28"
+              className="mb-3 h-20 w-20 object-contain md:mb-5 md:h-20 md:w-20 lg:mb-6 lg:h-28 lg:w-28"
             />
-
-            <h3 className="text-sm font-bold uppercase tracking-wide text-stone-600 md:text-base lg:text-xl">
+            <h3 className="text-base font-bold uppercase tracking-wide text-stone-600 md:text-base lg:text-xl">
               Easy Heat and Eat
             </h3>
-
-            <p className="mt-2 max-w-xs text-xs leading-4 text-stone-600 md:mt-3 md:text-sm md:leading-5 lg:text-base lg:leading-6">
+            <p className="mt-2 max-w-xs text-sm leading-5 text-stone-600 md:mt-3 md:text-sm md:leading-5 lg:text-base lg:leading-6">
               Simply, Heat and Eat!
             </p>
           </div>
-
         </div>
       </section>
 
       {/* Menu Section */}
-      <section id="todays-menu" className="scroll-mt-8 py-16 md:py-20 lg:py-28">
-        <div className="mx-auto grid max-w-[1600px] grid-cols-1 items-center gap-10 px-4 md:gap-12 md:px-6 lg:grid-cols-[minmax(24rem,0.8fr)_minmax(0,1.6fr)] lg:gap-16 lg:px-10">
+      <section id="todays-menu" className="scroll-mt-8 py-12 md:py-20 lg:py-9">
+        <div className="mx-auto grid max-w-[1800px] grid-cols-1 items-center gap-10 px-4 md:gap-12 md:px-6 lg:grid-cols-[22rem_minmax(0,1fr)] lg:gap-12 lg:px-10">
 
           {/* Left Content */}
           <div className="max-w-[28rem]">
@@ -264,10 +261,27 @@ export default function HomePage() {
 
 function FoodSlider({ menu }: { menu: DailyMenu[] }) {
   return (
-    <div className="grid grid-cols-2 gap-3 md:gap-5">
+    <div className="overflow-hidden">
+      <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-4 md:gap-4 lg:gap-5">
         {menu.map((item) => (
-          <FoodCard key={item.id} menu={item} />
+          <div
+            key={item.id}
+            className="
+              w-[calc((100vw-3.25rem)/2)]
+              min-w-[280px]
+              max-w-[330px]
+              shrink-0
+              snap-start
+
+              md:w-[300px]
+
+              lg:w-[330px]
+            "
+          >
+            <FoodCard menu={item} />
+          </div>
         ))}
+      </div>
     </div>
   );
 }

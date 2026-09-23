@@ -155,7 +155,7 @@ export default function FoodsPage() {
                 !categoriesQuery.isPending &&
                 !error &&
                 foods.length > 0 && (
-                    <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5 lg:grid-cols-4">
+                    <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4 lg:gap-5">
                         {foods.map((item) => (
                             <FoodCard key={item.id} menu={item} />
                         ))}

@@ -10,10 +10,10 @@ interface ModalProps {
 }
 
 const SIZE_CLASSES = {
-    sm: "sm:max-w-md",
-    md: "sm:max-w-lg",
-    lg: "sm:max-w-2xl",
-    xl: "sm:max-w-4xl",
+    sm: "md:max-w-md",
+    md: "md:max-w-lg",
+    lg: "md:max-w-2xl",
+    xl: "md:max-w-4xl",
 };
 
 export default function Modal({
@@ -40,7 +40,7 @@ export default function Modal({
 
     return createPortal(
         <div
-            className="fixed inset-0 z-50 flex items-end justify-center bg-black/16 backdrop-blur-[2px] sm:items-center sm:p-4"
+            className="fixed inset-0 z-50 flex items-end justify-center bg-black/16 backdrop-blur-[2px] md:items-center md:p-4"
             onClick={onClose}
             role="presentation"
         >
@@ -52,7 +52,7 @@ export default function Modal({
                 className={[
                     "max-h-[90vh] w-full overflow-y-auto rounded-t-2xl",
                     "bg-white p-5 shadow-[var(--shadow-pop)]",
-                    "sm:rounded-2xl sm:p-6",
+                    "md:rounded-2xl md:p-6",
                     SIZE_CLASSES[size],
                 ].join(" ")}
             >

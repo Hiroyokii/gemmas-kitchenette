@@ -92,7 +92,7 @@ export default function CartDrawer() {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[100] flex items-end justify-center lg:items-stretch lg:justify-end"
+      className="fixed inset-0 z-[100] flex items-end justify-center md:items-stretch md:justify-end"
       role="presentation"
     >
       <button
@@ -105,10 +105,10 @@ export default function CartDrawer() {
         role="dialog"
         aria-modal="true"
         aria-label={isCheckingOut ? "Checkout" : "Your cart"}
-        className="fixed bottom-0 flex max-h-[90dvh] w-full flex-col rounded-t-3xl bg-white shadow-[0_-12px_40px_rgba(28,25,23,0.18)] animate-[cart-drawer-mobile-in_250ms_ease-out] md:max-w-2xl lg:inset-y-0 lg:right-0 lg:h-full lg:max-h-none lg:max-w-xl lg:rounded-none lg:shadow-[-12px_0_40px_rgba(28,25,23,0.18)] lg:animate-[cart-drawer-in_220ms_ease-out]"
+        className="fixed bottom-0 flex max-h-[90dvh] w-full flex-col rounded-t-3xl bg-white shadow-[0_-12px_40px_rgba(28,25,23,0.18)] animate-[cart-drawer-mobile-in_250ms_ease-out] md:inset-y-0 md:right-0 md:h-full md:max-h-none md:max-w-lg md:rounded-none md:shadow-[-12px_0_40px_rgba(28,25,23,0.18)] md:animate-[cart-drawer-in_220ms_ease-out] lg:max-w-xl"
       >
         <header className="relative flex shrink-0 items-center justify-between border-b border-stone-100 px-5 pb-4 pt-7 md:px-8 md:py-5">
-          <span className="absolute left-1/2 top-3 h-1 w-10 -translate-x-1/2 rounded-full bg-stone-300 lg:hidden" aria-hidden="true" />
+          <span className="absolute left-1/2 top-3 h-1 w-10 -translate-x-1/2 rounded-full bg-stone-300 md:hidden" aria-hidden="true" />
           <div>
             <h2 className="mt-1 font-display text-2xl font-bold text-stone-900">
               {isCheckingOut ? "Checkout" : "Your Cart"}

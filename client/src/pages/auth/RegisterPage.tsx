@@ -46,7 +46,7 @@ export default function RegisterPage() {
     }
 
     return (
-        <div className="min-h-screen bg-stone-50 px-4 pt-6 pb-10 sm:pt-8">
+        <div className="min-h-screen bg-stone-50 px-4 pt-6 pb-10 md:pt-8">
             <div className="mx-auto w-full max-w-2xl">
 
                 {/* Header */}
@@ -72,7 +72,7 @@ export default function RegisterPage() {
                 {/* Form Card */}
                 <form
                     onSubmit={handleSubmit(onSubmit)}
-                    className="rounded-2xl border border-stone-200 bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] sm:p-8"
+                    className="rounded-2xl border border-stone-200 bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] md:p-8"
                 >
                     <Alert type="error" message={submitError} />
 
@@ -88,7 +88,7 @@ export default function RegisterPage() {
                         </div>
 
                         {/* First + Last */}
-                        <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="grid gap-4 md:grid-cols-2">
                             <Input
                                 label="First name"
                                 error={errors.firstName?.message}
@@ -129,7 +129,7 @@ export default function RegisterPage() {
                         />
 
                         {/* Password */}
-                        <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="grid gap-4 md:grid-cols-2">
                             <Input
                                 type={showPassword ? "text" : "password"}
                                 label="Password"
@@ -208,8 +208,8 @@ export default function RegisterPage() {
                             </p>
                         </div>
 
-                        <div className="space-y-5">
-                            <div className="grid gap-4 sm:grid-cols-3">
+                            <div className="space-y-5">
+                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                                 <Input
                                     label="Block"
                                     placeholder="e.g. 1"

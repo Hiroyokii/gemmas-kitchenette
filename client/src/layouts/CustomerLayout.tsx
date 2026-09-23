@@ -12,8 +12,10 @@ export default function CustomerLayout() {
             <div className="min-h-screen flex flex-col">
                 <Navbar />
 
-                <main className="container mx-auto flex-1 px-4 py-6 pb-28 md:px-6 md:py-8 lg:px-9 lg:py-10">
-                    <Outlet />
+                <main className="w-full flex-1 px-4 py-6 pb-28 md:px-6 md:py-8 lg:px-9 lg:py-10">
+                    <div className="mx-auto w-full max-w-7xl min-w-0">
+                        <Outlet />
+                    </div>
                 </main>
 
                 <Footer />

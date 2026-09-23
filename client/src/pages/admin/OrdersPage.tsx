@@ -112,7 +112,7 @@ export default function OrdersPage() {
     const loading = ordersQuery.isPending;
 
     return (
-        <div className="px-6 py-6 lg:px-8 lg:py-8">
+        <div className="px-4 py-6 md:px-6 md:py-8 lg:px-8">
             {/* Header */}
             <div className="mb-6">
                 <h1 className="text-2xl font-semibold text-ink-900">

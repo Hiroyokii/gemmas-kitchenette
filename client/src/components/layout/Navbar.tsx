@@ -77,7 +77,7 @@ export default function Navbar() {
                         onClick={() => setIsMenuOpen(false)}
                         className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 font-display text-lg font-semibold tracking-tight text-stone-900"
                     >
-                        <div className="mx-auto w-54">
+                        <div className="mx-auto w-40 md:w-54">
                             <img
                                 src="/gemmas-logo2.png"
                                 alt="Gemma's Kitchenette"

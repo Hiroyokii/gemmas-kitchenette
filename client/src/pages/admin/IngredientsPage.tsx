@@ -18,7 +18,7 @@ export default function IngredientsPage() {
     const unitsQuery = useQuery({ queryKey: ["units"], queryFn: getUnits });
     const ingredients = ingredientsQuery.data ?? [];
 
-    return <div className="px-6 pt-6 pb-8 lg:px-8 lg:pt-8">
+    return <div className="px-4 pt-6 pb-8 md:px-6 md:pt-8 lg:px-8">
         <div className="mb-7 flex items-start justify-between gap-4"><div><h1 className="text-3xl font-bold tracking-tight text-ink-900">Ingredients</h1><p className="mt-1 text-sm text-ink-500">Manage ingredients, stock levels, and costs.</p></div><Button onClick={() => { setEditing(null); setModalOpen(true); }}>+ Add Ingredient</Button></div>
         <Alert type="error" message={ingredientsQuery.error ? getErrorMessage(ingredientsQuery.error, "Failed to load ingredients.") : ""} />
         <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm"><div className="overflow-x-auto"><table className="w-full min-w-[720px] text-sm"><thead className="border-b border-stone-200 bg-stone-50"><tr className="text-left"><th className="px-6 py-4 font-semibold text-ink-800">Ingredient</th><th className="px-6 py-4 font-semibold text-ink-800">Unit</th><th className="px-6 py-4 font-semibold text-ink-800">Current Stock</th><th className="px-6 py-4 font-semibold text-ink-800">Minimum Stock</th><th className="px-6 py-4 font-semibold text-ink-800">Cost / Unit</th><th className="px-6 py-4 text-right font-semibold text-ink-800">Action</th></tr></thead><tbody>

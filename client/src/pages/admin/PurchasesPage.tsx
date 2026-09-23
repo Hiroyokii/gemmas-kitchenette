@@ -374,7 +374,7 @@ function PurchaseFormModal({
                                 key={field.id}
                                 className="border-b border-stone-100 p-4 last:border-0"
                             >
-                                <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(160px,1fr)_110px_130px_150px_auto] sm:items-end">
+                                <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(160px,1fr)_110px_130px_150px_auto] md:items-end">
                                     {/* Ingredient */}
                                     <div>
                                         <label

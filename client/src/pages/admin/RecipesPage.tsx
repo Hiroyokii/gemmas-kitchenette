@@ -303,7 +303,7 @@ export default function RecipesPage() {
                                 {fields.map((field, index) => (
                                     <div
                                         key={field.id}
-                                        className="grid gap-3 px-5 py-4 sm:grid-cols-[minmax(0,1fr)_140px_auto] sm:items-end"
+                                        className="grid gap-3 px-5 py-4 md:grid-cols-[minmax(0,1fr)_140px_auto] md:items-end"
                                     >
                                         {/* Ingredient */}
                                         <div className="min-w-0">
