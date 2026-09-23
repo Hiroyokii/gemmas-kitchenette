@@ -58,10 +58,10 @@ export default function FoodCard({ menu }: FoodCardProps) {
                     <span
                         className={[
                             "absolute right-2 top-2 rounded-full px-2.5 py-1",
-                            "text-[10px] font-bold shadow-sm backdrop-blur-sm",
-                            "md:right-3 md:top-3 md:px-3 md:py-1.5 md:text-xs",
+                            "text-[10px] font-display shadow-sm backdrop-blur-sm",
+                            "md:right-3 md:top-3 md:px-3 md:py-1.5 md:text-sm",
                             isLowStock
-                                ? "bg-[#FFB800] text-stone-900"
+                                ? "bg-[#FFB800] text-white"
                                 : "bg-white/95 text-stone-800",
                         ].join(" ")}
                     >
@@ -150,7 +150,7 @@ export default function FoodCard({ menu }: FoodCardProps) {
                                 className="h-9 w-18 shrink-0 rounded-lg bg-[#FFB800] p-0 text-stone-900 hover:bg-[#E6A600] active:bg-[#CC9400] disabled:bg-[#FFD966] md:h-9 md:w-20 lg:h-10 lg:w-22 lg:rounded-xl"
                                 aria-label={`Add ${menu.food.name} to cart`}
                             >
-                                <p className="flex-1 text-sm font-display font-bold leading-tight text-stone-900">
+                                <p className="flex-1 text-sm font-display font-bold leading-tight text-white">
                                     Add
                                 </p>
 

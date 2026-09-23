@@ -110,7 +110,7 @@ export default function OrderHistoryPage() {
                         {orders.map((order) => (
                             <div
                                 key={order.id}
-                                className="rounded-2xl border border-orange-100 bg-gradient-to-br from-orange-50/50 via-white to-amber-50/30 p-1 shadow-[0_8px_24px_rgba(41,37,36,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(41,37,36,0.1)]"
+                                className="rounded-3xl border border-orange-200 bg-gradient-to-br from-orange-50/50 via-white to-amber-50/30 p-1 shadow-[0_8px_24px_rgba(41,37,36,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(41,37,36,0.1)]"
                             >
                                 <OrderTicket order={order} />
                             </div>

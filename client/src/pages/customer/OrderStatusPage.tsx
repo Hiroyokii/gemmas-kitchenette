@@ -358,7 +358,7 @@ export default function OrderStatusPage() {
         description={`Placed ${formatDate(order.createdAt)}`}
       />
 
-      <Card className="mb-6 border-orange-100 bg-orange-50/50 p-5 md:p-6">
+      <Card className="mb-6 p-5 md:p-6 border border-orange-200 bg-gradient-to-br from-orange-50/50 via-white to-amber-50/30">
         <p className="font-display text-xl font-semibold text-ink-900">
           Thank you for your order!
         </p>
