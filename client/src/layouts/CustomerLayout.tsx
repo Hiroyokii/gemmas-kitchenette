@@ -9,7 +9,7 @@ import { CartDrawerProvider } from "../providers/CartDrawerProvider";
 export default function CustomerLayout() {
     return (
         <CartDrawerProvider>
-            <div className="min-h-screen flex flex-col">
+            <div className="min-h-screen flex flex-col bg-stone-50">
                 <Navbar />
 
                 <main className="w-full flex-1 px-4 py-6 pb-28 md:px-6 md:py-8 lg:px-9 lg:py-10">

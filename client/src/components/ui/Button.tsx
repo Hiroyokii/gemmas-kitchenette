@@ -16,7 +16,7 @@ const VARIANT_CLASSES: Record<ButtonVariant, string> = {
         "bg-[#FFB800] text-white hover:bg-[#E6A600] active:bg-[#CC9400] disabled:bg-[#FFD966]",
 
     secondary:
-        "border border-[#E5B52A] bg-white text-stone-900 hover:bg-[#FFF8DD] active:bg-[#FFF0B8] disabled:text-stone-400",
+        "border border-[#FFB800] bg-white text-[#FFB800] hover:bg-[#FFF8DD] active:bg-[#FFF0B8] disabled:text-stone-400",
 
     ghost:
         "text-stone-800 hover:bg-[#FFF8DD] active:bg-[#FFF0B8] disabled:text-stone-400",
