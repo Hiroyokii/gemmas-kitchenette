@@ -139,14 +139,14 @@ export default function HomePage() {
           >
             Simple steps. Easy ordering.
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-stone-500 md:text-base md:leading-7">
+          <p className="mx-auto mt-1 max-w-xl text-sm leading-6 text-stone-500 md:text-base md:leading-7">
             Order your favorite meals and let Gemma&apos;s Kitchenette take care of
             the rest.
           </p>
         </header>
 
         <div className="mt-7 grid auto-rows-fr grid-cols-2 gap-3 md:mt-8 md:grid-cols-4 md:gap-3 lg:mt-10 lg:gap-5">
-          <article className="flex h-full min-w-0 flex-col items-center rounded-2xl border border-stone-200 bg-white p-3 text-center md:p-3 lg:p-5">
+          <article className="group flex h-full min-w-0 flex-col items-center rounded-2xl border border-stone-200 bg-white p-3 text-center shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#FFB800] hover:shadow-[0_10px_30px_rgba(255,184,0,0.18)] md:p-3 lg:p-5">
             <span className="mb-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#FFB800]/25 text-xs font-bold text-stone-900 md:mb-2.5">
               1
             </span>
@@ -165,7 +165,7 @@ export default function HomePage() {
             </p>
           </article>
 
-          <article className="flex h-full min-w-0 flex-col items-center rounded-2xl border border-stone-200 bg-white p-3 text-center md:p-3 lg:p-5">
+          <article className="group flex h-full min-w-0 flex-col items-center rounded-2xl border border-stone-200 bg-white p-3 text-center shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#FFB800] hover:shadow-[0_10px_30px_rgba(255,184,0,0.18)] md:p-3 lg:p-5">
             <span className="mb-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#FFB800]/25 text-xs font-bold text-stone-900 md:mb-2.5">
               2
             </span>
@@ -184,7 +184,7 @@ export default function HomePage() {
             </p>
           </article>
 
-          <article className="flex h-full min-w-0 flex-col items-center rounded-2xl border border-stone-200 bg-white p-3 text-center md:p-3 lg:p-5">
+          <article className="group flex h-full min-w-0 flex-col items-center rounded-2xl border border-stone-200 bg-white p-3 text-center shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#FFB800] hover:shadow-[0_10px_30px_rgba(255,184,0,0.18)] md:p-3 lg:p-5">
             <span className="mb-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#FFB800]/25 text-xs font-bold text-stone-900 md:mb-2.5">
               3
             </span>
@@ -203,7 +203,7 @@ export default function HomePage() {
             </p>
           </article>
 
-          <article className="flex h-full min-w-0 flex-col items-center rounded-2xl border border-stone-200 bg-white p-3 text-center md:p-3 lg:p-5">
+          <article className="group flex h-full min-w-0 flex-col items-center rounded-2xl border border-stone-200 bg-white p-3 text-center shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#FFB800] hover:shadow-[0_10px_30px_rgba(255,184,0,0.18)] md:p-3 lg:p-5">
             <span className="mb-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#FFB800]/25 text-xs font-bold text-stone-900 md:mb-2.5">
               4
             </span>
