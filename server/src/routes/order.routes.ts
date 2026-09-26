@@ -6,7 +6,8 @@ import {
     getMyOrders, 
     updateOrderStatus, 
     getAllOrders, 
-    submitPaymentReference, 
+    submitPaymentProof,
+    getPaymentProof,
     verifyPayment, 
     rejectPayment  
 } from "../controllers/order.controller.js";
@@ -20,7 +21,7 @@ import { validate } from "../middleware/validate.middleware.js";
 
 import { 
     createOrderSchema, 
-    referenceSchema 
+    paymentProofSchema,
 } from "../schemas/order.schema.js";
 
 const router = Router();
@@ -67,11 +68,18 @@ router.patch(
 )
 
 router.patch(
-    "/:id/payment/reference", 
+    "/:id/payment/proof",
     authenticate, 
     authorize("CUSTOMER"), 
-    validate(referenceSchema), 
-    submitPaymentReference
+    validate(paymentProofSchema),
+    submitPaymentProof
+);
+
+router.get(
+    "/:id/payment/proof",
+    authenticate,
+    authorize("CUSTOMER", "ADMIN", "STAFF"),
+    getPaymentProof,
 );
 
 router.patch(

@@ -8,4 +8,10 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  server: {
+    watch: {
+      // Docker Desktop on Windows may not forward bind-mount file events.
+      usePolling: true,
+    },
+  },
 });

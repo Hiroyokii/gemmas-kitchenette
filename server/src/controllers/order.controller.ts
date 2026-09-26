@@ -6,7 +6,8 @@ import {
     getMyOrdersService,
     getAllOrdersService,
     updateOrderStatusService,
-    submitPaymentReferenceService,
+    submitPaymentProofService,
+    getPaymentProofService,
     verifyPaymentService,
     rejectPaymentService,
 } from "../services/order.service.js";
@@ -50,23 +51,34 @@ export const getOrderByIdForCustomer = asyncHandler(async (req, res) => {
 export const getAllOrders = asyncHandler(async (req, res) => {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
+    const date = typeof req.query.date === "string" ? req.query.date : undefined;
 
     const orders = await getAllOrdersService(
         page,
-        limit
+        limit,
+        date,
     );
 
     res.status(200).json(orders);
 });
 
-export const submitPaymentReference = asyncHandler(async (req, res) => {
-    const order = await submitPaymentReferenceService(
+export const submitPaymentProof = asyncHandler(async (req, res) => {
+    const order = await submitPaymentProofService(
         Number(req.params.id), 
         req.user!.userId, 
-        req.body.referenceNumber
+        req.body.screenshotDataUrl,
     );
 
     res.status(200).json(order);
+});
+
+export const getPaymentProof = asyncHandler(async (req, res) => {
+    const screenshotDataUrl = await getPaymentProofService(
+        Number(req.params.id),
+        req.user!.userId,
+        req.user!.role,
+    );
+    res.status(200).json({ screenshotDataUrl });
 });
 
 export const verifyPayment = asyncHandler(async (req, res) => {

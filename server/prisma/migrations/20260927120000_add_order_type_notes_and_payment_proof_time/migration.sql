@@ -1,0 +1,9 @@
+CREATE TYPE "OrderType" AS ENUM ('PICKUP', 'DELIVERY');
+
+ALTER TABLE "Order"
+ADD COLUMN "orderType" "OrderType" NOT NULL DEFAULT 'DELIVERY',
+ADD COLUMN "notes" TEXT,
+ALTER COLUMN "deliveryAddress" DROP NOT NULL;
+
+ALTER TABLE "Payment"
+ADD COLUMN "proofSubmittedAt" TIMESTAMP(3);

@@ -18,13 +18,14 @@ import { BadRequestError } from "../errors/BadRequestError.js";
 import { consumeInventoryBatches } from "../repositories/purchase.repository.js";
 import { processExpiredBatchesService } from "./spoilage.service.js";
 import { findFoodRatingSummaries } from "../repositories/review.repository.js";
+import { getManilaDayStart, getNextManilaDayStart } from "../utils/manilaDay.js";
 
 export async function prepareDailyFood(
     data: CreateDailyMenuInput
 ) {
     await processExpiredBatchesService();
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = getManilaDayStart();
+    const tomorrow = getNextManilaDayStart(today);
 
     const food = 
         await findFoodById(data.foodId);
@@ -38,7 +39,8 @@ export async function prepareDailyFood(
     const existing = 
         await findDailyMenuByFoodAndDate(
             data.foodId,
-            today
+            today,
+            tomorrow,
         );
 
     if (existing) {
@@ -124,11 +126,8 @@ export async function getTodayMenuService(
     search?: string,
     categoryId?: number,
 ) {
-    const start = new Date();
-    start.setHours(0, 0, 0, 0);
-
-    const end = new Date(start);
-    end.setDate(end.getDate() + 1);
+    const start = getManilaDayStart();
+    const end = getNextManilaDayStart(start);
 
     const availableFoods = await findFoods(search, categoryId, true);
     const menu = await findTodayMenu(
@@ -151,11 +150,8 @@ export async function getTodayMenuService(
 }
 
 export async function getTodayMenuForAdminService() {
-    const start = new Date();
-    start.setHours(0, 0, 0, 0);
-
-    const end = new Date(start);
-    end.setDate(end.getDate() + 1);
+    const start = getManilaDayStart();
+    const end = getNextManilaDayStart(start);
 
     return findTodayMenuForAdmin(start, end);
 }

@@ -48,6 +48,7 @@ model User {
 
   purchases        Purchase[]
   orders           Order[]
+  orderNumberCounter CustomerOrderCounter?
   refreshTokens    RefreshToken[]
   reviews          Review[]
   verifiedPayments Payment[]        @relation("PaymentVerifier")
@@ -245,13 +246,25 @@ enum PaymentStatus {
   REJECTED
 }
 
+enum OrderType {
+  PICKUP
+  DELIVERY
+}
+
 model Order {
   id Int @id @default(autoincrement())
 
   customerId Int
   customer   User @relation(fields: [customerId], references: [id])
 
-  deliveryAddress String
+  customerOrderNumber Int
+  dailyOrderNumber    Int
+  dailyOrderDate      DateTime @db.Date
+
+  deliveryAddress String?
+
+  orderType OrderType @default(DELIVERY)
+  notes     String?
 
   total Decimal @db.Decimal(10, 2)
 
@@ -264,6 +277,20 @@ model Order {
 
   orderItems OrderItem[]
   payment    Payment?
+
+  @@unique([customerId, customerOrderNumber])
+  @@unique([dailyOrderDate, dailyOrderNumber])
+}
+
+model CustomerOrderCounter {
+  customerId Int  @id
+  customer   User @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  lastNumber Int  @default(0)
+}
+
+model DailyOrderCounter {
+  date       DateTime @id @db.Date
+  lastNumber Int      @default(0)
 }
 
 model OrderItem {
@@ -293,6 +320,8 @@ model Payment {
   status PaymentStatus @default(PENDING)
 
   referenceNumber String?
+  proofImage      String?   @db.Text
+  proofSubmittedAt DateTime?
 
   rejectionReason String?
   verifiedAt      DateTime?

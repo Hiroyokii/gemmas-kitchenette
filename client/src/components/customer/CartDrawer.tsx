@@ -7,13 +7,15 @@ import { useCart } from "../../hooks/useCart";
 import { useCartDrawer } from "../../hooks/useCartDrawer";
 import {
   createOrder,
-  submitPaymentReference,
+  submitPaymentProof,
+  type OrderType,
   type PaymentMethod,
 } from "../../services/order.service";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 import CartItemRow from "./CartItemRow";
 import Alert from "../ui/Alert";
 import Icon from "../ui/Icon";
+import GcashPaymentPanel from "./GcashPaymentPanel";
 
 export default function CartDrawer() {
   const { isCartOpen, closeCart } = useCartDrawer();
@@ -29,22 +31,37 @@ export default function CartDrawer() {
   const navigate = useNavigate();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("COD");
-  const [referenceNumber, setReferenceNumber] = useState("");
+  const [orderType, setOrderType] = useState<OrderType>("DELIVERY");
+  const [orderNotes, setOrderNotes] = useState("");
+  const [paymentScreenshot, setPaymentScreenshot] = useState<File | null>(null);
+  const [screenshotError, setScreenshotError] = useState("");
+  const [pendingGcashOrderId, setPendingGcashOrderId] = useState<number | null>(null);
+  const [isRetryingPayment, setIsRetryingPayment] = useState(false);
   const [error, setError] = useState("");
+
+  function finishCheckout() {
+    clearCart();
+    setPendingGcashOrderId(null);
+    closeCart();
+    navigate("/orders");
+  }
 
   const orderMutation = useMutation({
     mutationFn: createOrder,
     onSuccess: async (order) => {
-      clearCart();
-      if (paymentMethod === "GCASH" && referenceNumber.trim()) {
+      if (paymentMethod === "GCASH") {
         try {
-          await submitPaymentReference(order.id, referenceNumber.trim());
+          await submitPaymentProof(
+            order.id,
+            await fileToDataUrl(paymentScreenshot!)
+          );
         } catch {
-          // The order itself was placed; a reference can be resubmitted from My Orders.
+          setPendingGcashOrderId(order.id);
+          setError(`Order #${order.id} was placed, but payment proof could not be submitted. Check your connection and submit again to retry.`);
+          return;
         }
       }
-      closeCart();
-      navigate("/orders");
+      finishCheckout();
     },
     onError: (err) =>
       setError(
@@ -73,10 +90,29 @@ export default function CartDrawer() {
     closeCart();
   }
 
-  function handleCheckout() {
+  async function handleCheckout() {
     setError("");
-    if (paymentMethod === "GCASH" && referenceNumber.trim().length < 4) {
-      setError("Enter your GCash reference number to place this order.");
+    if (paymentMethod === "GCASH" && !paymentScreenshot) {
+      setError("Upload a screenshot of your successful GCash payment.");
+      return;
+    }
+    if (pendingGcashOrderId !== null) {
+      if (paymentMethod !== "GCASH" || !paymentScreenshot) {
+        setError("Finish submitting the GCash payment proof for the order that was already placed.");
+        return;
+      }
+      setIsRetryingPayment(true);
+      try {
+        await submitPaymentProof(
+          pendingGcashOrderId,
+          await fileToDataUrl(paymentScreenshot)
+        );
+        finishCheckout();
+      } catch (err) {
+        setError(getErrorMessage(err, "Payment proof could not be submitted. Please try again."));
+      } finally {
+        setIsRetryingPayment(false);
+      }
       return;
     }
     orderMutation.mutate({
@@ -85,6 +121,8 @@ export default function CartDrawer() {
         quantity: item.quantity,
       })),
       paymentMethod,
+      orderType,
+      notes: orderNotes.trim() || undefined,
     });
   }
 
@@ -142,9 +180,17 @@ export default function CartDrawer() {
               cart={cart}
               subtotal={subtotal}
               paymentMethod={paymentMethod}
-              referenceNumber={referenceNumber}
+              orderType={orderType}
+              notes={orderNotes}
+              screenshot={paymentScreenshot}
+              screenshotError={screenshotError}
               onPaymentMethodChange={setPaymentMethod}
-              onReferenceNumberChange={setReferenceNumber}
+              onOrderTypeChange={setOrderType}
+              onNotesChange={setOrderNotes}
+              onScreenshotChange={(file, fileError) => {
+                setPaymentScreenshot(file);
+                setScreenshotError(fileError);
+              }}
               onIncrease={addToCart}
               onDecrease={decreaseQuantity}
             />
@@ -169,7 +215,7 @@ export default function CartDrawer() {
               <span>
                 Subtotal
               </span>
-              <span className="font-mono text-xl font-bold">
+              <span className="font-display text-xl font-bold">
                 ₱{subtotal.toFixed(2)}
               </span>
             </div>
@@ -182,10 +228,10 @@ export default function CartDrawer() {
                 <button
                   type="button"
                   onClick={handleCheckout}
-                  disabled={orderMutation.isPending}
+                  disabled={orderMutation.isPending || isRetryingPayment}
                   className="h-13 rounded-xl bg-[#FFB800] px-5 font-bold text-stone-900 transition hover:bg-[#e6a600] disabled:opacity-60"
                 >
-                  {orderMutation.isPending
+                  {orderMutation.isPending || isRetryingPayment
                     ? "Placing order…"
                     : `Place order · ₱${subtotal.toFixed(2)}`}
                 </button>
@@ -221,9 +267,14 @@ type CheckoutFormProps = {
   cart: ReturnType<typeof useCart>["cart"];
   subtotal: number;
   paymentMethod: PaymentMethod;
-  referenceNumber: string;
+  orderType: OrderType;
+  notes: string;
+  screenshot: File | null;
+  screenshotError: string;
   onPaymentMethodChange: (value: PaymentMethod) => void;
-  onReferenceNumberChange: (value: string) => void;
+  onOrderTypeChange: (value: OrderType) => void;
+  onNotesChange: (value: string) => void;
+  onScreenshotChange: (file: File | null, error: string) => void;
   onIncrease: ReturnType<typeof useCart>["addToCart"];
   onDecrease: ReturnType<typeof useCart>["decreaseQuantity"];
 };
@@ -232,9 +283,14 @@ function CheckoutForm({
   cart,
   subtotal,
   paymentMethod,
-  referenceNumber,
+  orderType,
+  notes,
+  screenshot,
+  screenshotError,
   onPaymentMethodChange,
-  onReferenceNumberChange,
+  onOrderTypeChange,
+  onNotesChange,
+  onScreenshotChange,
   onIncrease,
   onDecrease,
 }: CheckoutFormProps) {
@@ -251,7 +307,24 @@ function CheckoutForm({
         ))}
       </div>
       <section className="mt-6 border-t border-stone-200 pt-6">
-        <h3 className="font-display text-lg text-stone-900">Payment method</h3>
+        <h3 className="font-display text-lg text-stone-900">Order type</h3>
+        <div className="mt-3">
+          <select
+            id="drawer-order-type"
+            value={orderType}
+            onChange={(e) =>
+              onOrderTypeChange(e.target.value as "DELIVERY" | "PICKUP")
+            }
+            className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm font-medium text-stone-900 outline-none transition focus:border-[#FFB800] focus:ring-2 focus:ring-[#FFB800]/20"
+          >
+            <option value="DELIVERY">Delivery</option>
+            <option value="PICKUP">Pickup</option>
+          </select>
+        </div>
+        <label htmlFor="drawer-order-notes" className="mb-1.5 mt-4 block text-lg font-display text-stone-900">Order notes <span className="font-normal text-stone-500">(optional)</span></label>
+        <textarea id="drawer-order-notes" value={notes} onChange={(event) => onNotesChange(event.target.value)} maxLength={500} rows={3} placeholder="Add a note for the kitchen or store" className="w-full resize-y rounded-xl border border-stone-200 px-3 py-2 text-sm outline-none focus:border-[#FFB800] focus:ring-2 focus:ring-[#FFB800]/20" />
+
+        <h3 className="mt-6 font-display text-lg text-stone-900">Payment method</h3>
         <div className="mt-3 grid gap-3">
           <label
             className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 ${
@@ -295,34 +368,22 @@ function CheckoutForm({
                 GCash — simulated
               </strong>
               <small className="mt-1 block text-sm text-stone-500">
-                Enter your payment reference before placing the order.
+                Pay by GCash and upload your payment screenshot.
               </small>
             </span>
           </label>
         </div>
         {paymentMethod === "GCASH" && (
-          <div className="mt-4">
-            <label
-              htmlFor="drawer-gcash-reference"
-              className="mb-1.5 block text-sm font-semibold text-stone-800"
-            >
-              GCash reference number
-            </label>
-            <input
-              id="drawer-gcash-reference"
-              value={referenceNumber}
-              onChange={(event) =>
-                onReferenceNumberChange(event.target.value)
-              }
-              placeholder="e.g. 1234 5678 9012"
-              className="h-11 w-full rounded-xl border border-stone-200 px-3 text-sm outline-none focus:border-[#FFB800] focus:ring-2 focus:ring-[#FFB800]/20"
-            />
-          </div>
+          <GcashPaymentPanel
+            amount={subtotal}
+            screenshot={screenshot}
+            fileError={screenshotError}
+            onScreenshotChange={onScreenshotChange}
+          />
         )}
         <p className="mt-5 rounded-xl bg-stone-50 p-4 text-sm leading-6 text-stone-500">
-          Your saved delivery address and contact details will be used for this
-          order. The final total is{" "}
-          <strong className="font-mono text-stone-700">
+          {orderType === "DELIVERY" ? "Your saved delivery address and contact details will be used for this order." : "This order is for pickup at the store."} The final total is{" "}
+          <strong className="font-display text-stone-700">
             ₱{subtotal.toFixed(2)}
           </strong>
           .
@@ -330,4 +391,16 @@ function CheckoutForm({
       </section>
     </div>
   );
+}
+
+function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") resolve(reader.result);
+      else reject(new Error("Could not read the payment screenshot."));
+    };
+    reader.onerror = () => reject(new Error("Could not read the payment screenshot."));
+    reader.readAsDataURL(file);
+  });
 }

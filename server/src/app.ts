@@ -27,6 +27,7 @@ app.use(cors({
 }));
 
 app.use(cookieParser());
+app.use("/orders", express.json({ limit: "3mb" }));
 app.use(express.json());
 app.use(
     "/api-docs",

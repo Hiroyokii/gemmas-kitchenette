@@ -4,14 +4,24 @@ import type { Prisma, OrderStatus } from "../generated/prisma/index.js";
 export async function createOrder(
     tx: Prisma.TransactionClient,
     customerId: number,
-    deliveryAddress: string,
-    total: number
+    deliveryAddress: string | null,
+    total: number,
+    orderType: "PICKUP" | "DELIVERY",
+    customerOrderNumber: number,
+    dailyOrderNumber: number,
+    dailyOrderDate: Date,
+    notes?: string,
 ) {
     return tx.order.create({
         data: {
             customerId,
             deliveryAddress,
             total,
+            orderType,
+            customerOrderNumber,
+            dailyOrderNumber,
+            dailyOrderDate,
+            notes,
             status: "PENDING",
         },
     });
@@ -36,8 +46,21 @@ export async function createOrderItems(
     });
 }
 
+const paymentInclude = {
+    id: true,
+    orderId: true,
+    method: true,
+    status: true,
+    rejectionReason: true,
+    verifiedAt: true,
+    verifiedById: true,
+    createdAt: true,
+    updatedAt: true,
+    proofSubmittedAt: true,
+} as const;
+
 const orderInclude = {
-    payment: true,
+    payment: { select: paymentInclude },
     orderItems: { 
         include: { 
             dailyMenu: { 
@@ -56,7 +79,7 @@ export async function findOrdersByCustomer(
             customerId,
         },
         include: {
-            payment: true,
+            payment: { select: paymentInclude },
             orderItems: {
                 include: {
                     dailyMenu: {
@@ -90,7 +113,7 @@ export async function findOrderByIdForCustomer(
                     phoneNumber: true,
                 },
             },
-            payment: true,
+            payment: { select: paymentInclude },
             orderItems: {
                 include: orderInclude.orderItems.include,
             },
@@ -100,11 +123,14 @@ export async function findOrderByIdForCustomer(
 
 export async function findAllOrders(
     page: number, 
-    limit: number
+    limit: number,
+    orderDate?: Date,
 ) {
     const skip = (page - 1) * limit;
+    const where = orderDate ? { dailyOrderDate: orderDate } : {};
     const [orders, total] = await Promise.all([
         prisma.order.findMany({ 
+            where,
             skip, 
             take: limit, 
             include: { 
@@ -118,7 +144,7 @@ export async function findAllOrders(
                     orderBy: { 
                         createdAt: "desc" 
                     } }),
-        prisma.order.count(),
+        prisma.order.count({ where }),
     ]);
     return { orders, total };
 }
@@ -129,7 +155,7 @@ export async function findOrderById(id: number) {
             id,
         },
         include: { 
-            payment: true 
+            payment: { select: paymentInclude }
         }
     });
 }

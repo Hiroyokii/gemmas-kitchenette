@@ -16,14 +16,12 @@ export const createOrderSchema = z.object({
             "COD", 
             "GCASH"
         ]),
+    orderType: z.enum(["PICKUP", "DELIVERY"]),
+    notes: z.string().trim().max(500, "Order notes must be 500 characters or less.").optional(),
 })
 
-export const referenceSchema = z.object({ 
-    referenceNumber: z
-    .string()
-    .trim()
-    .min(4)
-    .max(100) 
+export const paymentProofSchema = z.object({
+    screenshotDataUrl: z.string().min(1).max(2_800_100),
 });
 
 export type CreateOrderInput = z.infer<typeof createOrderSchema>;

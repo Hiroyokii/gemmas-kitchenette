@@ -8,6 +8,8 @@ export type OrderStatus =
     | "COMPLETED"
     | "CANCELLED";
 
+export type OrderType = "PICKUP" | "DELIVERY";
+
 export interface OrderItem {
     id: number;
     quantity: number;
@@ -28,14 +30,19 @@ export interface Order {
     id: number;
     status: OrderStatus;
     total: number;
-    deliveryAddress: string;
+    deliveryAddress: string | null;
+    orderType: OrderType;
+    notes?: string | null;
+    customerOrderNumber: number;
+    dailyOrderNumber: number;
+    dailyOrderDate: string;
     createdAt: string;
     completedAt?: string | null;
     cancelledAt?: string | null;
     payment?: {
         method: "COD" | "GCASH";
         status: "NOT_APPLICABLE" | "PENDING" | "VERIFIED" | "REJECTED";
-        referenceNumber?: string | null;
+        proofSubmittedAt?: string | null;
         rejectionReason?: string | null;
         verifiedAt?: string | null;
     } | null;

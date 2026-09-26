@@ -16,12 +16,13 @@ export async function findDailyMenuById(
 
 export async function findDailyMenuByFoodAndDate(
     foodId: number,
-    date: Date
+    start: Date,
+    end: Date,
 ) {
     return prisma.dailyMenu.findFirst({
         where: {
             foodId,
-            date,
+            date: { gte: start, lt: end },
         }
     })
 }

@@ -29,6 +29,14 @@ html {
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Eina 04";
+  src: url("/fonts/Eina%2004%20W03%20SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
 .font-display {
   font-family: "Sharp Sans Display", sans-serif;
   font-weight: 700;
@@ -37,6 +45,11 @@ html {
 .font-editorial {
   font-family: Georgia, "Times New Roman", serif;
   font-style: italic;
+}
+
+.font-default {
+  font-family: "Eina 04", sans-serif;
+  font-weight: 600;
 }
 
 @keyframes cart-drawer-in {

@@ -27,7 +27,7 @@ export default function OrderTicket({ order }: OrderTicketProps) {
                     Order
                 </span>
                 <span className="font-display text-lg font-semibold text-ink-900">
-                    #{order.id}
+                    #{order.customerOrderNumber}
                 </span>
             </div>
 
@@ -36,7 +36,7 @@ export default function OrderTicket({ order }: OrderTicketProps) {
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                         <Link
                             to={`/orders/${order.id}/status`}
-                            className="inline-flex text-sm font-medium text-orange-600 transition-colors hover:text-orange-700"
+                            className="inline-flex text-sm font-medium text-[#FFB800] transition-colors hover:text-[#da9c00]"
                         >
                             View Order <Icon name="chevronRight" className="ml-1 h-4 w-4" />
                         </Link>
@@ -75,8 +75,9 @@ export default function OrderTicket({ order }: OrderTicketProps) {
 
                 <div className="mt-3 flex items-start gap-1.5 text-xs text-ink-400">
                     <Icon name="mapPin" className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                    {order.deliveryAddress}
+                    <span>{order.orderType === "PICKUP" ? "Pickup at the store" : order.deliveryAddress}</span>
                 </div>
+                {order.notes && <p className="mt-2 text-xs text-ink-500">Order note: {order.notes}</p>}
 
                 <div className="mt-3 flex items-center justify-between border-t border-dashed border-ink-200 pt-3">
                     <span className="text-sm font-medium text-ink-600">Total</span>

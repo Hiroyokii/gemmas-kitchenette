@@ -5,7 +5,7 @@ const FAQ_ITEMS = [
   {
     question: "What payment methods are available?",
     answer:
-      "You can choose cash on delivery or GCash when placing an order. GCash orders need a payment reference number.",
+      "You can choose cash on delivery or GCash when placing an order. GCash orders need a screenshot of the successful payment.",
   },
   {
     question: "How do I place an order?",

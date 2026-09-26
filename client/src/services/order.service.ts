@@ -2,11 +2,14 @@ import api from "../api/axios";
 import type { Order, OrderStatus, PaginationMeta } from "../types/Order";
 
 export type PaymentMethod = "COD" | "GCASH";
+export type OrderType = "PICKUP" | "DELIVERY";
 export type PaymentStatus = "NOT_APPLICABLE" | "PENDING" | "VERIFIED" | "REJECTED";
 
 export interface CreateOrderInput {
   items: { dailyMenuId: number; quantity: number }[];
   paymentMethod: PaymentMethod;
+  orderType: OrderType;
+  notes?: string;
 }
 
 export interface CreateReviewInput {
@@ -37,9 +40,10 @@ export async function getOrderById(orderId: number): Promise<Order> {
 
 export async function getAllOrders(
   page: number,
-  limit: number
+  limit: number,
+  date?: string,
 ): Promise<{ orders: Order[]; pagination: PaginationMeta }> {
-  const response = await api.get("/orders", { params: { page, limit } });
+  const response = await api.get("/orders", { params: { page, limit, date } });
   
   return response.data;
 }
@@ -78,10 +82,17 @@ export async function submitReview(
   return response.data;
 }
 
-export async function submitPaymentReference(
+export async function submitPaymentProof(
     id: number,
-    referenceNumber: string
+    screenshotDataUrl: string,
 ): Promise<unknown> {
-  const response = await api.patch(`/orders/${id}/payment/reference`, { referenceNumber });
+  const response = await api.patch(`/orders/${id}/payment/proof`, {
+    screenshotDataUrl,
+  });
   return response.data;
+}
+
+export async function getPaymentProof(id: number): Promise<string> {
+  const response = await api.get<{ screenshotDataUrl: string }>(`/orders/${id}/payment/proof`);
+  return response.data.screenshotDataUrl;
 }

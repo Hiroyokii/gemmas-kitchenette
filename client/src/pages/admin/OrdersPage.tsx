@@ -8,6 +8,7 @@ import {
 
 import {
     getAllOrders,
+    getPaymentProof,
     verifyPayment,
     rejectPayment,
     updateOrderStatus,
@@ -55,16 +56,24 @@ export default function OrdersPage() {
     const queryClient = useQueryClient();
 
     const [page, setPage] = useState(1);
+    const [selectedDate, setSelectedDate] = useState(getTodayInManila);
     const [actionError, setActionError] = useState("");
     const [rejectingOrderId, setRejectingOrderId] = useState<number | null>(null);
     const [rejectionReason, setRejectionReason] = useState("");
+    const [paymentProofOrderId, setPaymentProofOrderId] = useState<number | null>(null);
 
     const ordersQuery = useQuery<{
         orders: Order[];
         pagination: PaginationMeta;
     }>({
-        queryKey: ["orders", page],
-        queryFn: () => getAllOrders(page, 10),
+        queryKey: ["orders", page, selectedDate],
+        queryFn: () => getAllOrders(page, 10, selectedDate),
+    });
+
+    const paymentProofQuery = useQuery({
+        queryKey: ["payment-proof", paymentProofOrderId],
+        queryFn: () => getPaymentProof(paymentProofOrderId!),
+        enabled: paymentProofOrderId !== null,
     });
 
     const paymentMutation = useMutation({
@@ -120,8 +129,12 @@ export default function OrdersPage() {
                 </h1>
 
                 <p className="mt-1 text-sm text-ink-500">
-                    Manage customer orders and update their status.
+                    Daily order numbers reset at midnight (Asia/Manila). Select a date to review its orders.
                 </p>
+                <label className="mt-4 inline-flex items-center gap-3 text-sm font-medium text-ink-700">
+                    Order date
+                    <input type="date" value={selectedDate} onChange={(event) => { setSelectedDate(event.target.value); setPage(1); }} className="h-10 rounded-lg border border-stone-200 bg-white px-3 text-sm text-ink-800 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20" />
+                </label>
             </div>
 
             {/* Errors */}
@@ -226,8 +239,11 @@ export default function OrdersPage() {
                                             {/* Order */}
                                             <td className="px-5 py-4 align-top">
                                                 <span className="font-semibold text-ink-900">
-                                                    #{order.id}
+                                                    #{order.dailyOrderNumber}
                                                 </span>
+                                                <p className="mt-1 text-xs text-ink-500">Customer order #{order.customerOrderNumber}</p>
+                                                <p className="mt-1 text-xs text-ink-500">{order.orderType === "PICKUP" ? "Pickup" : "Delivery"}</p>
+                                                {order.notes && <p className="mt-1 max-w-36 text-xs text-ink-500">Note: {order.notes}</p>}
                                             </td>
 
                                             {/* Customer */}
@@ -318,9 +334,9 @@ export default function OrdersPage() {
                                                             "font-semibold",
                                                             order.payment.status === "VERIFIED" ? "text-green-700" : order.payment.status === "REJECTED" ? "text-red-700" : "text-yellow-700",
                                                         ].join(" ")}>{order.payment.status.replace(/_/g, " ")}</p>
-                                                        {order.payment.referenceNumber && <p className="font-mono text-ink-500">Ref: {order.payment.referenceNumber}</p>}
+                                                        {order.payment.method === "GCASH" && order.payment.proofSubmittedAt && <button type="button" onClick={() => setPaymentProofOrderId(order.id)} className="text-left font-medium text-blue-700 underline">View payment screenshot</button>}
                                                         {order.payment.rejectionReason && <p className="max-w-44 text-red-600">{order.payment.rejectionReason}</p>}
-                                                        {order.payment.method === "GCASH" && order.payment.status === "PENDING" && order.payment.referenceNumber && (
+                                                        {order.payment.method === "GCASH" && order.payment.status === "PENDING" && order.payment.proofSubmittedAt && (
                                                             <div className="flex gap-2 pt-1">
                                                                 <button type="button" disabled={paymentMutation.isPending} onClick={() => paymentMutation.mutate({ orderId: order.id, action: "verify" })} className="rounded bg-green-600 px-2 py-1 font-medium text-white hover:bg-green-700 disabled:opacity-50">Verify</button>
                                                                 <button type="button" disabled={paymentMutation.isPending} onClick={() => setRejectingOrderId(order.id)} className="rounded border border-red-200 px-2 py-1 font-medium text-red-700 hover:bg-red-50 disabled:opacity-50">Reject</button>
@@ -459,12 +475,34 @@ export default function OrdersPage() {
             {rejectingOrderId !== null && (
                 <Modal title="Reject simulated GCash payment" onClose={() => { setRejectingOrderId(null); setRejectionReason(""); }}>
                     <div className="space-y-4">
-                        <p className="text-sm text-ink-600">Give the customer a short reason so they can submit a corrected payment reference.</p>
+                        <p className="text-sm text-ink-600">Give the customer a short reason so they can submit a corrected payment screenshot.</p>
                         <Input label="Rejection reason" value={rejectionReason} onChange={(event) => setRejectionReason(event.target.value)} placeholder="e.g. Reference number could not be verified" />
                         <div className="flex justify-end gap-2"><Button variant="secondary" onClick={() => setRejectingOrderId(null)}>Cancel</Button><Button disabled={rejectionReason.trim().length < 2} isLoading={paymentMutation.isPending} onClick={() => paymentMutation.mutate({ orderId: rejectingOrderId, action: "reject", reason: rejectionReason })}>Reject payment</Button></div>
                     </div>
                 </Modal>
             )}
+            {paymentProofOrderId !== null && (
+                <Modal title={`Payment screenshot · Order #${orders.find((order) => order.id === paymentProofOrderId)?.dailyOrderNumber ?? paymentProofOrderId}`} onClose={() => setPaymentProofOrderId(null)}>
+                    {paymentProofQuery.isPending ? (
+                        <Spinner />
+                    ) : paymentProofQuery.error ? (
+                        <Alert type="error" message={getErrorMessage(paymentProofQuery.error, "Could not load payment screenshot.")} />
+                    ) : paymentProofQuery.data ? (
+                        <img src={paymentProofQuery.data} alt={`GCash payment proof for order ${paymentProofOrderId}`} className="max-h-[70dvh] max-w-full rounded-lg object-contain" />
+                    ) : null}
+                </Modal>
+            )}
         </div>
     );
+}
+
+function getTodayInManila(): string {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Manila",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+    }).formatToParts(new Date());
+    const part = (type: "year" | "month" | "day") => parts.find((value) => value.type === type)!.value;
+    return `${part("year")}-${part("month")}-${part("day")}`;
 }

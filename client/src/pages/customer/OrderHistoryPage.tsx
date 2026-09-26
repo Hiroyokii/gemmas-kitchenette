@@ -86,7 +86,7 @@ export default function OrderHistoryPage() {
                 <section>
                     <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
                         <div>
-                            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-orange-600">
+                            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#FFB800]">
                                 Your orders
                             </p>
 
@@ -95,7 +95,7 @@ export default function OrderHistoryPage() {
                                     Order History
                                 </h2>
 
-                                <span className="rounded-full bg-orange-50 px-2.5 py-1 text-xs font-semibold text-orange-700">
+                                <span className="rounded-full bg-[#FFB800] px-2.5 py-1 text-xs font-semibold text-white">
                                     {orders.length}
                                 </span>
                             </div>

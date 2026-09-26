@@ -38,6 +38,8 @@ export default function DailyMenuPage() {
     const menuQuery = useQuery<DailyMenu[]>({
         queryKey: ["daily-menu", "today"],
         queryFn: getTodayMenuForAdmin,
+        refetchInterval: 30_000,
+        refetchOnWindowFocus: true,
     });
 
     const foodsQuery = useQuery<Food[]>({

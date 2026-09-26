@@ -17,6 +17,7 @@ import type { CreateOrderInput } from "../schemas/order.schema.js";
 
 import { BadRequestError } from "../errors/BadRequestError.js";
 import { NotFoundError } from "../errors/NotFoundError.js";
+import { getManilaCalendarDate, getManilaDayStart, isInManilaDay } from "../utils/manilaDay.js";
 
 export async function createOrderService(
     customerId: number,
@@ -27,6 +28,7 @@ export async function createOrderService(
     );
 
     const uniqueIds = new Set(menuIds);
+    const today = getManilaDayStart();
 
     if (menuIds.length !== uniqueIds.size) {
         throw new BadRequestError(
@@ -49,6 +51,12 @@ export async function createOrderService(
         if (!menu) {
             throw new NotFoundError(
                 "Daily menu not found."
+            );
+        }
+
+        if (!isInManilaDay(menu.date, today)) {
+            throw new BadRequestError(
+                `${menu.food.name} is no longer on today's menu. Please refresh your cart.`
             );
         }
 
@@ -97,43 +105,60 @@ export async function createOrderService(
         );
 
     return prisma.$transaction(async (tx) => {
-        const customer = await tx.user.findUnique({
-            where: { id: customerId },
-            select: {
-                block: true,
-                lot: true,
-                street: true,
-                landmark: true,
-            },
-        });
+        const dailyOrderDate = getManilaCalendarDate();
+        const [customerCounter, dailyCounter] = await Promise.all([
+            tx.customerOrderCounter.upsert({
+                where: { customerId },
+                create: { customerId, lastNumber: 1 },
+                update: { lastNumber: { increment: 1 } },
+                select: { lastNumber: true },
+            }),
+            tx.dailyOrderCounter.upsert({
+                where: { date: dailyOrderDate },
+                create: { date: dailyOrderDate, lastNumber: 1 },
+                update: { lastNumber: { increment: 1 } },
+                select: { lastNumber: true },
+            }),
+        ]);
 
-        const savedAddress = customer
-            ? {
-                block: customer.block.trim(),
-                lot: customer.lot.trim(),
-                street: customer.street.trim(),
-                landmark: customer.landmark?.trim(),
+        let deliveryAddress: string | null = null;
+        if (data.orderType === "DELIVERY") {
+            const customer = await tx.user.findUnique({
+                where: { id: customerId },
+                select: { block: true, lot: true, street: true, landmark: true },
+            });
+            const savedAddress = customer
+                ? {
+                    block: customer.block.trim(),
+                    lot: customer.lot.trim(),
+                    street: customer.street.trim(),
+                    landmark: customer.landmark?.trim(),
+                }
+                : null;
+
+            if (!savedAddress?.block || !savedAddress.lot || !savedAddress.street) {
+                throw new BadRequestError(
+                    "Please complete your saved delivery address before placing a delivery order."
+                );
             }
-            : null;
-
-        if (!savedAddress?.block || !savedAddress.lot || !savedAddress.street) {
-            throw new BadRequestError(
-                "Please complete your saved delivery address before placing an order."
-            );
+            deliveryAddress = [
+                `Block ${savedAddress.block}`,
+                `Lot ${savedAddress.lot}`,
+                savedAddress.street,
+                savedAddress.landmark,
+            ].filter((part): part is string => Boolean(part)).join(", ");
         }
-
-        const deliveryAddress = [
-            `Block ${savedAddress.block}`,
-            `Lot ${savedAddress.lot}`,
-            savedAddress.street,
-            savedAddress.landmark,
-        ].filter((part): part is string => Boolean(part)).join(", ");
 
         const order = await createOrder(
             tx,
             customerId,
             deliveryAddress,
-            total
+            total,
+            data.orderType,
+            customerCounter.lastNumber,
+            dailyCounter.lastNumber,
+            dailyOrderDate,
+            data.notes,
         );
 
         await createOrderItems(
@@ -239,10 +264,10 @@ export async function updateOrderStatusService(
         ));
 }
 
-export async function submitPaymentReferenceService(
+export async function submitPaymentProofService(
     orderId: number, 
     customerId: number, 
-    referenceNumber: string
+    screenshotDataUrl: string,
 ) {
     const order = await prisma.order.findFirst({ 
         where: { 
@@ -270,19 +295,56 @@ export async function submitPaymentReferenceService(
         );
 
     if (order.status !== "PENDING") {
-        throw new BadRequestError("Payment references can only be submitted while an order is pending.");
+        throw new BadRequestError("Payment proof can only be submitted while an order is pending.");
     }
+
+    validatePaymentScreenshot(screenshotDataUrl);
 
     return prisma.payment.update({ 
         where: { 
             id: order.payment.id 
         }, 
         data: { 
-            referenceNumber: referenceNumber.trim(), 
+            proofImage: screenshotDataUrl,
+            proofSubmittedAt: new Date(),
             status: "PENDING", 
             rejectionReason: null 
         }
     });
+}
+
+function validatePaymentScreenshot(dataUrl: string): void {
+    const match = /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/]+={0,2})$/.exec(dataUrl);
+    if (!match) {
+        throw new BadRequestError("Payment screenshot must be a JPG, PNG, or WebP image.");
+    }
+
+    const buffer = Buffer.from(match[2], "base64");
+    if (buffer.length > 2 * 1024 * 1024 || buffer.length === 0 || buffer.toString("base64") !== match[2]) {
+        throw new BadRequestError("Payment screenshot must be 2 MB or smaller and contain valid image data.");
+    }
+
+    const isPng = buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
+    const isJpeg = buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
+    const isWebp = buffer.toString("ascii", 0, 4) === "RIFF" && buffer.toString("ascii", 8, 12) === "WEBP";
+    const mimeType = match[1];
+
+    if (!((mimeType === "image/png" && isPng) || (mimeType === "image/jpeg" && isJpeg) || (mimeType === "image/webp" && isWebp))) {
+        throw new BadRequestError("Payment screenshot contents do not match the selected image type.");
+    }
+}
+
+export async function getPaymentProofService(orderId: number, userId: number, role: string) {
+    const payment = await prisma.payment.findUnique({
+        where: { orderId },
+        select: { proofImage: true, order: { select: { customerId: true } } },
+    });
+
+    if (!payment || (role === "CUSTOMER" && payment.order.customerId !== userId)) {
+        throw new NotFoundError("Payment proof not found.");
+    }
+    if (!payment.proofImage) throw new NotFoundError("Payment screenshot not found.");
+    return payment.proofImage;
 }
 
 export async function verifyPaymentService(
@@ -299,8 +361,8 @@ export async function verifyPaymentService(
         if (payment.order.status !== "PENDING") {
             throw new BadRequestError("Only pending orders can have their payment verified.");
         }
-        if (payment.status !== "PENDING" || !payment.referenceNumber) {
-            throw new BadRequestError("A pending GCash payment reference is required for verification.");
+        if (payment.status !== "PENDING" || !payment.proofImage) {
+            throw new BadRequestError("A GCash payment screenshot is required for verification.");
         }
 
         await tx.payment.update({ 
@@ -350,8 +412,8 @@ export async function rejectPaymentService(
         if (payment.order.status !== "PENDING") {
             throw new BadRequestError("Only pending orders can have their payment rejected.");
         }
-        if (payment.status !== "PENDING" || !payment.referenceNumber) {
-            throw new BadRequestError("A pending GCash payment reference is required for rejection.");
+        if (payment.status !== "PENDING" || !payment.proofImage) {
+            throw new BadRequestError("A GCash payment screenshot is required for rejection.");
         }
 
         return tx.payment.update({
@@ -389,11 +451,14 @@ export async function getOrderByIdForCustomerService(
 
 export async function getAllOrdersService(
     page: number,
-    limit: number
+    limit: number,
+    date?: string,
 ) {
+    const orderDate = date ? new Date(`${date}T00:00:00.000Z`) : undefined;
     const { orders, total } = await findAllOrders(
         page,
-        limit
+        limit,
+        orderDate,
     );
 
     return {

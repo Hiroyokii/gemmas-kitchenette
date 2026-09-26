@@ -66,7 +66,7 @@ export default function HomePage() {
             </span>
           </h1>
 
-          <p className="mx-auto mt-5 max-w-md text-base leading-relaxed text-stone-600 md:mx-0 md:text-lg">
+          <p className="font-default mx-auto mt-5 max-w-md text-base leading-relaxed text-stone-500 md:mx-0 md:text-md">
             Freshly prepared food and comforting favorites from Gemma’s
             Kitchenette.
           </p>
@@ -140,14 +140,14 @@ export default function HomePage() {
           >
             Simple steps. Easy ordering.
           </h2>
-          <p className="mx-auto mt-1 max-w-xl text-sm leading-6 text-stone-500 md:text-base md:leading-7">
+          <p className="font-default mx-auto mt-3 max-w-lg text-sm leading-6 text-stone-500 md:text-base md:leading-6">
             Order your favorite meals and let Gemma&apos;s Kitchenette take care of
             the rest.
           </p>
         </header>
 
         <div className="mt-7 grid auto-rows-fr grid-cols-2 gap-3 md:mt-8 md:grid-cols-4 md:gap-3 lg:mt-10 lg:gap-5">
-          <Card role="article" variant="interactive" className="items-center text-center">
+          <Card role="article" variant="interactive" className="flex flex-col items-center p-5 text-center md:p-5 lg:gap-1 lg:p-8">
             <span className="mb-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#FFB800]/25 text-xs font-bold text-stone-900 md:mb-2.5">
               1
             </span>
@@ -155,18 +155,18 @@ export default function HomePage() {
               <img
                 src="/gifs/online-order1.gif"
                 alt="Order online"
-                className="h-12 w-12 object-contain md:h-14 md:w-14 lg:h-20 lg:w-20"
+                className="h-14 w-14 object-contain md:h-16 md:w-16 lg:h-20 lg:w-20"
               />
             </div>
-            <h3 className="mt-2 min-h-8 text-xs font-bold uppercase leading-4 tracking-wide text-stone-700 md:min-h-8 md:text-xs lg:mt-3 lg:min-h-10 lg:text-base lg:leading-5">
+            <h3 className="font-display mt-5 min-h-8 text-md font-bold uppercase leading-4 tracking-wide text-stone-800 md:min-h-8 md:text-md lg:mt-3 lg:min-h-10 lg:text-lg lg:leading-7">
               Order Online
             </h3>
-            <p className="mt-1.5 text-[11px] leading-4 text-stone-600 md:mt-2 md:text-xs md:leading-4 lg:mt-2 lg:text-sm lg:leading-5">
-              Select from our menu and easily place your order online from home.
+            <p className="font-default -mt-1 text-[12.5px] leading-4 text-stone-500 md:mt-2 md:text-xs md:leading-4 lg:-mt-1 lg:text-sm lg:leading-5">
+              Easily place your order online from home.
             </p>
           </Card>
 
-          <Card role="article" variant="interactive" className="items-center text-center">
+          <Card role="article" variant="interactive" className="flex flex-col items-center p-5 text-center md:p-5 lg:gap-1 lg:p-8">
             <span className="mb-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#FFB800]/25 text-xs font-bold text-stone-900 md:mb-2.5">
               2
             </span>
@@ -174,18 +174,18 @@ export default function HomePage() {
               <img
                 src="/gifs/frying-pan1.gif"
                 alt="We cook for you"
-                className="h-12 w-12 object-contain md:h-14 md:w-14 lg:h-20 lg:w-20"
+                className="h-14 w-14 object-contain md:h-16 md:w-16 lg:h-20 lg:w-20"
               />
             </div>
-            <h3 className="mt-2 min-h-8 text-xs font-bold uppercase leading-4 tracking-wide text-stone-700 md:min-h-8 md:text-xs lg:mt-3 lg:min-h-10 lg:text-base lg:leading-5">
-              We Cook For You
+            <h3 className="font-display mt-5 min-h-8 text-md font-bold uppercase leading-4 tracking-wide text-stone-800 md:min-h-8 md:text-md lg:mt-3 lg:min-h-10 lg:text-lg lg:leading-7">
+              Order Online
             </h3>
-            <p className="mt-1.5 text-[11px] leading-4 text-stone-600 md:mt-2 md:text-xs md:leading-4 lg:mt-2 lg:text-sm lg:leading-5">
-              Our chefs prepare your meals using fresh, authentic ingredients.
+            <p className="font-default -mt-1 text-[12.5px] leading-4 text-stone-500 md:mt-2 md:text-xs md:leading-4 lg:-mt-1 lg:text-sm lg:leading-5">
+              Prepares using fresh, authentic ingredients.
             </p>
           </Card>
 
-          <Card role="article" variant="interactive" className="items-center text-center">
+          <Card role="article" variant="interactive" className="flex flex-col items-center p-5 text-center md:p-5 lg:gap-1 lg:p-8">
             <span className="mb-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#FFB800]/25 text-xs font-bold text-stone-900 md:mb-2.5">
               3
             </span>
@@ -193,18 +193,18 @@ export default function HomePage() {
               <img
                 src="/gifs/door1.gif"
                 alt="Delivery to your doorstep"
-                className="h-12 w-12 object-contain md:h-14 md:w-14 lg:h-20 lg:w-20"
+                className="h-14 w-14 object-contain md:h-16 md:w-16 lg:h-20 lg:w-20"
               />
             </div>
-            <h3 className="mt-2 min-h-8 text-xs font-bold uppercase leading-4 tracking-wide text-stone-700 md:min-h-8 md:text-xs lg:mt-3 lg:min-h-10 lg:text-base lg:leading-5">
-              Right To Your Doorstep
+            <h3 className="font-display mt-5 min-h-8 text-md font-bold uppercase leading-4 tracking-wide text-stone-800 md:min-h-8 md:text-md lg:mt-3 lg:min-h-10 lg:text-lg lg:leading-7">
+              Delivery available
             </h3>
-            <p className="mt-1.5 text-[11px] leading-4 text-stone-600 md:mt-2 md:text-xs md:leading-4 lg:mt-2 lg:text-sm lg:leading-5">
-              Your order will be delivered to your doorstep on your selected delivery day.
+            <p className="font-default -mt-1 text-[12.5px] leading-4 text-stone-500 md:mt-2 md:text-xs md:leading-4 lg:-mt-1 lg:text-sm lg:leading-5">
+              Delivered to your doorstep.
             </p>
           </Card>
 
-          <Card role="article" variant="interactive" className="items-center text-center">
+          <Card role="article" variant="interactive" className="flex flex-col items-center p-5 text-center md:p-5 lg:gap-1 lg:p-8">
             <span className="mb-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#FFB800]/25 text-xs font-bold text-stone-900 md:mb-2.5">
               4
             </span>
@@ -212,13 +212,13 @@ export default function HomePage() {
               <img
                 src="/gifs/microwave1.gif"
                 alt="Easy heat and eat"
-                className="h-12 w-12 object-contain md:h-14 md:w-14 lg:h-20 lg:w-20"
+                className="h-14 w-14 object-contain md:h-16 md:w-16 lg:h-20 lg:w-20"
               />
             </div>
-            <h3 className="mt-2 min-h-8 text-xs font-bold uppercase leading-4 tracking-wide text-stone-700 md:min-h-8 md:text-xs lg:mt-3 lg:min-h-10 lg:text-base lg:leading-5">
+            <h3 className="font-display mt-5 min-h-8 text-md font-bold uppercase leading-4 tracking-wide text-stone-800 md:min-h-8 md:text-md lg:mt-3 lg:min-h-10 lg:text-lg lg:leading-7">
               Easy Heat And Eat
             </h3>
-            <p className="mt-1.5 text-[11px] leading-4 text-stone-600 md:mt-2 md:text-xs md:leading-4 lg:mt-2 lg:text-sm lg:leading-5">
+            <p className="font-default -mt-1 text-[12.5px] leading-4 text-stone-500 md:mt-2 md:text-xs md:leading-4 lg:-mt-1 lg:text-sm lg:leading-5">
               Simply, Heat and Eat!
             </p>
           </Card>

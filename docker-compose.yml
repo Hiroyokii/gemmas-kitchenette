@@ -33,6 +33,7 @@ services:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/gemmas_kitchenette?schema=public
       JWT_SECRET: ${JWT_SECRET:-development-only-change-me}
       FRONTEND_URL: http://localhost:5173
+      CHOKIDAR_USEPOLLING: "true"
     ports:
       - "5000:5000"
     volumes:
@@ -50,6 +51,7 @@ services:
     restart: unless-stopped
     environment:
       VITE_API_URL: http://localhost:5000
+      CHOKIDAR_USEPOLLING: "true"
     ports:
       - "5173:5173"
     volumes:

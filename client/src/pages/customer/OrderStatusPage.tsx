@@ -182,15 +182,14 @@ function DeliveryInformation({ order }: { order: Order }) {
 
   return (
     <Card className="h-auto p-5">
-      <h2 className="font-display text-lg font-semibold text-ink-900">Delivery information</h2>
+      <h2 className="font-display text-lg font-semibold text-ink-900">Order fulfillment</h2>
       <dl className="mt-4 space-y-4 text-sm">
-        <div>
+        <div><dt className="text-ink-500">Order type:</dt><dd className="mt-1 font-medium text-ink-800">{order.orderType === "PICKUP" ? "Pickup" : "Delivery"}</dd></div>
+        {order.orderType === "DELIVERY" && <div>
           <dt className="text-ink-500">Delivery address:</dt>
-          <dd className="mt-1 flex gap-2 font-medium leading-5 text-ink-800">
-            <Icon name="mapPin" className="mt-0.5 h-4 w-4 shrink-0 text-[#da9c00]" />
-            {order.deliveryAddress}
-          </dd>
-        </div>
+          <dd className="mt-1 flex gap-2 font-medium leading-5 text-ink-800"><Icon name="mapPin" className="mt-0.5 h-4 w-4 shrink-0 text-[#da9c00]" />{order.deliveryAddress}</dd>
+        </div>}
+        {order.notes && <div><dt className="text-ink-500">Order notes:</dt><dd className="mt-1 font-medium text-ink-800">{order.notes}</dd></div>}
         <div>
           <dt className="text-ink-500">Customer:</dt>
           <dd className="mt-1 font-medium text-ink-800">{customerName}</dd>
@@ -222,7 +221,7 @@ function PaymentInformation({ order }: { order: Order }) {
           <div className="flex items-center justify-between gap-3">
             <span className="text-ink-600">Method</span>
             <span className="font-medium text-ink-800">
-              {isGcash ? "GCash (simulated)" : "Cash on Delivery"}
+              {isGcash ? "GCash" : "Cash on Delivery"}
             </span>
           </div>
           {isGcash && (
@@ -353,7 +352,7 @@ export default function OrderStatusPage() {
     {/* Right side */}
     <div className="text-right">
       <h1 className="font-display text-2xl font-semibold text-ink-900">
-        Order #{order.id}
+        Order #{order.customerOrderNumber}
       </h1>
 
       <p className="mt-1 text-sm text-ink-600">
