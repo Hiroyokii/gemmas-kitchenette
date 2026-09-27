@@ -25,7 +25,7 @@ export default function ReviewModal({ order, onClose }: ReviewModalProps) {
 
             <div className="space-y-5">
                 {itemsToReview.map((item) => (
-                    <ReviewItemForm key={item.id} item={item} />
+                    <ReviewItemForm key={item.id} item={item} orderId={order.id} />
                 ))}
             </div>
 
@@ -38,7 +38,7 @@ export default function ReviewModal({ order, onClose }: ReviewModalProps) {
     );
 }
 
-function ReviewItemForm({ item }: { item: OrderItem }) {
+function ReviewItemForm({ item, orderId }: { item: OrderItem; orderId: number }) {
     const queryClient = useQueryClient();
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState("");
@@ -55,6 +55,7 @@ function ReviewItemForm({ item }: { item: OrderItem }) {
             setSubmitted(true);
             await Promise.all([
                 queryClient.invalidateQueries({ queryKey: ["my-orders"] }),
+                queryClient.invalidateQueries({ queryKey: ["order", orderId] }),
                 queryClient.invalidateQueries({ queryKey: ["today-menu"] }),
                 queryClient.invalidateQueries({ queryKey: ["food", item.dailyMenu.food.id] }),
                 queryClient.invalidateQueries({ queryKey: ["food-reviews", item.dailyMenu.food.id] }),

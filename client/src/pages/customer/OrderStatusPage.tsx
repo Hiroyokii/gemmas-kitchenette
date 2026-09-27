@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -14,6 +15,7 @@ import EmptyState from "../../components/ui/EmptyState";
 import Icon from "../../components/ui/Icon";
 import PageHeader from "../../components/ui/PageHeader";
 import Spinner from "../../components/ui/Spinner";
+import ReviewModal from "../../components/customer/ReviewModal";
 
 // ==========================================
 // CONSTANTS & HELPERS
@@ -54,7 +56,7 @@ function formatPrice(value: number) {
 function OrderTimeline({ order }: { order: Order }) {
   if (order.status === "CANCELLED") {
     return (
-      <Card className="border-red-200 bg-red-50/50 p-5 md:p-6">
+      <Card className="h-auto border-red-200 bg-red-50/50 p-5 md:p-6">
         <div className="flex items-start gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
             <Icon name="warning" className="h-5 w-5" />
@@ -81,7 +83,7 @@ function OrderTimeline({ order }: { order: Order }) {
   const currentIndex = TIMELINE_STEPS.findIndex((step) => step.status === order.status);
 
   return (
-    <Card className="p-5 md:p-6">
+    <Card className="h-auto p-5 md:p-6 bg-white">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="font-display text-xl font-semibold text-ink-900">Order status</h2>
@@ -92,7 +94,10 @@ function OrderTimeline({ order }: { order: Order }) {
             </p>
           )}
         </div>
-        <Badge tone={ORDER_STATUS_META[order.status].tone}>
+        <Badge
+          tone="custom"
+          className={ORDER_STATUS_META[order.status].badgeClassName}
+        >
           {ORDER_STATUS_META[order.status].label}
         </Badge>
       </div>
@@ -108,7 +113,7 @@ function OrderTimeline({ order }: { order: Order }) {
               {index > 0 && (
                 <span
                   className={`absolute right-1/2 top-4 h-0.5 w-full ${
-                    index <= currentIndex ? "bg-orange-400" : "bg-stone-200"
+                    index <= currentIndex ? "bg-[#FFB800]" : "bg-stone-800/30"
                   }`}
                   aria-hidden="true"
                 />
@@ -116,10 +121,10 @@ function OrderTimeline({ order }: { order: Order }) {
               <span
                 className={`relative z-10 mx-auto flex h-8 w-8 items-center justify-center rounded-full border-2 text-xs font-semibold ${
                   isCurrent
-                    ? "border-orange-500 bg-orange-500 text-white"
+                    ? "border-[#da9c00] bg-[#FFB800] text-white"
                     : isComplete
-                      ? "border-orange-400 bg-orange-50 text-orange-600"
-                      : "border-stone-200 bg-white text-stone-400"
+                      ? "border-[#FFB800] bg-white text-[#FFB800]"
+                      : "border-stone-700/40 bg-white text-stone-700"
                 }`}
               >
                 {isComplete ? <Icon name="check" className="h-4 w-4" /> : index + 1}
@@ -127,10 +132,10 @@ function OrderTimeline({ order }: { order: Order }) {
               <span
                 className={`mt-2 block text-[10px] font-medium leading-3 md:text-xs ${
                   isCurrent
-                    ? "text-orange-700"
+                    ? "text-[#da9c00]"
                     : isComplete
-                      ? "text-ink-700"
-                      : "text-stone-400"
+                      ? "text-[#da9c00]"
+                    : "text-stone-800"
                 }`}
               >
                 {step.label}
@@ -144,14 +149,8 @@ function OrderTimeline({ order }: { order: Order }) {
 }
 
 function OrderSummary({ order }: { order: Order }) {
-  const subtotal = order.orderItems.reduce(
-    (sum, item) => sum + Number(item.price) * item.quantity,
-    0
-  );
-  const deliveryFee = Number(order.total) - subtotal;
-
   return (
-    <Card className="p-5">
+    <Card className="h-auto p-5">
       <h2 className="font-display text-lg font-semibold text-ink-900">Order summary</h2>
       <ul className="mt-4 space-y-3">
         {order.orderItems.map((item) => (
@@ -169,14 +168,6 @@ function OrderSummary({ order }: { order: Order }) {
         ))}
       </ul>
       <div className="mt-5 space-y-2 border-t border-stone-200 pt-4 text-sm">
-        <div className="flex justify-between text-ink-600">
-          <span>Subtotal</span>
-          <span className="font-mono">{formatPrice(subtotal)}</span>
-        </div>
-        <div className="flex justify-between text-ink-600">
-          <span>Delivery fee</span>
-          <span className="font-mono">{formatPrice(deliveryFee)}</span>
-        </div>
         <div className="flex justify-between pt-2 text-base font-semibold text-ink-900">
           <span>Total</span>
           <span className="font-mono">{formatPrice(Number(order.total))}</span>
@@ -190,22 +181,18 @@ function DeliveryInformation({ order }: { order: Order }) {
   const customerName = `${order.customer.firstName} ${order.customer.lastName}`;
 
   return (
-    <Card className="p-5">
+    <Card className="h-auto p-5">
       <h2 className="font-display text-lg font-semibold text-ink-900">Delivery information</h2>
       <dl className="mt-4 space-y-4 text-sm">
         <div>
-          <dt className="text-ink-500">Fulfilment</dt>
-          <dd className="mt-1 font-medium text-ink-800">Delivery</dd>
-        </div>
-        <div>
-          <dt className="text-ink-500">Delivery address</dt>
+          <dt className="text-ink-500">Delivery address:</dt>
           <dd className="mt-1 flex gap-2 font-medium leading-5 text-ink-800">
-            <Icon name="mapPin" className="mt-0.5 h-4 w-4 shrink-0 text-orange-500" />
+            <Icon name="mapPin" className="mt-0.5 h-4 w-4 shrink-0 text-[#da9c00]" />
             {order.deliveryAddress}
           </dd>
         </div>
         <div>
-          <dt className="text-ink-500">Customer</dt>
+          <dt className="text-ink-500">Customer:</dt>
           <dd className="mt-1 font-medium text-ink-800">{customerName}</dd>
           {order.customer.phoneNumber && (
             <dd className="mt-0.5 text-ink-600">{order.customer.phoneNumber}</dd>
@@ -224,7 +211,7 @@ function PaymentInformation({ order }: { order: Order }) {
   const isGcash = payment?.method === "GCASH";
 
   return (
-    <Card className="p-5">
+    <Card className="h-auto p-5">
       <h2 className="font-display text-lg font-semibold text-ink-900">Payment information</h2>
       {!payment ? (
         <p className="mt-4 text-sm text-ink-500">
@@ -267,23 +254,13 @@ function PaymentInformation({ order }: { order: Order }) {
   );
 }
 
-function NeedHelp() {
-  return (
-    <Card className="p-5">
-      <h2 className="font-display text-lg font-semibold text-ink-900">Need help?</h2>
-      <p className="mt-2 text-sm leading-6 text-ink-600">
-        Please reach out to Gemma's Kitchenette if you have questions about your order.
-      </p>
-      <p className="mt-3 text-sm font-medium text-ink-700">Home-cooked, block by block.</p>
-    </Card>
-  );
-}
 
 // ==========================================
 // MAIN PAGE COMPONENT
 // ==========================================
 
 export default function OrderStatusPage() {
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const { orderId } = useParams();
   const navigate = useNavigate();
   const parsedOrderId = Number(orderId);
@@ -306,7 +283,7 @@ export default function OrderStatusPage() {
 
   if (!hasValidOrderId) {
     return (
-      <div className="-mx-6 -my-6 min-h-full bg-stone-50 p-6">
+      <div className="-mx-4 min-h-full bg-stone-50 p-6 md:-mx-6 md:px-6 lg:-mx-9 lg:px-9">
         <EmptyState
           icon={<Icon name="ticket" className="h-6 w-6" />}
           title="Order not found"
@@ -323,7 +300,7 @@ export default function OrderStatusPage() {
 
   if (orderQuery.isPending) {
     return (
-      <div className="-mx-6 -my-6 flex min-h-full justify-center bg-stone-50 p-6 py-16">
+      <div className="-mx-4 flex min-h-full justify-center bg-stone-50 p-6 py-16 md:-mx-6 md:px-6 lg:-mx-9 lg:px-9">
         <Spinner label="Loading order status…" />
       </div>
     );
@@ -331,7 +308,7 @@ export default function OrderStatusPage() {
 
   if (orderQuery.error || !orderQuery.data) {
     return (
-      <div className="-mx-6 -my-6 min-h-full bg-stone-50 p-6">
+      <div className="-mx-4 min-h-full bg-stone-50 p-6 md:-mx-6 md:px-6 lg:-mx-9 lg:px-9">
         <PageHeader title="Order status" />
         <Alert
           type="error"
@@ -350,45 +327,58 @@ export default function OrderStatusPage() {
   }
 
   const order = orderQuery.data;
+  const isReviewEligible = order.status === "COMPLETED";
+  const hasUnreviewedItems = order.orderItems.some((item) => !item.review);
 
   return (
-    <div className="-mx-6 -my-6 min-h-full bg-stone-50 p-6">
-      <PageHeader
-        title={`Order #${order.id}`}
-        description={`Placed ${formatDate(order.createdAt)}`}
-      />
-
-      <Card className="mb-6 p-5 md:p-6 border border-orange-200 bg-gradient-to-br from-orange-50/50 via-white to-amber-50/30">
-        <p className="font-display text-xl font-semibold text-ink-900">
-          Thank you for your order!
-        </p>
-        <p className="mt-1 text-sm text-ink-600">
-          We’ll keep this page updated as your order moves along.
-        </p>
-      </Card>
-
-      <OrderTimeline order={order} />
-
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <OrderSummary order={order} />
-        <div className="space-y-6">
-          <DeliveryInformation order={order} />
-          <PaymentInformation order={order} />
-          <NeedHelp />
-        </div>
-      </div>
-
-      <div className="mt-8 flex flex-col-reverse gap-3 border-t border-stone-200 pt-6 md:flex-row md:items-center md:justify-between">
-        <Button variant="secondary" onClick={() => navigate("/orders")}>
-          Back to Orders
-        </Button>
-        <div
-          className="rounded-lg border border-dashed border-stone-300 bg-white px-4 py-2.5 text-center text-sm text-stone-500"
-          aria-label="Reviews coming soon"
-        >
-          Review your order — coming soon
-        </div>
-      </div>
+<div className="-mx-4 min-h-full bg-stone-50 px-4 md:-mx-6 md:px-6 lg:-mx-9 lg:px-9">
+  <article className="mb-6 flex items-center justify-between rounded-2xl bg-[#FFB800] p-5 md:p-6">
+    {/* Left side */}
+    <div className="flex items-center">
+      <Button
+        variant="secondary"
+        size="lg"
+        className="w-28 px-3 py-1.5 text-sm text-[#FFB800] md:w-28 md:px-3 md:py-1.5 md:text-base"
+        aria-label="Back to Orders"
+        onClick={() => navigate("/orders")}
+      >
+        <Icon
+          name="chevronRight"
+          className="h-4 w-4 rotate-180 text-[#FFB800]"
+        />
+        Back
+      </Button>
     </div>
+
+    {/* Right side */}
+    <div className="text-right">
+      <h1 className="font-display text-2xl font-semibold text-ink-900">
+        Order #{order.id}
+      </h1>
+
+      <p className="mt-1 text-sm text-ink-600">
+        Placed {formatDate(order.createdAt)}
+      </p>
+    </div>
+  </article>
+
+  <OrderTimeline order={order} />
+
+  <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
+    <OrderSummary order={order} />
+
+    <div className="space-y-6">
+      <DeliveryInformation order={order} />
+      <PaymentInformation order={order} />
+    </div>
+  </div>
+
+  {isReviewModalOpen && isReviewEligible && hasUnreviewedItems && (
+    <ReviewModal
+      order={order}
+      onClose={() => setIsReviewModalOpen(false)}
+    />
+  )}
+</div>
   );
 }

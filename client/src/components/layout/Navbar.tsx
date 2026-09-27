@@ -12,7 +12,7 @@ const NAV_LINKS = [
 ];
 
 const ICON_BUTTON_CLASS =
-    "flex h-10 w-10 items-center justify-center rounded-xl border border-stone-200 bg-white text-stone-700 transition-colors hover:border-orange-300 hover:text-orange-600";
+    "flex h-10 w-10 items-center justify-center rounded-xl border border-stone-200 bg-white text-stone-700 transition-colors hover:border-[#FFB800] hover:text-[#da9c00]";
 
 const GHOST_BUTTON_CLASS =
     "rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-sm font-semibold text-stone-600 transition-colors hover:border-stone-300 hover:bg-stone-50 hover:text-stone-900 active:bg-stone-100";

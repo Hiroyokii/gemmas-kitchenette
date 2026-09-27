@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Card from "../ui/Card";
 
 const FAQ_ITEMS = [
   {
@@ -47,7 +48,7 @@ export default function HomeFaq() {
         </p>
       </div>
 
-      <div className="min-w-0 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-[0_8px_24px_rgba(41,37,36,0.04)]">
+      <Card className="overflow-hidden p-0">
         {FAQ_ITEMS.map((item, index) => {
           const isOpen = openIndex === index;
           const answerId = `home-faq-answer-${index}`;
@@ -94,7 +95,7 @@ export default function HomeFaq() {
             </div>
           );
         })}
-      </div>
+      </Card>
     </section>
   );
 }

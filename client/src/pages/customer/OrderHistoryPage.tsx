@@ -11,6 +11,7 @@ import Spinner from "../../components/ui/Spinner";
 import EmptyState from "../../components/ui/EmptyState";
 import Button from "../../components/ui/Button";
 import Icon from "../../components/ui/Icon";
+import Card from "../../components/ui/Card";
 
 const ACTIVE_ORDER_STATUSES = new Set<Order["status"]>([
     "PENDING",
@@ -108,12 +109,13 @@ export default function OrderHistoryPage() {
 
                     <div className="grid gap-5">
                         {orders.map((order) => (
-                            <div
+                            <Card
                                 key={order.id}
-                                className="rounded-3xl border border-orange-200 bg-gradient-to-br from-orange-50/50 via-white to-amber-50/30 p-1 shadow-[0_8px_24px_rgba(41,37,36,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(41,37,36,0.1)]"
+                                variant="interactive"
+                                className="overflow-hidden p-0"
                             >
                                 <OrderTicket order={order} />
-                            </div>
+                            </Card>
                         ))}
                     </div>
                 </section>

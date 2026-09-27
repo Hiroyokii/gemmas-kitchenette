@@ -4,6 +4,7 @@ import { useNavigate} from "react-router-dom";
 import Alert from "../../components/ui/Alert";
 import Button from "../../components/ui/Button";
 import EmptyState from "../../components/ui/EmptyState";
+import Card from "../../components/ui/Card";
 import FoodCard from "../../components/customer/FoodCard";
 import HomeFaq from "../../components/customer/HomeFaq";
 import Icon from "../../components/ui/Icon";
@@ -146,7 +147,7 @@ export default function HomePage() {
         </header>
 
         <div className="mt-7 grid auto-rows-fr grid-cols-2 gap-3 md:mt-8 md:grid-cols-4 md:gap-3 lg:mt-10 lg:gap-5">
-          <article className="group flex h-full min-w-0 flex-col items-center rounded-2xl border border-stone-200 bg-white p-3 text-center shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#FFB800] hover:shadow-[0_10px_30px_rgba(255,184,0,0.18)] md:p-3 lg:p-5">
+          <Card role="article" variant="interactive" className="items-center text-center">
             <span className="mb-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#FFB800]/25 text-xs font-bold text-stone-900 md:mb-2.5">
               1
             </span>
@@ -163,9 +164,9 @@ export default function HomePage() {
             <p className="mt-1.5 text-[11px] leading-4 text-stone-600 md:mt-2 md:text-xs md:leading-4 lg:mt-2 lg:text-sm lg:leading-5">
               Select from our menu and easily place your order online from home.
             </p>
-          </article>
+          </Card>
 
-          <article className="group flex h-full min-w-0 flex-col items-center rounded-2xl border border-stone-200 bg-white p-3 text-center shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#FFB800] hover:shadow-[0_10px_30px_rgba(255,184,0,0.18)] md:p-3 lg:p-5">
+          <Card role="article" variant="interactive" className="items-center text-center">
             <span className="mb-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#FFB800]/25 text-xs font-bold text-stone-900 md:mb-2.5">
               2
             </span>
@@ -182,9 +183,9 @@ export default function HomePage() {
             <p className="mt-1.5 text-[11px] leading-4 text-stone-600 md:mt-2 md:text-xs md:leading-4 lg:mt-2 lg:text-sm lg:leading-5">
               Our chefs prepare your meals using fresh, authentic ingredients.
             </p>
-          </article>
+          </Card>
 
-          <article className="group flex h-full min-w-0 flex-col items-center rounded-2xl border border-stone-200 bg-white p-3 text-center shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#FFB800] hover:shadow-[0_10px_30px_rgba(255,184,0,0.18)] md:p-3 lg:p-5">
+          <Card role="article" variant="interactive" className="items-center text-center">
             <span className="mb-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#FFB800]/25 text-xs font-bold text-stone-900 md:mb-2.5">
               3
             </span>
@@ -201,9 +202,9 @@ export default function HomePage() {
             <p className="mt-1.5 text-[11px] leading-4 text-stone-600 md:mt-2 md:text-xs md:leading-4 lg:mt-2 lg:text-sm lg:leading-5">
               Your order will be delivered to your doorstep on your selected delivery day.
             </p>
-          </article>
+          </Card>
 
-          <article className="group flex h-full min-w-0 flex-col items-center rounded-2xl border border-stone-200 bg-white p-3 text-center shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#FFB800] hover:shadow-[0_10px_30px_rgba(255,184,0,0.18)] md:p-3 lg:p-5">
+          <Card role="article" variant="interactive" className="items-center text-center">
             <span className="mb-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#FFB800]/25 text-xs font-bold text-stone-900 md:mb-2.5">
               4
             </span>
@@ -220,7 +221,7 @@ export default function HomePage() {
             <p className="mt-1.5 text-[11px] leading-4 text-stone-600 md:mt-2 md:text-xs md:leading-4 lg:mt-2 lg:text-sm lg:leading-5">
               Simply, Heat and Eat!
             </p>
-          </article>
+          </Card>
         </div>
       </section>
 

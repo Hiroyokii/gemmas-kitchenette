@@ -3,6 +3,7 @@ import type { DailyMenu } from "../../types/DailyMenu";
 import { useCart } from "../../hooks/useCart";
 
 import Button from "../ui/Button";
+import Card from "../ui/Card";
 import Icon from "../ui/Icon";
 import StarRating from "../ui/StarRating";
 
@@ -25,16 +26,7 @@ export default function FoodCard({ menu }: FoodCardProps) {
         quantityInCart < menu.remainingServings;
 
     return (
-        <article
-            className={[
-                "group flex min-w-0 w-full flex-col overflow-hidden rounded-2xl",
-                "border border-stone-200 bg-white",
-                "shadow-[0_6px_20px_rgba(41,37,36,0.06)]",
-                "transition-all duration-200",
-                "hover:-translate-y-0.5",
-                "hover:shadow-[0_12px_28px_rgba(41,37,36,0.10)]",
-            ].join(" ")}
-        >
+        <Card role="article" variant="interactive" className="overflow-hidden p-0">
 
             {/* Food Image */}
             <div className="relative aspect-[4/3] w-full overflow-hidden bg-stone-100">
@@ -203,6 +195,6 @@ export default function FoodCard({ menu }: FoodCardProps) {
                     )}
                 </div>
             </div>
-        </article>
+        </Card>
     );
 }
