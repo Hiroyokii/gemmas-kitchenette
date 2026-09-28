@@ -42,6 +42,14 @@ export default function CartDrawer() {
   function finishCheckout() {
     clearCart();
     setPendingGcashOrderId(null);
+    setIsCheckingOut(false);
+    setPaymentMethod("COD");
+    setOrderType("DELIVERY");
+    setOrderNotes("");
+    setPaymentScreenshot(null);
+    setScreenshotError("");
+    setIsRetryingPayment(false);
+    setError("");
     closeCart();
     navigate("/orders");
   }

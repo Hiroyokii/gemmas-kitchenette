@@ -16,7 +16,11 @@ export function getAvailableBatches() {
     return prisma.purchaseItem.findMany({
         where: { remainingQuantity: { gt: 0 } },
         include: { ingredient: { include: { unit: true } }, purchase: true },
-        orderBy: [{ expirationDate: "asc" }, { purchase: { createdAt: "asc" } }],
+        orderBy: [
+            { purchase: { createdAt: "asc" } },
+            { expirationDate: "asc" },
+            { id: "asc" },
+        ],
     });
 }
 

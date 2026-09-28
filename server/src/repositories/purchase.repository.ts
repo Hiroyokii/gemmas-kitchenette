@@ -117,7 +117,13 @@ export async function consumeInventoryBatches(
             remainingQuantity: { gt: 0 },
             OR: [{ expirationDate: null }, { expirationDate: { gte: today } }],
         },
-        orderBy: [{ expirationDate: "asc" }, { purchase: { createdAt: "asc" } }],
+        // FIFO: consume the oldest purchase batch first. Expiration is only
+        // used to break ties between batches received at the same time.
+        orderBy: [
+            { purchase: { createdAt: "asc" } },
+            { expirationDate: "asc" },
+            { id: "asc" },
+        ],
     });
 
     let remaining = quantity;
