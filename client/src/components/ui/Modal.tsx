@@ -40,7 +40,7 @@ export default function Modal({
 
     return createPortal(
         <div
-            className="fixed inset-0 z-50 flex items-end justify-center bg-black/16 backdrop-blur-[2px] md:items-center md:p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-[2px]"
             onClick={onClose}
             role="presentation"
         >
@@ -50,9 +50,9 @@ export default function Modal({
                 aria-label={title}
                 onClick={(event) => event.stopPropagation()}
                 className={[
-                    "max-h-[90vh] w-full overflow-y-auto rounded-t-2xl",
+                    "max-h-[90dvh] w-full max-w-full overflow-y-auto rounded-2xl",
                     "bg-white p-5 shadow-[var(--shadow-pop)]",
-                    "md:rounded-2xl md:p-6",
+                    "sm:p-6",
                     SIZE_CLASSES[size],
                 ].join(" ")}
             >

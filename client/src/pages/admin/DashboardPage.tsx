@@ -7,6 +7,7 @@ import type { Order } from "../../types/Order";
 import { useAuth } from "../../hooks/useAuth";
 import Icon from "../../components/ui/Icon";
 import { getErrorMessage } from "../../utils/getErrorMessage";
+import { formatDeliveryAddress } from "../../utils/formatDeliveryAddress";
 
 const money = (n: number) =>
   `₱${n.toLocaleString("en-PH", {
@@ -94,7 +95,9 @@ export default function DashboardPage() {
   const chartMax = Math.max(1, ...chartData.map((d) => d.revenue));
   const totalChartRevenue = chartData.reduce((sum, d) => sum + d.revenue, 0);
   const maxBars = Math.max(1, ...chartData.map((d) => d.orders));
-  const recentOrders = orders.slice(0, 8);
+  const recentOrders = orders
+    .filter((order) => order.status === "PENDING")
+    .slice(0, 8);
 
   return (
     <div className="min-h-full bg-[#f7f7f5] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
@@ -304,12 +307,6 @@ export default function DashboardPage() {
                   </div>
                 ))}
             </div>
-            <Link
-              to="/admin/reports"
-              className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-[#9b6d00] hover:text-stone-900"
-            >
-              View sales reports <span aria-hidden="true">→</span>
-            </Link>
           </article>
         </section>
 
@@ -321,7 +318,7 @@ export default function DashboardPage() {
                 Recent orders
               </h2>
               <p className="mt-1 text-sm text-stone-500">
-                Latest customer orders and their current status.
+                New orders awaiting confirmation. They leave this list when confirmed.
               </p>
             </div>
             <Link
@@ -332,21 +329,31 @@ export default function DashboardPage() {
             </Link>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[680px] text-left text-sm">
+            <table className="w-full min-w-[900px] table-fixed text-left text-sm">
+              <colgroup>
+                <col className="w-[10%]" />
+                <col className="w-[12%]" />
+                <col className="w-[27%]" />
+                <col className="w-[15%]" />
+                <col className="w-[10%]" />
+                <col className="w-[13%]" />
+                <col className="w-[13%]" />
+              </colgroup>
               <thead>
                 <tr className="border-y border-stone-100 text-xs text-stone-500">
-                  <th className="py-3 pr-4 font-medium">Order</th>
-                  <th className="py-3 pr-4 font-medium">Date</th>
-                  <th className="py-3 pr-4 font-medium">Customer</th>
-                  <th className="py-3 pr-4 font-medium">Items</th>
-                  <th className="py-3 pr-4 font-medium">Status</th>
-                  <th className="py-3 text-right font-medium">Total</th>
+                  <th className="px-3 py-3 font-medium sm:px-4">Order</th>
+                  <th className="px-3 py-3 font-medium sm:px-4">Date</th>
+                  <th className="px-3 py-3 font-medium sm:px-4">Customer</th>
+                  <th className="px-3 py-3 font-medium sm:px-4">Payment mode</th>
+                  <th className="px-3 py-3 font-medium sm:px-4">Items</th>
+                  <th className="px-3 py-3 font-medium sm:px-4">Status</th>
+                  <th className="px-3 py-3 text-right font-medium sm:px-4">Total</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100">
                 {ordersQuery.isLoading ? (
                   <tr>
-                    <td colSpan={6} className="py-8 text-center text-stone-500">
+                    <td colSpan={7} className="py-8 text-center text-stone-500">
                       Loading recent orders…
                     </td>
                   </tr>
@@ -356,8 +363,8 @@ export default function DashboardPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={6} className="py-8 text-center text-stone-500">
-                      No orders to show yet.
+                    <td colSpan={7} className="py-8 text-center text-stone-500">
+                      No new orders awaiting confirmation.
                     </td>
                   </tr>
                 )}
@@ -386,7 +393,6 @@ export default function DashboardPage() {
               ["Recipes", "/admin/recipes", "Manage recipe usage"],
               ["Purchases", "/admin/purchases", "Record incoming stock"],
               ["Spoilage", "/admin/spoilage", "Review stock loss"],
-              ["Sales reports", "/admin/reports", "Review business performance"],
               ["All orders", "/admin/orders", "Update and fulfill orders"],
             ].map(([title, to, description]) => (
               <Link
@@ -459,28 +465,31 @@ function OrderRow({ order }: { order: Order }) {
 
   return (
     <tr className="text-stone-700">
-      <td className="py-3 pr-4 font-semibold text-stone-900">
-        #{order.dailyOrderNumber || order.id}
+      <td className="px-3 py-3 font-semibold text-stone-900 sm:px-4">
+        #{order.dailyOrderNumber}
       </td>
-      <td className="py-3 pr-4 whitespace-nowrap">
+      <td className="px-3 py-3 whitespace-nowrap sm:px-4">
         {shortDate(order.createdAt)}
       </td>
-      <td className="py-3 pr-4">
+      <td className="px-3 py-3 sm:px-4">
         {order.customer.firstName} {order.customer.lastName}
-        <span className="mt-1 block max-w-56 text-xs font-normal text-stone-500">{order.deliveryAddress ?? (order.orderType === "PICKUP" ? "Pickup" : "Address unavailable")}</span>
+        <span className="mt-1 block max-w-56 text-xs font-normal text-stone-500">{order.deliveryAddress ? formatDeliveryAddress(order.deliveryAddress) : (order.orderType === "PICKUP" ? "Pickup" : "Address unavailable")}</span>
         {order.notes && <span className="mt-1 block max-w-56 text-xs font-normal text-stone-600">Note: {order.notes}</span>}
       </td>
-      <td className="py-3 pr-4">
+      <td className="px-3 py-3 whitespace-nowrap sm:px-4">
+        {order.payment?.method === "GCASH" ? "GCash" : order.payment?.method === "COD" ? "Cash on delivery" : "—"}
+      </td>
+      <td className="px-3 py-3 sm:px-4">
         {order.orderItems.reduce((sum, item) => sum + item.quantity, 0)} items
       </td>
-      <td className="py-3 pr-4">
+      <td className="px-3 py-3 sm:px-4">
         <span
           className={`rounded-full px-2.5 py-1 text-xs font-medium ${statusClass}`}
         >
           {order.status.replaceAll("_", " ")}
         </span>
       </td>
-      <td className="py-3 text-right font-semibold text-stone-900">
+      <td className="px-3 py-3 text-right font-semibold text-stone-900 sm:px-4">
         {money(Number(order.total))}
       </td>
     </tr>

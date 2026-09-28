@@ -178,7 +178,7 @@ export default function HomePage() {
               />
             </div>
             <h3 className="font-display mt-5 min-h-8 text-md font-bold uppercase leading-4 tracking-wide text-stone-800 md:min-h-8 md:text-md lg:mt-3 lg:min-h-10 lg:text-lg lg:leading-7">
-              Order Online
+              We cook for you
             </h3>
             <p className="font-default -mt-1 text-[12.5px] leading-4 text-stone-500 md:mt-2 md:text-xs md:leading-4 lg:-mt-1 lg:text-sm lg:leading-5">
               Prepares using fresh, authentic ingredients.

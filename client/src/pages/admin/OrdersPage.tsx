@@ -29,6 +29,7 @@ import EmptyState from "../../components/ui/EmptyState";
 import Icon from "../../components/ui/Icon";
 import Modal from "../../components/ui/Modal";
 import Input from "../../components/ui/Input";
+import { formatDeliveryAddress } from "../../utils/formatDeliveryAddress";
 
 const ALLOWED_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
     PENDING: ["CONFIRMED", "CANCELLED"],
@@ -175,7 +176,7 @@ export default function OrdersPage() {
                             setSelectedDate(event.target.value);
                             setPage(1);
                         }}
-                        className="h-10 rounded-lg border border-stone-200 bg-white px-3 text-sm text-ink-800 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                        className="h-10 rounded-lg border border-stone-200 bg-white px-3 text-sm text-ink-800 outline-none focus:border-[#FFB800] focus:ring-2 focus:ring-[#FFB800]"
                     />
                 </label>
             </div>
@@ -206,7 +207,6 @@ export default function OrdersPage() {
                         <Spinner label="Loading orders…" />
                     </div>
                 ) : orders.length === 0 ? (
-                    <div className="py-12">
                         <EmptyState
                             icon={
                                 <Icon
@@ -217,7 +217,6 @@ export default function OrdersPage() {
                             title="No orders yet"
                             description="Customer orders will appear here once they are placed."
                         />
-                    </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full min-w-[900px] text-sm">
@@ -303,7 +302,9 @@ export default function OrdersPage() {
                                                 </div>
 
                                                 <p className="mt-1 max-w-52 text-xs text-ink-500">
-                                                    {order.deliveryAddress ??
+                                                    {order.deliveryAddress
+                                                        ? formatDeliveryAddress(order.deliveryAddress)
+                                                        :
                                                         (order.orderType ===
                                                         "PICKUP"
                                                             ? "Pickup"
@@ -382,7 +383,7 @@ export default function OrdersPage() {
                                                             {order.payment
                                                                 .method ===
                                                             "GCASH"
-                                                                ? "GCash (simulated)"
+                                                                ? "GCash Payment"
                                                                 : "Cash on Delivery"}
                                                         </p>
 
@@ -516,7 +517,7 @@ export default function OrdersPage() {
                                                                 );
                                                             }
                                                         }}
-                                                        className="h-9 rounded-lg border border-stone-200 bg-white px-3 text-xs text-ink-700 outline-none transition-colors focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 disabled:cursor-not-allowed disabled:bg-stone-50 disabled:text-ink-400"
+                                                        className="h-9 rounded-lg border border-stone-200 bg-white px-3 text-xs text-ink-700 outline-none transition-colors focus:border-[#FFB800] focus:ring-2 focus:ring-[#FFB800] disabled:cursor-not-allowed disabled:bg-stone-50 disabled:text-ink-400"
                                                     >
                                                         <option value="">
                                                             {isUpdating

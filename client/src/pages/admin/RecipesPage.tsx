@@ -188,7 +188,7 @@ export default function RecipesPage() {
             </div>
 
             {/* Food selector */}
-            <div className="mb-6 max-w-md rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+            <div className="mb-6 w-full rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
                 <label
                     htmlFor="food"
                     className="mb-1.5 block text-sm font-medium text-ink-800"
@@ -203,7 +203,7 @@ export default function RecipesPage() {
                         handleFoodChange(event.target.value)
                     }
                     disabled={isLoadingInitialData}
-                    className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-ink-900 transition-colors focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20 disabled:cursor-not-allowed disabled:bg-stone-50"
+                    className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-ink-900 transition-colors focus:border-[#FFB800] focus:outline-none focus:ring-2 focus:ring-[#FFB800] disabled:cursor-not-allowed disabled:bg-stone-50"
                 >
                     <option value="">
                         {isLoadingInitialData
@@ -328,7 +328,7 @@ export default function RecipesPage() {
                                                         valueAsNumber: true,
                                                     }
                                                 )}
-                                                className="w-full min-w-0 rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-ink-900 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+                                                className="w-full min-w-0 rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-ink-900 focus:border-[#FFB800] focus:outline-none focus:ring-2 focus:ring-[#FFB800]"
                                             >
                                                 <option value="">
                                                     Select ingredient...
@@ -367,7 +367,7 @@ export default function RecipesPage() {
                                                         valueAsNumber: true,
                                                     }
                                                 )}
-                                                className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-ink-900 placeholder:text-ink-400 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+                                                className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-ink-900 placeholder:text-ink-400 focus:border-[#FFB800] focus:outline-none focus:ring-2 focus:ring-[#FFB800]"
                                             />
                                         </div>
 

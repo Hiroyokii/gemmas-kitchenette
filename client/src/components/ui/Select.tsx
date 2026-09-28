@@ -31,10 +31,10 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
                 aria-invalid={Boolean(error)}
                 className={[
                     "w-full rounded-lg border bg-white px-3 py-2 text-sm text-ink-900",
-                    "transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/30",
+                    "transition-colors focus:outline-none",
                     error
                         ? "border-red-300 focus:border-red-400"
-                        : "border-ink-200 focus:border-brand-400",
+                        : "border-ink-200 focus:border-[#FFB800] focus:ring-2 focus:ring-[#FFB800]",
                     className,
                 ].join(" ")}
                 {...rest}

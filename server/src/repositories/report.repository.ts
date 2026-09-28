@@ -9,7 +9,7 @@ export async function getTodaySalesReport(
         await prisma.order.findMany({
             where: {
                 status: OrderStatus.COMPLETED,
-                updatedAt: {
+                completedAt: {
                     gte: start,
                     lt: end,
                 },
@@ -20,7 +20,7 @@ export async function getTodaySalesReport(
         await prisma.order.count({
             where: {
                 status: OrderStatus.CANCELLED,
-                updatedAt: {
+                cancelledAt: {
                     gte: start,
                     lt: end,
                 },

@@ -104,7 +104,7 @@ export default function FoodsPage() {
                                 getCategoryId(event.target.value),
                             )
                         }
-                        className="h-10 border-stone-200 text-stone-900 focus:border-orange-500"
+                        className="h-10 border-stone-200 text-stone-900 focus:border-[#FFB800] focus:ring-2 focus:ring-[#FFB800]"
                     >
                         <option value="">All categories</option>
                         {categories.map((category) => (

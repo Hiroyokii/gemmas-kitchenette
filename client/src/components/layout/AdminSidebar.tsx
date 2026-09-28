@@ -19,7 +19,6 @@ const NAV_ITEMS: NavItem[] = [
     { to: "/admin/recipes", label: "Recipes", icon: "book" },
     { to: "/admin/ingredients", label: "Ingredients", icon: "leaf" },
     { to: "/admin/purchases", label: "Purchases", icon: "bag" },
-    { to: "/admin/reports", label: "Reports", icon: "chart" },
 ];
 
 interface AdminSidebarProps {
@@ -51,12 +50,9 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                     <Link
                         to="/admin"
                         onClick={onClose}
-                        className="flex items-center gap-2 font-display text-base font-semibold text-ink-900"
+                        className="flex items-center gap-2"
                     >
-                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500 text-white">
-                            <Icon name="bowl" className="h-4 w-4" />
-                        </span>
-                        Gemma's Kitchen
+                        <img src="/gemmas-logo2.png" alt="Gemma's Kitchenette" className="h-auto w-40 object-contain" />
                     </Link>
                 </div>
 

@@ -17,6 +17,7 @@ import PageHeader from "../../components/ui/PageHeader";
 import Spinner from "../../components/ui/Spinner";
 import ReviewModal from "../../components/customer/ReviewModal";
 import CancelOrderModal from "../../components/customer/CancelOrderModal";
+import { formatDeliveryAddress } from "../../utils/formatDeliveryAddress";
 
 // ==========================================
 // CONSTANTS & HELPERS
@@ -188,7 +189,7 @@ function DeliveryInformation({ order }: { order: Order }) {
         <div><dt className="text-ink-500">Order type:</dt><dd className="mt-1 font-medium text-ink-800">{order.orderType === "PICKUP" ? "Pickup" : "Delivery"}</dd></div>
         {order.orderType === "DELIVERY" && <div>
           <dt className="text-ink-500">Delivery address:</dt>
-          <dd className="mt-1 flex gap-2 font-medium leading-5 text-ink-800"><Icon name="mapPin" className="mt-0.5 h-4 w-4 shrink-0 text-[#da9c00]" />{order.deliveryAddress}</dd>
+          <dd className="mt-1 flex gap-2 font-medium leading-5 text-ink-800"><Icon name="mapPin" className="mt-0.5 h-4 w-4 shrink-0 text-[#da9c00]" />{formatDeliveryAddress(order.deliveryAddress)}</dd>
         </div>}
         {order.notes && <div><dt className="text-ink-500">Order notes:</dt><dd className="mt-1 font-medium text-ink-800">{order.notes}</dd></div>}
         <div>

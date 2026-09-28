@@ -129,8 +129,8 @@ export async function createOrderService(
             });
             const savedAddress = customer
                 ? {
-                    block: customer.block.trim(),
-                    lot: customer.lot.trim(),
+                    block: customer.block.trim().replace(/^block\s*/i, ""),
+                    lot: customer.lot.trim().replace(/^lot\s*/i, ""),
                     street: customer.street.trim(),
                     landmark: customer.landmark?.trim(),
                 }

@@ -20,7 +20,6 @@ import PurchasesPage from "../pages/admin/PurchasesPage";
 import RecipesPage from "../pages/admin/RecipesPage";
 import DailyMenuPage from "../pages/admin/DailyMenuPage";
 import OrdersPage from "../pages/admin/OrdersPage";
-import ReportsPage from "../pages/admin/ReportsPage";
 import SpoilagePage from "../pages/admin/SpoilagePage";
 
 import ProtectedRoute from "../components/ProtectedRoute";
@@ -135,10 +134,6 @@ export default function AppRoutes() {
                             element={<OrdersPage />}
                         />
 
-                        <Route
-                            path="reports"
-                            element={<ReportsPage />}
-                        />
                     </Route>
                 </Route>
 

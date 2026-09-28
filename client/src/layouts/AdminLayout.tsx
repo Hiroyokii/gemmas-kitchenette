@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet } from "react-router-dom";
 
 import { useAuth } from "../hooks/useAuth";
 import Icon from "../components/ui/Icon";
@@ -8,7 +8,6 @@ const NAV_SECTIONS = [
     { title: "Workspace", links: [
         { to: "/admin", label: "Overview", icon: "dashboard", end: true },
         { to: "/admin/orders", label: "Orders", icon: "list" },
-        { to: "/admin/reports", label: "Sales reports", icon: "chart" },
     ] },
     { title: "Kitchen", links: [
         { to: "/admin/menu", label: "Daily menu", icon: "calendar" },
@@ -52,7 +51,7 @@ export default function AdminLayout() {
             {/* Sidebar */}
             <aside
                 className={[
-                    "fixed inset-y-0 left-0 z-40 flex flex-col border-r border-stone-200",
+                    "fixed inset-y-0 left-0 z-40 flex flex-col",
                     "bg-white transition-all duration-200",
                     "md:sticky md:top-0 md:h-screen md:translate-x-0",
                     "w-60 md:w-20",
@@ -63,19 +62,21 @@ export default function AdminLayout() {
                 {/* Header */}
                 <div
                     className={[
-                        "flex h-16 shrink-0 items-center border-b border-stone-200",
+                        "flex h-22 shrink-0 items-center border-b border-stone-200",
                         "justify-between px-4 md:justify-center md:px-2 lg:justify-between lg:px-4",
                     ].join(" ")}
                 >
-                    <div className={`min-w-0 ${collapsed ? "hidden" : "md:hidden lg:block"}`}>
-                                <h1 className="truncate text-base font-bold text-stone-900">
-                                Gemma's Kitchenette
-                            </h1>
-
-                            <p className="mt-1 inline-flex items-center rounded-full bg-[#fff2cc] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#8f6500]">
-                                Admin workspace
-                            </p>
-                    </div>
+                    <Link
+                        to="/admin"
+                        aria-label="Gemma's Kitchenette admin home"
+                        className={`min-w-0 items-center ${collapsed ? "hidden" : "hidden lg:flex"}`}
+                    >
+                        <img
+                            src="/gemmas-logo2.png"
+                            alt="Gemma's Kitchenette"
+                            className={`h-auto object-contain ${collapsed ? "w-10" : "w-36"}`}
+                        />
+                    </Link>
 
                     {/* Desktop collapse button */}
                     <button
@@ -116,7 +117,7 @@ export default function AdminLayout() {
                 {/* Navigation */}
                 <nav className="flex-1 space-y-5 overflow-y-auto p-2 lg:p-3">
                     {NAV_SECTIONS.map((section) => <section key={section.title}>
-                        <p className="mb-2 hidden px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-stone-400 lg:block">{section.title}</p>
+                        <p className={`mb-2 hidden px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-stone-400 ${collapsed ? "lg:hidden" : "lg:block"}`}>{section.title}</p>
                         <div className="space-y-1">{section.links.map((item) => (
                         <NavLink
                             key={item.to}
@@ -127,7 +128,9 @@ export default function AdminLayout() {
                             className={({ isActive }) =>
                                 [
                                     NAV_BASE,
-                                    "justify-center px-2 lg:justify-start lg:px-3",
+                                    collapsed
+                                        ? "justify-center px-2"
+                                        : "justify-center px-2 lg:justify-start lg:px-3",
                                     isActive
                                         ? NAV_ACTIVE
                                         : NAV_INACTIVE,
@@ -141,7 +144,7 @@ export default function AdminLayout() {
                                 className="h-5 w-5 shrink-0"
                             />
 
-                            <span className="hidden truncate lg:inline">
+                            <span className={`hidden truncate ${collapsed ? "" : "lg:inline"}`}>
                                     {item.label}
                             </span>
                         </NavLink>
@@ -166,10 +169,10 @@ export default function AdminLayout() {
                         onClick={logout}
                         title={collapsed ? "Log out" : undefined}
                         className={[
-                            "flex w-full items-center rounded-xl border border-stone-200",
+                            "flex w-full items-center justify-center rounded-xl border border-stone-200",
                             "text-sm font-semibold text-stone-600",
                             "transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600",
-                            "justify-center px-2 py-2.5 lg:px-3",
+                            "px-2 py-2.5",
                         ].join(" ")}
                     >
                         <Icon
@@ -177,8 +180,8 @@ export default function AdminLayout() {
                             className="h-4 w-4 shrink-0"
                         />
 
-                        <span className="ml-2 hidden lg:inline">
-                                Log out
+                        <span className={`ml-2 hidden ${collapsed ? "" : "lg:inline"}`}>
+                            Log out
                         </span>
                     </button>
                 </div>
@@ -187,7 +190,7 @@ export default function AdminLayout() {
             {/* Main content */}
             <div className="flex min-w-0 flex-1 flex-col">
                 {/* Mobile top bar */}
-                <header className="sticky top-0 z-20 flex h-16 items-center border-b border-stone-200 bg-white px-4 md:hidden">
+                <header className="sticky top-0 z-20 flex h-16 items-center border-b border-stone-200 bg-white px-4 md:hidden relative">
                     <button
                         type="button"
                         onClick={() => setMobileOpen(true)}
@@ -197,13 +200,12 @@ export default function AdminLayout() {
                         <Icon name="menu" className="h-5 w-5" />
                     </button>
 
-                    <div className="ml-3">
-                        <p className="text-sm font-bold text-stone-900">
-                            Gemma's Kitchenette
-                        </p>
-                        <p className="text-xs text-[#9b6d00]">
-                            Admin workspace
-                        </p>
+                    <div className="absolute left-1/2 -translate-x-1/2">
+                        <img
+                            src="/gemmas-logo2.png"
+                            alt="Gemma's Kitchenette"
+                            className="h-auto w-32 object-contain"
+                        />
                     </div>
                 </header>
 

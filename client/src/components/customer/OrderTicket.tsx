@@ -10,6 +10,7 @@ import ReviewModal from "./ReviewModal";
 import { cancelMyOrder } from "../../services/order.service";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 import CancelOrderModal from "./CancelOrderModal";
+import { formatDeliveryAddress } from "../../utils/formatDeliveryAddress";
 
 interface OrderTicketProps {
     order: Order;
@@ -107,7 +108,7 @@ export default function OrderTicket({ order }: OrderTicketProps) {
 
                 <div className="mt-3 flex items-start gap-1.5 text-xs text-ink-400">
                     <Icon name="mapPin" className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                    <span>{order.orderType === "PICKUP" ? "Pickup at the store" : order.deliveryAddress}</span>
+                    <span>{order.orderType === "PICKUP" ? "Pickup at the store" : formatDeliveryAddress(order.deliveryAddress)}</span>
                 </div>
                 {order.notes && <p className="mt-2 text-xs text-ink-500">Order note: {order.notes}</p>}
 

@@ -26,7 +26,9 @@ export type IconName =
     | "search"
     | "warning"
     | "eye"
-    | "eyeOff";
+    | "eyeOff"
+    | "mail"
+    | "lock";
 
 interface IconProps extends SVGAttributes<SVGSVGElement> {
     name: IconName;
@@ -180,6 +182,19 @@ const ICON_PATHS: Record<IconName, React.ReactNode> = {
             <path d="M10.6 6.2A10.7 10.7 0 0112 6c6 0 9.5 6 9.5 6a17 17 0 01-3.2 3.9" />
             <path d="M6.2 6.7C3.7 8.3 2.5 12 2.5 12s3.5 6 9.5 6c1.8 0 3.4-.5 4.8-1.2" />
             <path d="M9.9 9.9a3 3 0 004.2 4.2" />
+        </>
+    ),
+    mail: (
+        <>
+            <rect x="3" y="5" width="18" height="14" rx="2" />
+            <path d="m4 7 8 6 8-6" />
+        </>
+    ),
+    lock: (
+        <>
+            <rect x="4" y="10" width="16" height="11" rx="2" />
+            <path d="M8 10V7a4 4 0 018 0v3" />
+            <path d="M12 14v3" />
         </>
     ),
 };

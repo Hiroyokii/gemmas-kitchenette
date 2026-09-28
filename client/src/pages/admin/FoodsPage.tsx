@@ -101,8 +101,8 @@ export default function FoodsPage() {
     }
 
     return (
-        <div className="min-h-full bg-stone-50 px-4 py-6 md:px-6 md:py-8">
-            <div className="mx-auto w-full max-w-7xl">
+        <div className="min-w-0 px-6 py-6 lg:px-8 lg:py-8">
+            <div className="w-full min-w-0">
                 {/* Header */}
                 <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
@@ -156,7 +156,7 @@ export default function FoodsPage() {
                                 onChange={(event) =>
                                     setCategoryFilter(event.target.value)
                                 }
-                                className="h-10 w-full rounded-lg border border-stone-200 bg-white px-3 text-sm text-stone-900 transition-colors focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+                                className="h-10 w-full rounded-lg border border-stone-200 bg-white px-3 text-sm text-stone-900 transition-colors focus:border-[#FFB800] focus:outline-none focus:ring-2 focus:ring-[#FFB800]"
                             >
                                 <option value="">
                                     All categories
@@ -398,7 +398,7 @@ function FoodFormModal({
                         rows={3}
                         placeholder="Describe the food..."
                         {...register("description")}
-                        className="w-full resize-none rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 transition-colors focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+                        className="w-full resize-none rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 transition-colors focus:border-[#FFB800] focus:outline-none focus:ring-2 focus:ring-[#FFB800]"
                     />
 
                     {errors.description && (
@@ -428,7 +428,7 @@ function FoodFormModal({
                         <select
                             id="food-category"
                             {...register("categoryId")}
-                            className="h-10 w-full rounded-lg border border-stone-200 bg-white px-3 text-sm text-stone-900 transition-colors focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+                            className="h-10 w-full rounded-lg border border-stone-200 bg-white px-3 text-sm text-stone-900 transition-colors focus:border-[#FFB800] focus:outline-none focus:ring-2 focus:ring-[#FFB800]"
                         >
                             <option value="">
                                 Select category...
@@ -464,7 +464,7 @@ function FoodFormModal({
                         <input
                             type="checkbox"
                             {...register("isAvailable")}
-                            className="h-4 w-4 rounded border-stone-300 text-orange-500 focus:ring-orange-500"
+                            className="h-4 w-4 rounded border-stone-300 text-[#FFB800] focus:ring-[#FFB800]"
                         />
 
                         Available for ordering

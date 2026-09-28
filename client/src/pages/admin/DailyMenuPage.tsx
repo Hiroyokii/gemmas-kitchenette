@@ -278,7 +278,7 @@ function PrepareFoodModal({
                             isLoadingFoods ||
                             prepareMutation.isPending
                         }
-                        className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-ink-900 transition-colors focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20 disabled:cursor-not-allowed disabled:bg-stone-50"
+                        className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-ink-900 transition-colors focus:border-[#FFB800] focus:outline-none focus:ring-2 focus:ring-[#FFB800] disabled:cursor-not-allowed disabled:bg-stone-50"
                     >
                         <option value="">
                             {isLoadingFoods
@@ -325,7 +325,7 @@ function PrepareFoodModal({
                         min="1"
                         {...register("preparedServings")}
                         disabled={prepareMutation.isPending}
-                        className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-ink-900 placeholder:text-ink-400 transition-colors focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20 disabled:cursor-not-allowed disabled:bg-stone-50"
+                        className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-ink-900 placeholder:text-ink-400 transition-colors focus:border-[#FFB800] focus:outline-none focus:ring-2 focus:ring-[#FFB800] disabled:cursor-not-allowed disabled:bg-stone-50"
                     />
 
                     {errors.preparedServings && (

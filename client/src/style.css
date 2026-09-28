@@ -37,6 +37,21 @@ html {
   font-display: swap;
 }
 
+/* Keep form focus styling consistent across shared and native controls. */
+input:not([type="checkbox"]):not([type="radio"]):focus,
+select:focus,
+textarea:focus {
+  border-color: #FFB800 !important;
+  outline: 2px solid #FFB800;
+  outline-offset: 1px;
+  box-shadow: none !important;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: #FFB800;
+}
+
 .font-display {
   font-family: "Sharp Sans Display", sans-serif;
   font-weight: 700;
