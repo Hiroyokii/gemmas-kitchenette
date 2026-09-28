@@ -38,11 +38,15 @@ export default function PurchasesPage() {
     const purchasesQuery = useQuery<Purchase[]>({
         queryKey: ["purchases"],
         queryFn: getPurchases,
+        refetchInterval: 30_000,
+        refetchOnWindowFocus: true,
     });
 
     const ingredientsQuery = useQuery<Ingredient[]>({
         queryKey: ["ingredients"],
         queryFn: getIngredients,
+        refetchInterval: 30_000,
+        refetchOnWindowFocus: true,
     });
 
     const purchases = purchasesQuery.data ?? [];

@@ -18,6 +18,8 @@ export default function ReportsPage() {
     } = useQuery<SalesReport>({
         queryKey: ["reports", "today-sales"],
         queryFn: getTodaySalesReport,
+        refetchInterval: 30_000,
+        refetchOnWindowFocus: true,
     });
 
     const errorMessage = error

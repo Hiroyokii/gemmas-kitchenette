@@ -48,7 +48,7 @@ export default function Navbar() {
     return (
         <>
             {/* Header */}
-            <header className="border-b border-stone-200 bg-white/90 shadow-[0_1px_20px_rgba(0,0,0,0.04)] backdrop-blur">
+            <header className="sticky top-0 z-50 border-b border-stone-200 bg-white/95 shadow-[0_1px_20px_rgba(0,0,0,0.04)] backdrop-blur">
                 <div className="relative mx-auto flex h-26 max-w-9xl items-center justify-between px-4 md:px-8 lg:px-12">
                     {/* Mobile menu button */}
                     <div className="flex items-center gap-2 lg:hidden">
@@ -136,7 +136,7 @@ export default function Navbar() {
             </header>
 
             {/* Desktop sticky navigation */}
-            <nav className="sticky top-0 z-40 hidden items-center justify-center gap-6 border-b border-stone-200 bg-white/95 py-4 shadow-sm backdrop-blur lg:flex">
+            <nav className="sticky top-[104px] z-40 hidden items-center justify-center gap-6 border-b border-stone-200 bg-white/95 py-4 shadow-sm backdrop-blur lg:flex">
                 {NAV_LINKS.map((link) => (
                     <NavLink
                         key={link.to}

@@ -56,11 +56,15 @@ export default function FoodsPage() {
                     ? Number(categoryFilter)
                     : undefined,
             }),
+        refetchInterval: 30_000,
+        refetchOnWindowFocus: true,
     });
 
     const categoriesQuery = useQuery<Category[]>({
         queryKey: ["categories"],
         queryFn: getCategories,
+        refetchInterval: 30_000,
+        refetchOnWindowFocus: true,
     });
 
     const foods = foodsQuery.data ?? [];

@@ -256,12 +256,41 @@ export async function updateOrderStatusService(
         "GCash payment must be verified before confirming the order."
         );
 
-    return prisma.$transaction((tx) => 
-        updateOrderStatus(
-            tx, 
-            orderId, 
-            status
-        ));
+    if (status === OrderStatus.CANCELLED) {
+        return prisma.$transaction(async (tx) => {
+            // Claim cancellation conditionally so concurrent requests cannot
+            // restore the same servings more than once.
+            const changed = await tx.order.updateMany({
+                where: { id: orderId, status: order.status },
+                data: { status, cancelledAt: new Date() },
+            });
+            if (changed.count !== 1) {
+                throw new BadRequestError("This order has already been updated.");
+            }
+
+            const items = await tx.orderItem.findMany({
+                where: { orderId },
+                select: { dailyMenuId: true, quantity: true },
+            });
+            for (const item of items) {
+                await tx.dailyMenu.update({
+                    where: { id: item.dailyMenuId },
+                    data: { remainingServings: { increment: item.quantity } },
+                });
+            }
+
+            return tx.order.findUniqueOrThrow({
+                where: { id: orderId },
+                include: {
+                    customer: { select: { id: true, firstName: true, lastName: true } },
+                    payment: true,
+                    orderItems: { include: { dailyMenu: { include: { food: true } }, review: true } },
+                },
+            });
+        });
+    }
+
+    return prisma.$transaction((tx) => updateOrderStatus(tx, orderId, status));
 }
 
 export async function submitPaymentProofService(

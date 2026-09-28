@@ -34,17 +34,23 @@ export default function RecipesPage() {
     const foodsQuery = useQuery<Food[]>({
         queryKey: ["foods"],
         queryFn: () => getFoods(),
+        refetchInterval: 30_000,
+        refetchOnWindowFocus: true,
     });
 
     const ingredientsQuery = useQuery<Ingredient[]>({
         queryKey: ["ingredients"],
         queryFn: getIngredients,
+        refetchInterval: 30_000,
+        refetchOnWindowFocus: true,
     });
 
     const recipeQuery = useQuery({
         queryKey: ["recipes", selectedFoodId],
         queryFn: () => getRecipe(selectedFoodId as number),
         enabled: selectedFoodId !== "",
+        refetchInterval: 30_000,
+        refetchOnWindowFocus: true,
     });
 
     const {

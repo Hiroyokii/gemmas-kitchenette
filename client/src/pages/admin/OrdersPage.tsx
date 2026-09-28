@@ -30,10 +30,7 @@ import Icon from "../../components/ui/Icon";
 import Modal from "../../components/ui/Modal";
 import Input from "../../components/ui/Input";
 
-const ALLOWED_TRANSITIONS: Record<
-    OrderStatus,
-    OrderStatus[]
-> = {
+const ALLOWED_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
     PENDING: ["CONFIRMED", "CANCELLED"],
     CONFIRMED: ["PREPARING"],
     PREPARING: ["OUT_FOR_DELIVERY"],
@@ -46,8 +43,7 @@ const STATUS_STYLES: Record<OrderStatus, string> = {
     PENDING: "bg-yellow-50 text-yellow-700 border-yellow-200",
     CONFIRMED: "bg-blue-50 text-blue-700 border-blue-200",
     PREPARING: "bg-purple-50 text-purple-700 border-purple-200",
-    OUT_FOR_DELIVERY:
-        "bg-indigo-50 text-indigo-700 border-indigo-200",
+    OUT_FOR_DELIVERY: "bg-indigo-50 text-indigo-700 border-indigo-200",
     COMPLETED: "bg-green-50 text-green-700 border-green-200",
     CANCELLED: "bg-red-50 text-red-700 border-red-200",
 };
@@ -58,9 +54,13 @@ export default function OrdersPage() {
     const [page, setPage] = useState(1);
     const [selectedDate, setSelectedDate] = useState(getTodayInManila);
     const [actionError, setActionError] = useState("");
-    const [rejectingOrderId, setRejectingOrderId] = useState<number | null>(null);
+    const [rejectingOrderId, setRejectingOrderId] = useState<number | null>(
+        null
+    );
     const [rejectionReason, setRejectionReason] = useState("");
-    const [paymentProofOrderId, setPaymentProofOrderId] = useState<number | null>(null);
+    const [paymentProofOrderId, setPaymentProofOrderId] = useState<
+        number | null
+    >(null);
 
     const ordersQuery = useQuery<{
         orders: Order[];
@@ -68,6 +68,8 @@ export default function OrdersPage() {
     }>({
         queryKey: ["orders", page, selectedDate],
         queryFn: () => getAllOrders(page, 10, selectedDate),
+        refetchInterval: 15_000,
+        refetchOnWindowFocus: true,
     });
 
     const paymentProofQuery = useQuery({
@@ -77,15 +79,33 @@ export default function OrdersPage() {
     });
 
     const paymentMutation = useMutation({
-        mutationFn: ({ orderId, action, reason }: { orderId: number; action: "verify" | "reject"; reason?: string }) =>
-            action === "verify" ? verifyPayment(orderId) : rejectPayment(orderId, reason!.trim()),
+        mutationFn: ({
+            orderId,
+            action,
+            reason,
+        }: {
+            orderId: number;
+            action: "verify" | "reject";
+            reason?: string;
+        }) =>
+            action === "verify"
+                ? verifyPayment(orderId)
+                : rejectPayment(orderId, reason!.trim()),
+
         onSuccess: () => {
             setActionError("");
             setRejectingOrderId(null);
             setRejectionReason("");
             queryClient.invalidateQueries({ queryKey: ["orders"] });
         },
-        onError: (error) => setActionError(getErrorMessage(error, "Failed to update GCash payment.")),
+
+        onError: (error) =>
+            setActionError(
+                getErrorMessage(
+                    error,
+                    "Failed to update GCash payment."
+                )
+            ),
     });
 
     const updateMutation = useMutation({
@@ -97,12 +117,24 @@ export default function OrdersPage() {
             status: OrderStatus;
         }) => updateOrderStatus(orderId, status),
 
-        onSuccess: () => {
+        onSuccess: async (_order, variables) => {
             setActionError("");
 
-            queryClient.invalidateQueries({
-                queryKey: ["orders"],
-            });
+            await Promise.all([
+                queryClient.invalidateQueries({
+                    queryKey: ["orders"],
+                }),
+                queryClient.invalidateQueries({
+                    queryKey: ["admin-dashboard-orders"],
+                }),
+                ...(variables.status === "CANCELLED"
+                    ? [
+                          queryClient.invalidateQueries({
+                              queryKey: ["daily-menu"],
+                          }),
+                      ]
+                    : []),
+            ]);
         },
 
         onError: (error) => {
@@ -129,11 +161,22 @@ export default function OrdersPage() {
                 </h1>
 
                 <p className="mt-1 text-sm text-ink-500">
-                    Daily order numbers reset at midnight (Asia/Manila). Select a date to review its orders.
+                    Daily order numbers reset at midnight (Asia/Manila). Select
+                    a date to review its orders.
                 </p>
+
                 <label className="mt-4 inline-flex items-center gap-3 text-sm font-medium text-ink-700">
                     Order date
-                    <input type="date" value={selectedDate} onChange={(event) => { setSelectedDate(event.target.value); setPage(1); }} className="h-10 rounded-lg border border-stone-200 bg-white px-3 text-sm text-ink-800 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20" />
+
+                    <input
+                        type="date"
+                        value={selectedDate}
+                        onChange={(event) => {
+                            setSelectedDate(event.target.value);
+                            setPage(1);
+                        }}
+                        className="h-10 rounded-lg border border-stone-200 bg-white px-3 text-sm text-ink-800 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                    />
                 </label>
             </div>
 
@@ -152,10 +195,7 @@ export default function OrdersPage() {
 
             {actionError && (
                 <div className="mb-5">
-                    <Alert
-                        type="error"
-                        message={actionError}
-                    />
+                    <Alert type="error" message={actionError} />
                 </div>
             )}
 
@@ -219,17 +259,22 @@ export default function OrdersPage() {
 
                             <tbody>
                                 {orders.map((order) => {
-                                    const nextStatuses = ALLOWED_TRANSITIONS[order.status].filter(
-                                        (nextStatus) =>
-                                            nextStatus !== "CONFIRMED" ||
-                                            order.payment?.method !== "GCASH" ||
-                                            order.payment.status === "VERIFIED"
-                                    );
+                                    const nextStatuses =
+                                        ALLOWED_TRANSITIONS[
+                                            order.status
+                                        ].filter(
+                                            (nextStatus) =>
+                                                nextStatus !== "CONFIRMED" ||
+                                                order.payment?.method !==
+                                                    "GCASH" ||
+                                                order.payment.status ===
+                                                    "VERIFIED"
+                                        );
 
                                     const isUpdating =
                                         updateMutation.isPending &&
-                                        updateMutation.variables
-                                            ?.orderId === order.id;
+                                        updateMutation.variables?.orderId ===
+                                            order.id;
 
                                     return (
                                         <tr
@@ -241,25 +286,38 @@ export default function OrdersPage() {
                                                 <span className="font-semibold text-ink-900">
                                                     #{order.dailyOrderNumber}
                                                 </span>
-                                                <p className="mt-1 text-xs text-ink-500">Customer order #{order.customerOrderNumber}</p>
-                                                <p className="mt-1 text-xs text-ink-500">{order.orderType === "PICKUP" ? "Pickup" : "Delivery"}</p>
-                                                {order.notes && <p className="mt-1 max-w-36 text-xs text-ink-500">Note: {order.notes}</p>}
+
+                                                <p className="mt-1 text-xs text-ink-500">
+                                                    {order.orderType ===
+                                                    "PICKUP"
+                                                        ? "Pickup"
+                                                        : "Delivery"}
+                                                </p>
                                             </td>
 
                                             {/* Customer */}
                                             <td className="px-5 py-4 align-top">
                                                 <div className="font-medium text-ink-900">
-                                                    {
-                                                        order
-                                                            .customer
-                                                            .firstName
-                                                    }{" "}
-                                                    {
-                                                        order
-                                                            .customer
-                                                            .lastName
-                                                    }
+                                                    {order.customer.firstName}{" "}
+                                                    {order.customer.lastName}
                                                 </div>
+
+                                                <p className="mt-1 max-w-52 text-xs text-ink-500">
+                                                    {order.deliveryAddress ??
+                                                        (order.orderType ===
+                                                        "PICKUP"
+                                                            ? "Pickup"
+                                                            : "Address unavailable")}
+                                                </p>
+
+                                                {order.notes && (
+                                                    <p className="mt-2 max-w-52 rounded-md bg-amber-50 px-2 py-1 text-xs text-amber-900">
+                                                        <span className="font-semibold">
+                                                            Customer note:
+                                                        </span>{" "}
+                                                        {order.notes}
+                                                    </p>
+                                                )}
                                             </td>
 
                                             {/* Items */}
@@ -268,9 +326,7 @@ export default function OrdersPage() {
                                                     {order.orderItems.map(
                                                         (item) => (
                                                             <div
-                                                                key={
-                                                                    item.id
-                                                                }
+                                                                key={item.id}
                                                                 className="text-ink-600"
                                                             >
                                                                 <span className="font-medium text-ink-800">
@@ -280,8 +336,7 @@ export default function OrdersPage() {
                                                                     x
                                                                 </span>{" "}
                                                                 {
-                                                                    item
-                                                                        .dailyMenu
+                                                                    item.dailyMenu
                                                                         .food
                                                                         .name
                                                                 }
@@ -297,9 +352,7 @@ export default function OrdersPage() {
                                                     ₱
                                                     {Number(
                                                         order.total
-                                                    ).toFixed(
-                                                        2
-                                                    )}
+                                                    ).toFixed(2)}
                                                 </span>
                                             </td>
 
@@ -310,12 +363,9 @@ export default function OrdersPage() {
                                                         "inline-flex rounded-full border px-2.5 py-1",
                                                         "text-xs font-medium",
                                                         STATUS_STYLES[
-                                                            order
-                                                                .status
+                                                            order.status
                                                         ],
-                                                    ].join(
-                                                        " "
-                                                    )}
+                                                    ].join(" ")}
                                                 >
                                                     {order.status.replace(
                                                         /_/g,
@@ -324,26 +374,115 @@ export default function OrdersPage() {
                                                 </span>
                                             </td>
 
+                                            {/* Payment */}
                                             <td className="px-5 py-4 align-top">
                                                 {order.payment ? (
                                                     <div className="space-y-1 text-xs">
                                                         <p className="font-medium text-ink-800">
-                                                            {order.payment.method === "GCASH" ? "GCash (simulated)" : "Cash on Delivery"}
+                                                            {order.payment
+                                                                .method ===
+                                                            "GCASH"
+                                                                ? "GCash (simulated)"
+                                                                : "Cash on Delivery"}
                                                         </p>
-                                                        <p className={[
-                                                            "font-semibold",
-                                                            order.payment.status === "VERIFIED" ? "text-green-700" : order.payment.status === "REJECTED" ? "text-red-700" : "text-yellow-700",
-                                                        ].join(" ")}>{order.payment.status.replace(/_/g, " ")}</p>
-                                                        {order.payment.method === "GCASH" && order.payment.proofSubmittedAt && <button type="button" onClick={() => setPaymentProofOrderId(order.id)} className="text-left font-medium text-blue-700 underline">View payment screenshot</button>}
-                                                        {order.payment.rejectionReason && <p className="max-w-44 text-red-600">{order.payment.rejectionReason}</p>}
-                                                        {order.payment.method === "GCASH" && order.payment.status === "PENDING" && order.payment.proofSubmittedAt && (
-                                                            <div className="flex gap-2 pt-1">
-                                                                <button type="button" disabled={paymentMutation.isPending} onClick={() => paymentMutation.mutate({ orderId: order.id, action: "verify" })} className="rounded bg-green-600 px-2 py-1 font-medium text-white hover:bg-green-700 disabled:opacity-50">Verify</button>
-                                                                <button type="button" disabled={paymentMutation.isPending} onClick={() => setRejectingOrderId(order.id)} className="rounded border border-red-200 px-2 py-1 font-medium text-red-700 hover:bg-red-50 disabled:opacity-50">Reject</button>
-                                                            </div>
+
+                                                        <p
+                                                            className={[
+                                                                "font-semibold",
+                                                                order.payment
+                                                                    .status ===
+                                                                "VERIFIED"
+                                                                    ? "text-green-700"
+                                                                    : order.payment
+                                                                          .status ===
+                                                                      "REJECTED"
+                                                                    ? "text-red-700"
+                                                                    : "text-yellow-700",
+                                                            ].join(" ")}
+                                                        >
+                                                            {order.payment.status.replace(
+                                                                /_/g,
+                                                                " "
+                                                            )}
+                                                        </p>
+
+                                                        {order.payment
+                                                            .method === "GCASH" &&
+                                                            order.payment
+                                                                .proofSubmittedAt && (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() =>
+                                                                        setPaymentProofOrderId(
+                                                                            order.id
+                                                                        )
+                                                                    }
+                                                                    className="text-left font-medium text-blue-700 underline"
+                                                                >
+                                                                    View payment
+                                                                    screenshot
+                                                                </button>
+                                                            )}
+
+                                                        {order.payment
+                                                            .rejectionReason && (
+                                                            <p className="max-w-44 text-red-600">
+                                                                {
+                                                                    order
+                                                                        .payment
+                                                                        .rejectionReason
+                                                                }
+                                                            </p>
                                                         )}
+
+                                                        {order.payment
+                                                            .method === "GCASH" &&
+                                                            order.payment
+                                                                .status ===
+                                                                "PENDING" &&
+                                                            order.payment
+                                                                .proofSubmittedAt && (
+                                                                <div className="flex gap-2 pt-1">
+                                                                    <button
+                                                                        type="button"
+                                                                        disabled={
+                                                                            paymentMutation.isPending
+                                                                        }
+                                                                        onClick={() =>
+                                                                            paymentMutation.mutate(
+                                                                                {
+                                                                                    orderId:
+                                                                                        order.id,
+                                                                                    action:
+                                                                                        "verify",
+                                                                                }
+                                                                            )
+                                                                        }
+                                                                        className="rounded bg-green-600 px-2 py-1 font-medium text-white hover:bg-green-700 disabled:opacity-50"
+                                                                    >
+                                                                        Verify
+                                                                    </button>
+
+                                                                    <button
+                                                                        type="button"
+                                                                        disabled={
+                                                                            paymentMutation.isPending
+                                                                        }
+                                                                        onClick={() =>
+                                                                            setRejectingOrderId(
+                                                                                order.id
+                                                                            )
+                                                                        }
+                                                                        className="rounded border border-red-200 px-2 py-1 font-medium text-red-700 hover:bg-red-50 disabled:opacity-50"
+                                                                    >
+                                                                        Reject
+                                                                    </button>
+                                                                </div>
+                                                            )}
                                                     </div>
-                                                ) : "—"}
+                                                ) : (
+                                                    "—"
+                                                )}
                                             </td>
 
                                             {/* Date */}
@@ -357,19 +496,13 @@ export default function OrdersPage() {
 
                                             {/* Action */}
                                             <td className="px-5 py-4 align-top">
-                                                {nextStatuses.length >
-                                                0 ? (
+                                                {nextStatuses.length > 0 ? (
                                                     <select
-                                                        disabled={
-                                                            isUpdating
-                                                        }
+                                                        disabled={isUpdating}
                                                         value=""
-                                                        onChange={(
-                                                            event
-                                                        ) => {
+                                                        onChange={(event) => {
                                                             if (
-                                                                event
-                                                                    .target
+                                                                event.target
                                                                     .value
                                                             ) {
                                                                 updateMutation.mutate(
@@ -392,16 +525,10 @@ export default function OrdersPage() {
                                                         </option>
 
                                                         {nextStatuses.map(
-                                                            (
-                                                                status
-                                                            ) => (
+                                                            (status) => (
                                                                 <option
-                                                                    key={
-                                                                        status
-                                                                    }
-                                                                    value={
-                                                                        status
-                                                                    }
+                                                                    key={status}
+                                                                    value={status}
                                                                 >
                                                                     {status.replace(
                                                                         /_/g,
@@ -427,68 +554,124 @@ export default function OrdersPage() {
             </div>
 
             {/* Pagination */}
-            {pagination &&
-                pagination.totalPages > 1 && (
-                    <div className="mt-5 flex items-center justify-between rounded-2xl border border-stone-200 bg-white px-5 py-4 shadow-sm">
-                        <Button
-                            variant="secondary"
-                            size="sm"
-                            disabled={
-                                page <= 1 ||
-                                ordersQuery.isFetching
-                            }
-                            onClick={() =>
-                                setPage((current) => current - 1)
-                            }
-                        >
-                            Previous
-                        </Button>
+            {pagination && pagination.totalPages > 1 && (
+                <div className="mt-5 flex items-center justify-between rounded-2xl border border-stone-200 bg-white px-5 py-4 shadow-sm">
+                    <Button
+                        variant="secondary"
+                        size="sm"
+                        disabled={page <= 1 || ordersQuery.isFetching}
+                        onClick={() =>
+                            setPage((current) => current - 1)
+                        }
+                    >
+                        Previous
+                    </Button>
 
-                        <span className="text-sm text-ink-600">
-                            Page{" "}
-                            <span className="font-medium text-ink-900">
-                                {pagination.page}
-                            </span>{" "}
-                            of{" "}
-                            <span className="font-medium text-ink-900">
-                                {pagination.totalPages}
-                            </span>
+                    <span className="text-sm text-ink-600">
+                        Page{" "}
+                        <span className="font-medium text-ink-900">
+                            {pagination.page}
+                        </span>{" "}
+                        of{" "}
+                        <span className="font-medium text-ink-900">
+                            {pagination.totalPages}
                         </span>
+                    </span>
 
-                        <Button
-                            variant="secondary"
-                            size="sm"
-                            disabled={
-                                page >=
-                                    pagination.totalPages ||
-                                ordersQuery.isFetching
-                            }
-                            onClick={() =>
-                                setPage((current) => current + 1)
-                            }
-                        >
-                            Next
-                        </Button>
-                    </div>
-                )}
+                    <Button
+                        variant="secondary"
+                        size="sm"
+                        disabled={
+                            page >= pagination.totalPages ||
+                            ordersQuery.isFetching
+                        }
+                        onClick={() =>
+                            setPage((current) => current + 1)
+                        }
+                    >
+                        Next
+                    </Button>
+                </div>
+            )}
 
             {rejectingOrderId !== null && (
-                <Modal title="Reject simulated GCash payment" onClose={() => { setRejectingOrderId(null); setRejectionReason(""); }}>
+                <Modal
+                    title="Reject simulated GCash payment"
+                    onClose={() => {
+                        setRejectingOrderId(null);
+                        setRejectionReason("");
+                    }}
+                >
                     <div className="space-y-4">
-                        <p className="text-sm text-ink-600">Give the customer a short reason so they can submit a corrected payment screenshot.</p>
-                        <Input label="Rejection reason" value={rejectionReason} onChange={(event) => setRejectionReason(event.target.value)} placeholder="e.g. Reference number could not be verified" />
-                        <div className="flex justify-end gap-2"><Button variant="secondary" onClick={() => setRejectingOrderId(null)}>Cancel</Button><Button disabled={rejectionReason.trim().length < 2} isLoading={paymentMutation.isPending} onClick={() => paymentMutation.mutate({ orderId: rejectingOrderId, action: "reject", reason: rejectionReason })}>Reject payment</Button></div>
+                        <p className="text-sm text-ink-600">
+                            Give the customer a short reason so they can submit
+                            a corrected payment screenshot.
+                        </p>
+
+                        <Input
+                            label="Rejection reason"
+                            value={rejectionReason}
+                            onChange={(event) =>
+                                setRejectionReason(event.target.value)
+                            }
+                            placeholder="e.g. Reference number could not be verified"
+                        />
+
+                        <div className="flex justify-end gap-2">
+                            <Button
+                                variant="secondary"
+                                onClick={() =>
+                                    setRejectingOrderId(null)
+                                }
+                            >
+                                Cancel
+                            </Button>
+
+                            <Button
+                                disabled={
+                                    rejectionReason.trim().length < 2
+                                }
+                                isLoading={paymentMutation.isPending}
+                                onClick={() =>
+                                    paymentMutation.mutate({
+                                        orderId: rejectingOrderId,
+                                        action: "reject",
+                                        reason: rejectionReason,
+                                    })
+                                }
+                            >
+                                Reject payment
+                            </Button>
+                        </div>
                     </div>
                 </Modal>
             )}
+
             {paymentProofOrderId !== null && (
-                <Modal title={`Payment screenshot · Order #${orders.find((order) => order.id === paymentProofOrderId)?.dailyOrderNumber ?? paymentProofOrderId}`} onClose={() => setPaymentProofOrderId(null)}>
+                <Modal
+                    title={`Payment screenshot · Order #${
+                        orders.find(
+                            (order) => order.id === paymentProofOrderId
+                        )?.dailyOrderNumber ?? paymentProofOrderId
+                    }`}
+                    onClose={() => setPaymentProofOrderId(null)}
+                >
                     {paymentProofQuery.isPending ? (
                         <Spinner />
                     ) : paymentProofQuery.error ? (
-                        <Alert type="error" message={getErrorMessage(paymentProofQuery.error, "Could not load payment screenshot.")} />
+                        <Alert
+                            type="error"
+                            message={getErrorMessage(
+                                paymentProofQuery.error,
+                                "Could not load payment screenshot."
+                            )}
+                        />
                     ) : paymentProofQuery.data ? (
-                        <img src={paymentProofQuery.data} alt={`GCash payment proof for order ${paymentProofOrderId}`} className="max-h-[70dvh] max-w-full rounded-lg object-contain" />
+                        <img
+                            src={paymentProofQuery.data}
+                            alt={`GCash payment proof for order ${paymentProofOrderId}`}
+                            className="max-h-[70dvh] max-w-full rounded-lg object-contain"
+                        />
                     ) : null}
                 </Modal>
             )}
@@ -503,6 +686,9 @@ function getTodayInManila(): string {
         month: "2-digit",
         day: "2-digit",
     }).formatToParts(new Date());
-    const part = (type: "year" | "month" | "day") => parts.find((value) => value.type === type)!.value;
+
+    const part = (type: "year" | "month" | "day") =>
+        parts.find((value) => value.type === type)!.value;
+
     return `${part("year")}-${part("month")}-${part("day")}`;
 }
