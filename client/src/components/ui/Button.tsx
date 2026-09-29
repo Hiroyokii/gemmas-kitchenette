@@ -22,7 +22,7 @@ const VARIANT_CLASSES: Record<ButtonVariant, string> = {
         "text-stone-800 hover:bg-[#FFF8DD] active:bg-[#FFF0B8] disabled:text-stone-400",
 
     danger:
-        "border border-red-200 bg-white text-red-600 hover:bg-red-50 active:bg-red-100 disabled:text-red-300",
+        "bg-red-500 text-white hover:bg-red-400 active:bg-red-800 disabled:text-red-100",
 };
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {

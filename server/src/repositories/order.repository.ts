@@ -1,5 +1,6 @@
 import { prisma } from "../lib/prisma.js";
 import type { Prisma, OrderStatus } from "../generated/prisma/index.js";
+import { BadRequestError } from "../errors/BadRequestError.js";
 
 export async function createOrder(
     tx: Prisma.TransactionClient,
@@ -163,17 +164,22 @@ export async function findOrderById(id: number) {
 export async function updateOrderStatus(
     tx: Prisma.TransactionClient, 
     orderId: number, 
-    status: OrderStatus
+    status: OrderStatus,
+    expectedStatus: OrderStatus,
 ) {
-    return tx.order.update({
-        where: { 
-            id: orderId 
-        },
+    const changed = await tx.order.updateMany({
+        where: { id: orderId, status: expectedStatus },
         data: { 
             status,
             completedAt: status === "COMPLETED" ? new Date() : undefined,
             cancelledAt: status === "CANCELLED" ? new Date() : undefined,
         },
+    });
+    if (changed.count !== 1) {
+        throw new BadRequestError("This order has already been updated.");
+    }
+    return tx.order.findUniqueOrThrow({
+        where: { id: orderId },
         include: { 
             customer: { 
                 select: { 

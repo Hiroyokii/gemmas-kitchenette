@@ -3,9 +3,13 @@ import Badge from "../ui/Badge";
 import Icon from "../ui/Icon";
 import { ORDER_STATUS_META } from "../../utils/orderStatus";
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import Button from "../ui/Button";
 import ReviewModal from "./ReviewModal";
+import { cancelMyOrder } from "../../services/order.service";
+import { getErrorMessage } from "../../utils/getErrorMessage";
+import CancelOrderModal from "./CancelOrderModal";
 
 interface OrderTicketProps {
     order: Order;
@@ -14,9 +18,21 @@ interface OrderTicketProps {
 export default function OrderTicket({ order }: OrderTicketProps) {
     const status = ORDER_STATUS_META[order.status];
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
     const reviewedItems = order.orderItems.filter((item) => item.review).length;
     const isCompleted = order.status === "COMPLETED";
     const hasUnreviewedItems = reviewedItems < order.orderItems.length;
+    const queryClient = useQueryClient();
+    const cancelMutation = useMutation({
+        mutationFn: () => cancelMyOrder(order.id),
+        onSuccess: async () => {
+            setIsCancelModalOpen(false);
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: ["my-orders"] }),
+                queryClient.invalidateQueries({ queryKey: ["order", order.id] }),
+            ]);
+        },
+    });
 
 
     return (
@@ -48,6 +64,22 @@ export default function OrderTicket({ order }: OrderTicketProps) {
                         ) : (
                             <span className="text-sm font-medium text-emerald-700">✓ Reviewed</span>
                         ))}
+
+                        
+                        {order.status === "PENDING" && (
+                            <div className="flex flex-wrap items-center gap-3">
+                                <Button
+                                    type="button"
+                                    variant="danger"
+                                    size="sm"
+                                    isLoading={cancelMutation.isPending}
+                                    onClick={() => setIsCancelModalOpen(true)}
+                                >
+                                    Cancel order
+                                </Button>
+                            </div>
+                        )}
+
                     </div>
                     <Badge tone="custom" className={status.badgeClassName}>
                         {status.label}
@@ -90,6 +122,14 @@ export default function OrderTicket({ order }: OrderTicketProps) {
 
             {isReviewModalOpen && (
                 <ReviewModal order={order} onClose={() => setIsReviewModalOpen(false)} />
+            )}
+            {isCancelModalOpen && (
+                <CancelOrderModal
+                    isLoading={cancelMutation.isPending}
+                    errorMessage={cancelMutation.error ? getErrorMessage(cancelMutation.error, "Could not cancel this order.") : ""}
+                    onCancel={() => setIsCancelModalOpen(false)}
+                    onConfirm={() => cancelMutation.mutate()}
+                />
             )}
         </div>
     );

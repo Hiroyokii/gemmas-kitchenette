@@ -290,7 +290,50 @@ export async function updateOrderStatusService(
         });
     }
 
-    return prisma.$transaction((tx) => updateOrderStatus(tx, orderId, status));
+    return prisma.$transaction((tx) => updateOrderStatus(tx, orderId, status, order.status));
+}
+
+export async function cancelMyOrderService(orderId: number, customerId: number) {
+    const order = await findOrderByIdForCustomer(orderId, customerId);
+    if (!order) throw new NotFoundError("Order not found.");
+    if (order.status !== OrderStatus.PENDING) {
+        throw new BadRequestError("You can only cancel an order before it is confirmed.");
+    }
+
+    return prisma.$transaction(async (tx) => {
+        // Claim cancellation only while still pending so a simultaneous admin
+        // confirmation cannot also succeed or cause servings to be restored twice.
+        const changed = await tx.order.updateMany({
+            where: { id: orderId, customerId, status: OrderStatus.PENDING },
+            data: { status: OrderStatus.CANCELLED, cancelledAt: new Date() },
+        });
+        if (changed.count !== 1) {
+            throw new BadRequestError("This order has already been confirmed or cancelled.");
+        }
+
+        const items = await tx.orderItem.findMany({
+            where: { orderId },
+            select: { dailyMenuId: true, quantity: true },
+        });
+        for (const item of items) {
+            await tx.dailyMenu.update({
+                where: { id: item.dailyMenuId },
+                data: { remainingServings: { increment: item.quantity } },
+            });
+        }
+
+        return tx.order.findUniqueOrThrow({
+            where: { id: orderId },
+            include: {
+                customer: { select: { id: true, firstName: true, lastName: true, email: true, phoneNumber: true } },
+                payment: { select: {
+                    id: true, orderId: true, method: true, status: true, rejectionReason: true,
+                    verifiedAt: true, verifiedById: true, createdAt: true, updatedAt: true, proofSubmittedAt: true,
+                } },
+                orderItems: { include: { dailyMenu: { include: { food: true } }, review: true } },
+            },
+        });
+    });
 }
 
 export async function submitPaymentProofService(

@@ -7,8 +7,8 @@ import { useCartDrawer } from "../../hooks/useCartDrawer";
 import Icon from "../ui/Icon";
 
 const NAV_LINKS = [
-    { to: "/", label: "Menu", end: true },
-    { to: "/foods", label: "Foods" },
+    { to: "/", label: "Home", end: true },
+    { to: "/foods", label: "Menu" },
 ];
 
 const ICON_BUTTON_CLASS =

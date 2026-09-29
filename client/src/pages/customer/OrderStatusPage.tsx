@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { getOrderById } from "../../services/order.service";
+import { cancelMyOrder, getOrderById } from "../../services/order.service";
 import type { Order, OrderStatus } from "../../types/Order";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 import { ORDER_STATUS_META } from "../../utils/orderStatus";
@@ -16,6 +16,7 @@ import Icon from "../../components/ui/Icon";
 import PageHeader from "../../components/ui/PageHeader";
 import Spinner from "../../components/ui/Spinner";
 import ReviewModal from "../../components/customer/ReviewModal";
+import CancelOrderModal from "../../components/customer/CancelOrderModal";
 
 // ==========================================
 // CONSTANTS & HELPERS
@@ -260,8 +261,10 @@ function PaymentInformation({ order }: { order: Order }) {
 
 export default function OrderStatusPage() {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const { orderId } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const parsedOrderId = Number(orderId);
   const hasValidOrderId = Number.isInteger(parsedOrderId) && parsedOrderId > 0;
 
@@ -277,6 +280,14 @@ export default function OrderStatusPage() {
       }
 
       return 3000;
+    },
+  });
+  const cancelMutation = useMutation({
+    mutationFn: () => cancelMyOrder(parsedOrderId),
+    onSuccess: async (updatedOrder) => {
+      setIsCancelModalOpen(false);
+      queryClient.setQueryData(["order", parsedOrderId], updatedOrder);
+      await queryClient.invalidateQueries({ queryKey: ["my-orders"] });
     },
   });
 
@@ -330,54 +341,81 @@ export default function OrderStatusPage() {
   const hasUnreviewedItems = order.orderItems.some((item) => !item.review);
 
   return (
-<div className="-mx-4 min-h-full bg-stone-50 px-4 md:-mx-6 md:px-6 lg:-mx-9 lg:px-9">
-  <article className="mb-6 flex items-center justify-between rounded-2xl bg-[#FFB800] p-5 md:p-6">
-    {/* Left side */}
-    <div className="flex items-center">
-      <Button
-        variant="secondary"
-        size="lg"
-        className="w-28 px-3 py-1.5 text-sm text-[#FFB800] md:w-28 md:px-3 md:py-1.5 md:text-base"
-        aria-label="Back to Orders"
-        onClick={() => navigate("/orders")}
-      >
-        <Icon
-          name="chevronRight"
-          className="h-4 w-4 rotate-180 text-[#FFB800]"
+    <div className="-mx-4 min-h-full bg-stone-50 px-4 md:-mx-6 md:px-6 lg:-mx-9 lg:px-9">
+      <article className="mb-6 flex items-center justify-between rounded-2xl bg-[#FFB800] p-5 md:p-6">
+        {/* Left side */}
+    <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant="secondary"
+            size="lg"
+            className="w-28 px-3 py-1.5 text-sm text-[#FFB800] md:w-28 md:px-3 md:py-1.5 md:text-base"
+            aria-label="Back to Orders"
+            onClick={() => navigate("/orders")}
+          >
+            <Icon
+              name="chevronRight"
+              className="h-4 w-4 rotate-180 text-[#FFB800]"
+            />
+            Back
+          </Button>
+      {order.status === "PENDING" && (
+        <Button
+          type="button"
+          variant="danger"
+          size="lg"
+          isLoading={cancelMutation.isPending}
+          onClick={() => setIsCancelModalOpen(true)}
+        >
+          Cancel order
+        </Button>
+      )}
+      {isReviewEligible && hasUnreviewedItems && (
+        <Button type="button" variant="secondary" size="lg" onClick={() => setIsReviewModalOpen(true)}>
+          Rate your order
+        </Button>
+      )}
+      {isReviewEligible && !hasUnreviewedItems && (
+        <span className="px-3 text-sm font-medium text-emerald-700">✓ Reviewed</span>
+      )}
+        </div>
+
+        {/* Right side */}
+        <div className="text-right">
+          <h1 className="font-display text-2xl font-semibold text-ink-900">
+            Order #{order.customerOrderNumber}
+          </h1>
+
+          <p className="mt-1 text-sm text-ink-600">
+            Placed {formatDate(order.createdAt)}
+          </p>
+        </div>
+      </article>
+
+      <OrderTimeline order={order} />
+
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
+        <OrderSummary order={order} />
+
+        <div className="space-y-6">
+          <DeliveryInformation order={order} />
+          <PaymentInformation order={order} />
+        </div>
+      </div>
+
+      {isReviewModalOpen && isReviewEligible && hasUnreviewedItems && (
+        <ReviewModal
+          order={order}
+          onClose={() => setIsReviewModalOpen(false)}
         />
-        Back
-      </Button>
-    </div>
-
-    {/* Right side */}
-    <div className="text-right">
-      <h1 className="font-display text-2xl font-semibold text-ink-900">
-        Order #{order.customerOrderNumber}
-      </h1>
-
-      <p className="mt-1 text-sm text-ink-600">
-        Placed {formatDate(order.createdAt)}
-      </p>
-    </div>
-  </article>
-
-  <OrderTimeline order={order} />
-
-  <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
-    <OrderSummary order={order} />
-
-    <div className="space-y-6">
-      <DeliveryInformation order={order} />
-      <PaymentInformation order={order} />
-    </div>
-  </div>
-
-  {isReviewModalOpen && isReviewEligible && hasUnreviewedItems && (
-    <ReviewModal
-      order={order}
-      onClose={() => setIsReviewModalOpen(false)}
+      )}
+  {isCancelModalOpen && (
+    <CancelOrderModal
+      isLoading={cancelMutation.isPending}
+      errorMessage={cancelMutation.error ? getErrorMessage(cancelMutation.error, "Could not cancel this order.") : ""}
+      onCancel={() => setIsCancelModalOpen(false)}
+      onConfirm={() => cancelMutation.mutate()}
     />
   )}
-</div>
+    </div>
   );
 }

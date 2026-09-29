@@ -57,6 +57,11 @@ export async function updateOrderStatus(
   return response.data;
 }
 
+export async function cancelMyOrder(id: number): Promise<Order> {
+  const response = await api.patch(`/orders/${id}/cancel`);
+  return response.data;
+}
+
 export async function verifyPayment(
     id: number
 ): Promise<Order> {

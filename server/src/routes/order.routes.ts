@@ -9,7 +9,8 @@ import {
     submitPaymentProof,
     getPaymentProof,
     verifyPayment, 
-    rejectPayment  
+    rejectPayment,
+    cancelMyOrder,
 } from "../controllers/order.controller.js";
 import { updateOrderStatusSchema } from "../schemas/orderStatus.schema.js";
 import { paginationSchema } from "../schemas/pagination.schema.js";
@@ -66,6 +67,13 @@ router.patch(
     validate(updateOrderStatusSchema),
     updateOrderStatus
 )
+
+router.patch(
+    "/:id/cancel",
+    authenticate,
+    authorize("CUSTOMER"),
+    cancelMyOrder,
+);
 
 router.patch(
     "/:id/payment/proof",

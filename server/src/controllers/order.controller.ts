@@ -10,6 +10,7 @@ import {
     getPaymentProofService,
     verifyPaymentService,
     rejectPaymentService,
+    cancelMyOrderService,
 } from "../services/order.service.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
@@ -28,6 +29,14 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
         req.body.status as OrderStatus
     );
 
+    res.status(200).json(order);
+});
+
+export const cancelMyOrder = asyncHandler(async (req, res) => {
+    const order = await cancelMyOrderService(
+        Number(req.params.id),
+        req.user!.userId,
+    );
     res.status(200).json(order);
 });
 
