@@ -12,7 +12,7 @@ The production layout uses Vercel for the Vite client, a Docker-capable applicat
 
 1. Create a Supabase project and open **Project Settings → Database → Connection string**.
 2. Set `DATABASE_URL` to Supabase's **session pooler** connection string for the long-running Docker API, and `DIRECT_URL` to the direct database connection string for Prisma migrations. If direct connectivity is unavailable on your network, the session pooler can also be used for `DIRECT_URL`. Add `?schema=public` if the URL does not already specify a schema. Keep both values private.
-3. The API container runs `prisma migrate deploy` on startup, applying the checked-in migrations. Seed initial roles and catalog data once, after the first migration, with `npm run prisma -- seed` from `server` (or `npx prisma db seed`).
+3. The API container runs `prisma migrate deploy` and the idempotent seed on startup, applying checked-in migrations and initial roles/catalog data.
 
 ### Docker API
 
