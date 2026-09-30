@@ -19,7 +19,6 @@ export async function createUser(data: RegisterInput & {
     return prisma.user.create({
         data: {
             firstName: data.firstName,
-            middleName: data.middleName,
             lastName: data.lastName,
 
             email: data.email,

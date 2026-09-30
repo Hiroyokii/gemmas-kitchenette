@@ -54,7 +54,7 @@ export default function AdminLayout() {
                     "fixed inset-y-0 left-0 z-40 flex flex-col",
                     "bg-white transition-all duration-200",
                     "md:sticky md:top-0 md:h-screen md:translate-x-0",
-                    "w-60 md:w-20",
+                    "w-60 md:w-60",
                     collapsed ? "lg:w-20" : "lg:w-60",
                     mobileOpen ? "translate-x-0" : "-translate-x-full",
                 ].join(" ")}
@@ -128,9 +128,8 @@ export default function AdminLayout() {
                             className={({ isActive }) =>
                                 [
                                     NAV_BASE,
-                                    collapsed
-                                        ? "justify-center px-2"
-                                        : "justify-center px-2 lg:justify-start lg:px-3",
+                                    "justify-start px-3",
+                                    collapsed ? "lg:justify-center lg:px-2" : "",
                                     isActive
                                         ? NAV_ACTIVE
                                         : NAV_INACTIVE,
@@ -144,7 +143,7 @@ export default function AdminLayout() {
                                 className="h-5 w-5 shrink-0"
                             />
 
-                            <span className={`hidden truncate ${collapsed ? "" : "lg:inline"}`}>
+                            <span className={`truncate ${collapsed ? "lg:hidden" : ""}`}>
                                     {item.label}
                             </span>
                         </NavLink>

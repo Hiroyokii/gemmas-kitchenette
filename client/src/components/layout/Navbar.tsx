@@ -5,10 +5,11 @@ import { useAuth } from "../../hooks/useAuth";
 import { useCart } from "../../hooks/useCart";
 import { useCartDrawer } from "../../hooks/useCartDrawer";
 import Icon from "../ui/Icon";
+import Button from "../ui/Button";
 
 const NAV_LINKS = [
-    { to: "/", label: "Home", end: true },
-    { to: "/foods", label: "Menu" },
+    { to: "/", label: "Home", end: true, icon: "dashboard" as const },
+    { to: "/foods", label: "Menu", icon: "bowl" as const },
 ];
 
 const ICON_BUTTON_CLASS =
@@ -16,12 +17,6 @@ const ICON_BUTTON_CLASS =
 
 const GHOST_BUTTON_CLASS =
     "rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-sm font-semibold text-stone-600 transition-colors hover:border-stone-300 hover:bg-stone-50 hover:text-stone-900 active:bg-stone-100";
-
-const OUTLINE_BUTTON_CLASS =
-    "rounded-lg border border-orange-200 bg-white px-3 py-1.5 text-sm font-semibold text-orange-600 transition-colors hover:border-orange-300 hover:bg-orange-50 hover:text-orange-700 active:bg-orange-100";
-
-const PRIMARY_BUTTON_CLASS =
-    "rounded-lg bg-orange-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-orange-700 active:bg-orange-800";
 
 export default function Navbar() {
     const { user, logout } = useAuth();
@@ -155,18 +150,40 @@ export default function Navbar() {
                 )}
             </nav>
 
-            {/* Mobile dropdown */}
-            {isMenuOpen && (
-                <div className="sticky top-[104px] z-40 max-h-[calc(100dvh-104px)] overflow-y-auto border-b border-stone-200 bg-white px-4 py-4 shadow-[0_8px_30px_rgba(0,0,0,0.06)] lg:hidden">
-                    <nav className="flex flex-col gap-3">
+            {/* Mobile sidebar */}
+            <button
+                type="button"
+                aria-label="Close navigation"
+                onClick={() => setIsMenuOpen(false)}
+                className={`fixed inset-0 z-[55] bg-black/35 transition-opacity lg:hidden ${isMenuOpen ? "opacity-100" : "pointer-events-none opacity-0"}`}
+            />
+            <aside
+                aria-label="Mobile navigation"
+                aria-hidden={!isMenuOpen}
+                inert={!isMenuOpen}
+                className={`fixed inset-y-0 left-0 z-[60] flex w-62 max-w-[85vw] flex-col bg-white shadow-2xl transition-transform duration-200 ease-out lg:hidden ${isMenuOpen ? "translate-x-0" : "-translate-x-full"}`}
+            >
+                <div className="flex h-20 shrink-0 items-center justify-between border-b border-stone-200 px-5">
+                    <button
+                        type="button"
+                        onClick={() => setIsMenuOpen(false)}
+                        aria-label="Close navigation"
+                        className={ICON_BUTTON_CLASS}
+                    >
+                        <Icon name="close" className="h-5 w-5" />
+                    </button>
+                </div>
+
+                <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-5">
                         {NAV_LINKS.map((link) => (
                             <NavLink
                                 key={link.to}
                                 to={link.to}
                                 end={link.end}
                                 onClick={() => setIsMenuOpen(false)}
-                                className={linkClass}
+                                className={({ isActive }) => `flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition-colors ${isActive ? "bg-[#FFB800] text-stone-950" : "text-stone-600 hover:bg-amber-50 hover:text-stone-950"}`}
                             >
+                                <Icon name={link.icon} className="h-5 w-5 shrink-0" />
                                 {link.label}
                             </NavLink>
                         ))}
@@ -175,8 +192,9 @@ export default function Navbar() {
                             <NavLink
                                 to="/orders"
                                 onClick={() => setIsMenuOpen(false)}
-                                className={linkClass}
+                                className={({ isActive }) => `flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition-colors ${isActive ? "bg-[#FFB800] text-stone-950" : "text-stone-600 hover:bg-amber-50 hover:text-stone-950"}`}
                             >
+                                <Icon name="list" className="h-5 w-5 shrink-0" />
                                 My Orders
                             </NavLink>
                         )}
@@ -185,21 +203,19 @@ export default function Navbar() {
                             <Link
                                 to="/admin"
                                 onClick={() => setIsMenuOpen(false)}
-                                className={linkClass({
-                                    isActive: false,
-                                })}
+                                className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-stone-600 transition-colors hover:bg-amber-50 hover:text-stone-950"
                             >
+                                <Icon name="dashboard" className="h-5 w-5 shrink-0" />
                                 Admin panel
                             </Link>
                         )}
                     </nav>
 
-                    <div className="mt-4 border-t border-stone-100 pt-4">
+                    <div className="shrink-0 border-t border-stone-200 p-4">
                         {user ? (
-                            <div className="flex items-center justify-between gap-3">
-                                <span className="text-sm text-stone-500">
-                                    Signed in as {user.firstName}{" "}
-                                    {user.lastName}
+                            <div className="space-y-3">
+                                <span className="block truncate text-sm text-stone-500">
+                                    Signed in as {user.firstName} {user.lastName}
                                 </span>
 
                                 <button
@@ -220,8 +236,7 @@ export default function Navbar() {
                             <AuthButtons />
                         )}
                     </div>
-                </div>
-            )}
+            </aside>
         </>
     );
 }
@@ -231,15 +246,17 @@ function isAdminOrStaff(role?: string) {
 }
 
 function AuthButtons() {
+    const navigate = useNavigate();
+
     return (
         <div className="flex gap-2">
-            <Link to="/login" className={OUTLINE_BUTTON_CLASS}>
+            <Button type="button" variant="secondary" size="md" onClick={() => navigate("/login")}>
                 Log in
-            </Link>
+            </Button>
 
-            <Link to="/register" className={PRIMARY_BUTTON_CLASS}>
+            <Button type="button" variant="primary" size="md" onClick={() => navigate("/register")}>
                 Sign up
-            </Link>
+            </Button>
         </div>
     );
 }

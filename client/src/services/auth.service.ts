@@ -8,7 +8,6 @@ export interface LoginInput {
 export interface RegisterInput {
     firstName: string;
     lastName: string;
-    middleName?: string;
     email: string;
     password: string;
     phoneNumber: string;

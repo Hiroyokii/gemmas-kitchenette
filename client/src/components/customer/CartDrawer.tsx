@@ -230,39 +230,41 @@ export default function CartDrawer() {
             <p className="mb-4 text-xs leading-5 text-stone-500">
               {itemCount} item{itemCount === 1 ? "" : "s"} · Delivery fees, if any, are confirmed at checkout.
             </p>
-            <Alert type="error" message={error} />
-            {isCheckingOut ? (
-              <div className="grid gap-3">
+            <div className="grid gap-3">
+              <Alert type="error" message={error} />
+              {isCheckingOut ? (
+                <div className="grid gap-3">
+                  <button
+                    type="button"
+                    onClick={handleCheckout}
+                    disabled={orderMutation.isPending || isRetryingPayment}
+                    className="h-13 rounded-xl bg-[#FFB800] px-5 font-bold text-stone-900 transition hover:bg-[#e6a600] disabled:opacity-60"
+                  >
+                    {orderMutation.isPending || isRetryingPayment
+                      ? "Placing order…"
+                      : `Place order · ₱${subtotal.toFixed(2)}`}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsCheckingOut(false);
+                      setError("");
+                    }}
+                    className="h-12 rounded-xl border border-stone-200 font-semibold text-stone-700 transition hover:bg-stone-50"
+                  >
+                    Back to Cart
+                  </button>
+                </div>
+              ) : (
                 <button
                   type="button"
-                  onClick={handleCheckout}
-                  disabled={orderMutation.isPending || isRetryingPayment}
-                  className="h-13 rounded-xl bg-[#FFB800] px-5 font-bold text-stone-900 transition hover:bg-[#e6a600] disabled:opacity-60"
+                  onClick={() => setIsCheckingOut(true)}
+                  className="h-13 w-full rounded-xl bg-[#FFB800] px-5 font-bold text-stone-900 transition hover:bg-[#e6a600]"
                 >
-                  {orderMutation.isPending || isRetryingPayment
-                    ? "Placing order…"
-                    : `Place order · ₱${subtotal.toFixed(2)}`}
+                  Continue to Checkout
                 </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsCheckingOut(false);
-                    setError("");
-                  }}
-                  className="h-12 rounded-xl border border-stone-200 font-semibold text-stone-700 transition hover:bg-stone-50"
-                >
-                  Back to Cart
-                </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setIsCheckingOut(true)}
-                className="h-13 w-full rounded-xl bg-[#FFB800] px-5 font-bold text-stone-900 transition hover:bg-[#e6a600]"
-              >
-                Continue to Checkout
-              </button>
-            )}
+              )}
+            </div>
           </footer>
         )}
       </aside>

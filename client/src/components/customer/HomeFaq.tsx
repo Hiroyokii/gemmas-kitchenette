@@ -3,6 +3,11 @@ import Card from "../ui/Card";
 
 const FAQ_ITEMS = [
   {
+    question: "Not from Tanza, Punta 1?",
+    answer:
+      "We may still be able to accommodate your order. Message us on Facebook or Messenger and we can arrange delivery through Lalamove. We’ll confirm availability and the delivery fee with you first.",
+  },
+  {
     question: "What payment methods are available?",
     answer:
       "You can choose cash on delivery or GCash when placing an order. GCash orders need a screenshot of the successful payment.",
@@ -16,11 +21,6 @@ const FAQ_ITEMS = [
     question: "Can I track my order?",
     answer:
       "Yes. Open My Orders to see your orders, then select an order to view its current status.",
-  },
-  {
-    question: "How do I know what food is available today?",
-    answer:
-      "Today’s Menu on this page shows the items currently posted for the day. You can also browse the full Foods page.",
   },
 ];
 

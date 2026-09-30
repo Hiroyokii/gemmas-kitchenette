@@ -30,7 +30,6 @@ export default function RegisterPage() {
         try {
             const response = await registerRequest({
                 ...data,
-                middleName: data.middleName || undefined,
                 landmark: data.landmark || undefined,
             });
             loginContext(response.token, response.user);
@@ -105,15 +104,6 @@ export default function RegisterPage() {
                             error={errors.phoneNumber?.message}
                             className="h-12 rounded-xl"
                             {...register("phoneNumber")}
-                        />
-                        <Input
-                            label="Middle name (optional)"
-                            tone="brand"
-                            placeholder="Middle name"
-                            autoComplete="additional-name"
-                            error={errors.middleName?.message}
-                            className="h-12 rounded-xl sm:col-span-2"
-                            {...register("middleName")}
                         />
                         <Input
                             type={showPassword ? "text" : "password"}
@@ -223,8 +213,8 @@ export default function RegisterPage() {
                     </p>
                 </form>
 
-                <p className="mt-6 text-center font-editorial text-xl text-[#a66f00] sm:text-2xl">
-                    Support local. Eat local.
+                <p className="mt-5 text-center text-xs text-stone-500">
+                    Home-cooked goodness, made just for you.
                 </p>
             </div>
         </main>
