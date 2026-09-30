@@ -1,6 +1,6 @@
-import { Router } from "express";
+import express, { Router } from "express";
 
-import { createFood, getFoods, updateFood } from "../controllers/food.controller.js";
+import { createFood, getFoods, updateFood, uploadFoodImage } from "../controllers/food.controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 import { authorize } from "../middleware/authorize.middleware.js";
 import { validate } from "../middleware/validate.middleware.js";
@@ -8,6 +8,14 @@ import { updateFoodSchema } from "../schemas/food.schema.js";
 
 
 const router = Router();
+
+router.post(
+    "/image",
+    authenticate,
+    authorize("ADMIN"),
+    express.raw({ type: ["image/jpeg", "image/png", "image/webp"], limit: "5mb" }),
+    uploadFoodImage
+);
 
 router.get(
     "/",

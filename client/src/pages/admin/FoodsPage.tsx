@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     useMutation,
     useQuery,
@@ -17,6 +17,7 @@ import {
     getFoods,
     createFood,
     updateFood,
+    uploadFoodImage,
 } from "../../services/food.service";
 
 import { getCategories } from "../../services/category.service";
@@ -305,6 +306,8 @@ function FoodFormModal({
     const isEditing = Boolean(food);
 
     const [submitError, setSubmitError] = useState("");
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState(food?.imageUrl ?? "");
 
     const {
         register,
@@ -319,7 +322,6 @@ function FoodFormModal({
                   description: food.description,
                   price: food.price,
                   categoryId: food.categoryId,
-                  imageUrl: food.imageUrl ?? "",
                   isAvailable: food.isAvailable,
               }
             : {
@@ -327,23 +329,26 @@ function FoodFormModal({
                   description: "",
                   price: 0,
                   categoryId: undefined,
-                  imageUrl: "",
                   isAvailable: true,
               },
     });
 
     const saveMutation = useMutation({
         mutationFn: async (data: FoodForm) => {
+            const imageUrl = imageFile
+                ? await uploadFoodImage(imageFile)
+                : food?.imageUrl || undefined;
+
             if (isEditing && food) {
                 return updateFood(food.id, {
                     ...data,
-                    imageUrl: data.imageUrl || undefined,
+                    imageUrl,
                 });
             }
 
             return createFood({
                 ...data,
-                imageUrl: data.imageUrl || undefined,
+                imageUrl,
             });
         },
 
@@ -358,6 +363,14 @@ function FoodFormModal({
             );
         },
     });
+
+    useEffect(() => {
+        return () => {
+            if (imagePreview.startsWith("blob:")) {
+                URL.revokeObjectURL(imagePreview);
+            }
+        };
+    }, [imagePreview]);
 
     function onSubmit(data: FoodForm) {
         setSubmitError("");
@@ -452,12 +465,44 @@ function FoodFormModal({
                     </div>
                 </div>
 
-                <Input
-                    label="Image URL (optional)"
-                    placeholder="https://..."
-                    error={errors.imageUrl?.message}
-                    {...register("imageUrl")}
-                />
+                <div>
+                    <label
+                        htmlFor="food-image"
+                        className="mb-1.5 block text-sm font-medium text-stone-800"
+                    >
+                        Food image (optional)
+                    </label>
+                    <input
+                        id="food-image"
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        onChange={(event) => {
+                            const file = event.target.files?.[0] ?? null;
+                            if (file && !["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+                                setSubmitError("Choose a JPG, PNG, or WebP image.");
+                                event.target.value = "";
+                                return;
+                            }
+                            if (file && file.size > 5 * 1024 * 1024) {
+                                setSubmitError("Image must be smaller than 5 MB.");
+                                event.target.value = "";
+                                return;
+                            }
+                            setSubmitError("");
+                            setImageFile(file);
+                            setImagePreview(file ? URL.createObjectURL(file) : food?.imageUrl ?? "");
+                        }}
+                        className="block w-full rounded-lg border border-stone-200 bg-white text-sm text-stone-700 file:mr-3 file:border-0 file:bg-[#FFF8DD] file:px-4 file:py-2.5 file:font-medium file:text-stone-800"
+                    />
+                    <p className="mt-1 text-xs text-stone-500">JPG, PNG, or WebP. Maximum size: 5 MB.</p>
+                    {imagePreview && (
+                        <img
+                            src={imagePreview}
+                            alt="Food image preview"
+                            className="mt-3 h-28 w-28 rounded-xl object-cover"
+                        />
+                    )}
+                </div>
 
                 {isEditing && (
                     <label className="flex cursor-pointer items-center gap-2 text-sm text-stone-700">

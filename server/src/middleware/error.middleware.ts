@@ -14,6 +14,10 @@ export function errorHandler(
     res: Response,
     next: NextFunction
 ) {
+    if ((err as Error & { status?: number }).status === 413) {
+        return res.status(413).json({ message: "Image must be smaller than 5 MB." });
+    }
+
     if (err instanceof AppError) {
         return res.status(err.statusCode).json({
             message: err.message,

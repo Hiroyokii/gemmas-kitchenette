@@ -14,10 +14,8 @@ export const foodSchema = z.object({
         .int()
         .positive("Category is required."),
 
-    imageUrl: z.string().trim().optional().or(z.literal("")),
-
     isAvailable: z.boolean(),
 })
 
 export type FoodFormInput = z.input<typeof foodSchema>;
-export type FoodForm = z.output<typeof foodSchema>; 
+export type FoodForm = z.output<typeof foodSchema>;

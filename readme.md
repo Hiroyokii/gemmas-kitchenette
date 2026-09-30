@@ -32,6 +32,10 @@ Import the repository into Vercel and set the project **Root Directory** to `cli
 
 For browser refresh-token cookies, use HTTPS for both deployed sites. Production cookies use `SameSite=None; Secure`; the API's `FRONTEND_URL` must exactly match the Vercel origin. Add a separate deployment or update that value when changing the production frontend domain.
 
+### Food image uploads
+
+Food images are uploaded by the API to Supabase Storage; they are not stored on the Render filesystem. In Supabase Storage, create a public bucket named `food-images`, limit it to 5 MB per object, and allow only `image/jpeg`, `image/png`, and `image/webp`. Public access lets visitors see menu images without signing in. Add `SUPABASE_URL` and a server-only `SUPABASE_SECRET_KEY` to the Render service environment. Keep the secret key out of Vercel and source control. `SUPABASE_FOOD_BUCKET` is optional and defaults to `food-images`.
+
 ### Local Docker Compose
 
 `docker compose up --build` remains a local development setup with a local PostgreSQL container. Production uses Supabase and the standalone API image described above; do not expose the local Compose database publicly.

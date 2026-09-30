@@ -22,6 +22,15 @@ export async function getFoods(params?: {
     return response.data;
 }
 
+export async function uploadFoodImage(file: File): Promise<string> {
+    const response = await api.post<{ imageUrl: string }>("/foods/image", file, {
+        headers: { "Content-Type": file.type },
+        transformRequest: [(data) => data],
+    });
+
+    return response.data.imageUrl;
+}
+
 export async function createFood(data: FoodInput): Promise<Food> {
     const response = await api.post("/foods", data);
 
