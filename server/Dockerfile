@@ -11,6 +11,7 @@ RUN npm ci --no-audit --no-fund
 COPY . .
 RUN npx prisma generate
 RUN npm run build
+RUN mkdir -p dist/src/generated/prisma && cp -R src/generated/prisma/. dist/src/generated/prisma/
 
 EXPOSE 5000
 
