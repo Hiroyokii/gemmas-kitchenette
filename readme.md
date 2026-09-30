@@ -8,10 +8,9 @@ The system provides a centralized platform for managing daily food preparation, 
 
 Gemma's Kitchenette currently handles customer orders and business operations through manual processes. This system was developed to help organize these activities through a web-based application.
 
-The system supports three user roles:
+The system supports two user roles:
 
 - **Customer** – browses the daily menu, places orders, and tracks orders.
-- **Staff** – assists with order processing and daily operations.
 - **Admin** – manages foods, recipes, inventory, purchases, menus, users, orders, and reports.
 
 ## Features
@@ -46,15 +45,6 @@ The system supports three user roles:
 - Expiration monitoring
 - Spoilage and waste tracking
 - User management
-
-### Staff
-
-- View customer orders
-- Process orders
-- Update order status
-- Monitor daily food preparation
-- View ingredient inventory
-- Assist with order processing
 
 ## Order Management
 

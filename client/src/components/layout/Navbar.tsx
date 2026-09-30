@@ -87,7 +87,7 @@ export default function Navbar() {
                             <CartButton itemCount={itemCount} onClick={openCart} />
                         )}
 
-                        {isAdminOrStaff(user?.role) && (
+                        {user?.role === "ADMIN" && (
                             <Link
                                 to="/admin"
                                 className={GHOST_BUTTON_CLASS}
@@ -199,7 +199,7 @@ export default function Navbar() {
                             </NavLink>
                         )}
 
-                        {isAdminOrStaff(user?.role) && (
+                        {user?.role === "ADMIN" && (
                             <Link
                                 to="/admin"
                                 onClick={() => setIsMenuOpen(false)}
@@ -239,10 +239,6 @@ export default function Navbar() {
             </aside>
         </>
     );
-}
-
-function isAdminOrStaff(role?: string) {
-    return role === "ADMIN" || role === "STAFF";
 }
 
 function AuthButtons() {

@@ -6,7 +6,7 @@ export default function PublicRoute() {
     const { user } = useAuth();
 
     if (user) {
-        const destination = user.role === "ADMIN" || user.role === "STAFF" ? "/admin" : "/";
+        const destination = user.role === "ADMIN" ? "/admin" : "/";
 
         return <Navigate to={destination} replace />;
     }

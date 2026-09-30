@@ -8,7 +8,6 @@ async function main() {
     await prisma.role.createMany({
         data:[
             { name: "ADMIN" },
-            { name: "STAFF" },
             { name: "CUSTOMER" }
         ],
         skipDuplicates: true,

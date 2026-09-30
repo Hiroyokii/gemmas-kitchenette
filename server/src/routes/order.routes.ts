@@ -30,7 +30,7 @@ const router = Router();
 router.get(
     "/",
     authenticate,
-    authorize("ADMIN", "STAFF"),
+    authorize("ADMIN"),
     validate(
         paginationSchema,
         "query"
@@ -63,7 +63,7 @@ router.post(
 router.patch(
     "/:id/status",
     authenticate,
-    authorize("ADMIN", "STAFF"),
+    authorize("ADMIN"),
     validate(updateOrderStatusSchema),
     updateOrderStatus
 )
@@ -86,21 +86,21 @@ router.patch(
 router.get(
     "/:id/payment/proof",
     authenticate,
-    authorize("CUSTOMER", "ADMIN", "STAFF"),
+    authorize("CUSTOMER", "ADMIN"),
     getPaymentProof,
 );
 
 router.patch(
     "/:id/payment/verify", 
     authenticate, 
-    authorize("ADMIN", "STAFF"), 
+    authorize("ADMIN"),
     verifyPayment
 );
 
 router.patch(
     "/:id/payment/reject", 
     authenticate, 
-    authorize("ADMIN", "STAFF"), 
+    authorize("ADMIN"),
     validate(rejectPaymentSchema), 
     rejectPayment
 );

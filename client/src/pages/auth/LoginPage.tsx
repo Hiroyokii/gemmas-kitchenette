@@ -28,7 +28,7 @@ export default function LoginPage() {
         try {
             const response = await login(data);
             loginContext(response.token, response.user);
-            navigate(response.user.role === "ADMIN" || response.user.role === "STAFF" ? "/admin" : "/");
+            navigate(response.user.role === "ADMIN" ? "/admin" : "/");
         } catch {
             setLoginError("Invalid email or password.");
         }

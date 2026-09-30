@@ -12,21 +12,21 @@ const router = Router();
 router.get(
     "/expiration-alerts",
     authenticate,
-    authorize("ADMIN", "STAFF"),
+    authorize("ADMIN"),
     getExpirationAlerts
 );
 
 router.get(
     "/",
     authenticate,
-    authorize("ADMIN", "STAFF"),
+    authorize("ADMIN"),
     getPurchases
 )
 
 router.post(
     "/",
     authenticate,
-    authorize("ADMIN", "STAFF"),
+    authorize("ADMIN"),
     validate(createPurchaseSchema),
     createPurchase
 )

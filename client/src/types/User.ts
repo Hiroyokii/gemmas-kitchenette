@@ -6,5 +6,5 @@ export interface User {
     lot: string;
     street: string;
     landmark?: string | null;
-    role: "ADMIN" | "STAFF" | "CUSTOMER";
+    role: "ADMIN" | "CUSTOMER";
 }

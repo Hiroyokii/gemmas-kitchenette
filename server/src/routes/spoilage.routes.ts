@@ -6,7 +6,7 @@ import { createSpoilageSchema } from "../schemas/spoilage.schema.js";
 import { createSpoilage, getAvailableBatches, getSpoilageRecords } from "../controllers/spoilage.controller.js";
 
 const router = Router();
-router.use(authenticate, authorize("ADMIN", "STAFF"));
+router.use(authenticate, authorize("ADMIN"));
 router.get("/", getSpoilageRecords);
 router.get("/batches", getAvailableBatches);
 router.post("/", validate(createSpoilageSchema), createSpoilage);
