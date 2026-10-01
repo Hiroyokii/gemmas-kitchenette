@@ -6,7 +6,11 @@ interface RefreshResponse {
 }
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
+    // In production, keep API requests on the Vercel origin. This makes the
+    // refresh cookie first-party even though Vercel proxies to the Render API.
+    baseURL: import.meta.env.PROD
+        ? "/api"
+        : import.meta.env.VITE_API_URL,
     withCredentials: true,
     headers: {
         "Content-Type": "application/json",

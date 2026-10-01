@@ -16,8 +16,9 @@ const REFRESH_COOKIE_NAME = "refreshToken";
 const REFRESH_COOKIE_OPTION = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" as const : "lax" as const,
-    path: "/auth",
+    sameSite: "lax" as const,
+    // Root scope works through Vercel's /api proxy and direct API requests.
+    path: "/",
     maxAge: 7 * 24 * 60 * 60 * 1000,
 }
 

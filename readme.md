@@ -28,9 +28,9 @@ The container applies migrations and then starts the compiled Express server. Ke
 
 ### Vercel client
 
-Import the repository into Vercel and set the project **Root Directory** to `client`. Use `npm run build` as the build command and `dist` as the output directory. Add `VITE_API_URL` with the API's public HTTPS origin (no trailing slash), then deploy. `client/vercel.json` rewrites client-side routes to the Vite entry point.
+Import the repository into Vercel and set the project **Root Directory** to `client`. Use `npm run build` as the build command and `dist` as the output directory, then deploy. Production API calls use the same-origin `/api` route, which `client/vercel.json` proxies to the Render API. Local development continues to use `VITE_API_URL` (for example, `http://localhost:5000`).
 
-For browser refresh-token cookies, use HTTPS for both deployed sites. Production cookies use `SameSite=None; Secure`; the API's `FRONTEND_URL` must exactly match the Vercel origin. Add a separate deployment or update that value when changing the production frontend domain.
+The Vercel proxy keeps the refresh-token cookie first-party in the browser. Production cookies use `SameSite=Lax; Secure` with the `/` path so they work through both the proxy and direct API routes. The short-lived access JWT is kept in tab-scoped `sessionStorage` and refreshed using the HttpOnly cookie. Keep `FRONTEND_URL` set to the deployed Vercel origin, especially if you use other API clients that call Render directly.
 
 ### Food image uploads
 
