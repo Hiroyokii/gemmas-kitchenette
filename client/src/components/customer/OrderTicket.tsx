@@ -110,6 +110,9 @@ export default function OrderTicket({ order }: OrderTicketProps) {
                     <Icon name="mapPin" className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                     <span>{order.orderType === "PICKUP" ? "Pickup at the store" : formatDeliveryAddress(order.deliveryAddress)}</span>
                 </div>
+                <p className="mt-1 text-xs text-ink-500">
+                    Payment: {order.orderType === "PICKUP" ? "Pay at pickup" : order.payment?.method === "GCASH" ? "GCash" : order.payment?.method === "COD" ? "Cash on delivery" : "Unavailable"}
+                </p>
                 {order.notes && <p className="mt-2 text-xs text-ink-500">Order note: {order.notes}</p>}
 
                 <div className="mt-3 flex items-center justify-between border-t border-dashed border-ink-200 pt-3">

@@ -210,6 +210,7 @@ function DeliveryInformation({ order }: { order: Order }) {
 function PaymentInformation({ order }: { order: Order }) {
   const payment = order.payment;
   const isGcash = payment?.method === "GCASH";
+  const isPickup = order.orderType === "PICKUP";
 
   return (
     <Card className="h-auto p-5">
@@ -223,7 +224,7 @@ function PaymentInformation({ order }: { order: Order }) {
           <div className="flex items-center justify-between gap-3">
             <span className="text-ink-600">Method</span>
             <span className="font-medium text-ink-800">
-              {isGcash ? "GCash" : "Cash on Delivery"}
+              {isPickup ? "Pay at pickup" : isGcash ? "GCash" : "Cash on Delivery"}
             </span>
           </div>
           {isGcash && (
@@ -248,7 +249,7 @@ function PaymentInformation({ order }: { order: Order }) {
           {isGcash && payment.rejectionReason && (
             <p className="rounded-lg bg-red-50 p-3 text-red-700">{payment.rejectionReason}</p>
           )}
-          {!isGcash && <p className="text-ink-600">Pay when your order arrives.</p>}
+          {!isGcash && <p className="text-ink-600">{isPickup ? "Payment will be collected when you pick up your order." : "Pay when your order arrives."}</p>}
         </div>
       )}
     </Card>
