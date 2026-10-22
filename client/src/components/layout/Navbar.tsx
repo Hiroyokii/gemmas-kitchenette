@@ -6,6 +6,8 @@ import { useCart } from "../../hooks/useCart";
 import { useCartDrawer } from "../../hooks/useCartDrawer";
 import Icon from "../ui/Icon";
 import Button from "../ui/Button";
+import Modal from "../ui/Modal";
+import ProfilePage from "../../pages/customer/ProfilePage";
 
 const NAV_LINKS = [
     { to: "/", label: "Home", end: true, icon: "dashboard" as const },
@@ -25,6 +27,7 @@ export default function Navbar() {
     const navigate = useNavigate();
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
 
     async function handleLogout() {
         setIsMenuOpen(false);
@@ -98,7 +101,11 @@ export default function Navbar() {
 
                         {user ? (
                             <div className="flex items-center gap-3 border-l border-stone-200 pl-3">
-                                {user.role === "CUSTOMER" && <ProfileAvatar user={user} />}
+                                {user.role === "CUSTOMER" && (
+                                    <button type="button" onClick={() => setIsProfileOpen(true)} aria-label="Open profile management" title="Manage profile" className="rounded-full transition-opacity hover:opacity-75 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500">
+                                        <ProfileAvatar user={user} />
+                                    </button>
+                                )}
                                 <span className="text-sm text-stone-500">
                                     Hi, {user.firstName}
                                 </span>
@@ -207,14 +214,14 @@ export default function Navbar() {
                         )}
 
                         {user?.role === "CUSTOMER" && (
-                            <NavLink
-                                to="/profile"
-                                onClick={() => setIsMenuOpen(false)}
-                                className={({ isActive }) => `flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition-colors ${isActive ? "bg-[#FFB800] text-stone-950" : "text-stone-600 hover:bg-amber-50 hover:text-stone-950"}`}
+                            <button
+                                type="button"
+                                onClick={() => { setIsMenuOpen(false); setIsProfileOpen(true); }}
+                                className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold text-stone-600 transition-colors hover:bg-amber-50 hover:text-stone-950"
                             >
                                 <ProfileAvatar user={user} />
                                 My Profile
-                            </NavLink>
+                            </button>
                         )}
 
                         {user?.role === "ADMIN" && (
@@ -256,6 +263,11 @@ export default function Navbar() {
                         )}
                     </div>
             </aside>
+            {isProfileOpen && user?.role === "CUSTOMER" && (
+                <Modal title="Manage your profile" onClose={() => setIsProfileOpen(false)} size="xl">
+                    <ProfilePage embedded />
+                </Modal>
+            )}
         </>
     );
 }

@@ -13,7 +13,7 @@ import PageHeader from "../../components/ui/PageHeader";
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 
-export default function ProfilePage() {
+export default function ProfilePage({ embedded = false }: { embedded?: boolean }) {
     const { user, updateUser } = useAuth();
     const [firstName, setFirstName] = useState(user?.firstName ?? "");
     const [lastName, setLastName] = useState(user?.lastName ?? "");
@@ -112,8 +112,8 @@ export default function ProfilePage() {
     const initials = `${user?.firstName?.[0] ?? ""}${user?.lastName?.[0] ?? ""}`;
 
     return (
-        <div className="mx-auto max-w-3xl space-y-6">
-            <PageHeader title="My profile" description="Update your contact details, delivery address, password, and profile picture." />
+        <div className={embedded ? "space-y-4" : "mx-auto max-w-3xl space-y-6"}>
+            {!embedded && <PageHeader title="My profile" description="Update your contact details, delivery address, password, and profile picture." />}
 
             <Card className="h-auto p-5 sm:p-6">
                 <h2 className="font-display text-lg font-semibold text-ink-900">Profile picture</h2>
