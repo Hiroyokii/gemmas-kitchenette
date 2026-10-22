@@ -473,11 +473,11 @@ function OrderRow({ order }: { order: Order }) {
       </td>
       <td className="px-3 py-3 sm:px-4">
         {order.customer.firstName} {order.customer.lastName}
-        <span className="mt-1 block max-w-56 text-xs font-normal text-stone-500">{order.deliveryAddress ? formatDeliveryAddress(order.deliveryAddress) : (order.orderType === "PICKUP" ? "Pickup" : "Address unavailable")}</span>
+        <span className="mt-1 block max-w-56 text-xs font-normal text-stone-500">{order.orderType === "PICKUP" ? "Pickup" : order.deliveryAddress ? formatDeliveryAddress(order.deliveryAddress) : "Address unavailable"}</span>
         {order.notes && <span className="mt-1 block max-w-56 text-xs font-normal text-stone-600">Note: {order.notes}</span>}
       </td>
       <td className="px-3 py-3 whitespace-nowrap sm:px-4">
-        {order.payment?.method === "GCASH" ? "GCash" : order.payment?.method === "COD" ? "Cash on delivery" : "—"}
+        {order.orderType === "PICKUP" ? "Pay at pickup" : order.payment?.method === "GCASH" ? "GCash" : order.payment?.method === "COD" ? "Cash on delivery" : "—"}
       </td>
       <td className="px-3 py-3 sm:px-4">
         {order.orderItems.reduce((sum, item) => sum + item.quantity, 0)} items
