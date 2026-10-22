@@ -52,7 +52,7 @@ export default function Footer() {
 
             <nav aria-label="Contact us" className="flex items-center gap-4">
               <a
-                href="https://www.facebook.com/"
+                href="https://www.facebook.com/people/Gemmas-Kitchenette/61580580509201/"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Find us on Facebook"
@@ -64,7 +64,7 @@ export default function Footer() {
                 </svg>
               </a>
               <a
-                href="https://www.messenger.com/"
+                href="https://www.facebook.com/people/Gemmas-Kitchenette/61580580509201/"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Message us on Messenger"
@@ -76,7 +76,7 @@ export default function Footer() {
                 </svg>
               </a>
               <a
-                href="https://mail.google.com/"
+                href="mailto:gemmasalibay481@gmail.com"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Contact us with Gmail"

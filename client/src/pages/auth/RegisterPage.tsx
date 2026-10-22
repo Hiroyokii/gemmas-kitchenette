@@ -95,6 +95,7 @@ export default function RegisterPage() {
                             {...register("email")}
                         />
                         <Input
+                            type="tel"
                             label="Phone number"
                             tone="brand"
                             placeholder="09XXXXXXXXX"
@@ -103,7 +104,11 @@ export default function RegisterPage() {
                             hint="Enter 11 digits, no spaces."
                             error={errors.phoneNumber?.message}
                             className="h-12 rounded-xl"
-                            {...register("phoneNumber")}
+                            {...register("phoneNumber", {
+                                onChange: (event) => {
+                                    event.target.value = event.target.value.replace(/\D/g, "").slice(0, 11);
+                                },
+                            })}
                         />
                         <Input
                             type={showPassword ? "text" : "password"}

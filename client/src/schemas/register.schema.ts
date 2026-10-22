@@ -16,7 +16,7 @@ export const registerSchema = z.object({
 
     phoneNumber: z
         .string()
-        .length(11, "Phone number must be exactly 11 digits."),
+        .regex(/^\d{11}$/, "Phone number must be exactly 11 digits."),
 
     block: z.string().trim().min(1, "Block is required."),
     lot: z.string().trim().min(1, "Lot is required."),
