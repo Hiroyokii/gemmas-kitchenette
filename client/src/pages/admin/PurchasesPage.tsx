@@ -378,7 +378,7 @@ function PurchaseFormModal({
                                 key={field.id}
                                 className="border-b border-stone-100 p-4 last:border-0"
                             >
-                                <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(160px,1fr)_110px_130px_150px_auto] md:items-end">
+                                <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(140px,1fr)_90px_130px_110px_auto] md:items-end">
                                     {/* Ingredient */}
                                     <div>
                                         <label
@@ -465,7 +465,7 @@ function PurchaseFormModal({
                                         type="button"
                                         onClick={() => remove(index)}
                                         disabled={fields.length === 1}
-                                        className="h-10 rounded-lg px-3 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:text-stone-300"
+                                        className="h-10 whitespace-nowrap rounded-lg px-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:text-stone-300"
                                     >
                                         Remove
                                     </button>
