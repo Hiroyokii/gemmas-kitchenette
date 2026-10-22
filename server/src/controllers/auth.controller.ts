@@ -1,11 +1,15 @@
 import type { Response } from "express";
 
-import { registerSchema, loginSchema } from "../schemas/auth.schema.js";
+import { registerSchema, loginSchema, updateProfileSchema, changePasswordSchema } from "../schemas/auth.schema.js";
 import { 
     registerUser, 
     loginUser, 
     refreshSession,
     logoutUser,
+    getCustomerProfile,
+    saveCustomerProfile,
+    saveCustomerAvatar,
+    changeCustomerPassword,
 } from "../services/auth.service.js";
 
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -108,3 +112,54 @@ export const logout = asyncHandler(async (req, res) => {
         message: "Logged out.",
     })
 })
+
+export const getProfile = asyncHandler(async (req, res) => {
+    const user = await getCustomerProfile(req.user!.userId);
+    return res.status(200).json({ user });
+});
+
+export const updateProfile = asyncHandler(async (req, res) => {
+    const data = updateProfileSchema.parse(req.body);
+    const user = await saveCustomerProfile(req.user!.userId, data);
+    return res.status(200).json({ message: "Profile updated.", user });
+});
+
+export const updatePassword = asyncHandler(async (req, res) => {
+    const data = changePasswordSchema.parse(req.body);
+    await changeCustomerPassword(
+        req.user!.userId,
+        data,
+        req.cookies?.[REFRESH_COOKIE_NAME],
+    );
+    return res.status(200).json({ message: "Password updated." });
+});
+
+const PROFILE_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+
+function imageContentMatches(image: Buffer, contentType: string): boolean {
+    if (contentType === "image/png") {
+        return image.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
+    }
+    if (contentType === "image/jpeg") {
+        return image[0] === 0xff && image[1] === 0xd8 && image[2] === 0xff;
+    }
+    return contentType === "image/webp"
+        && image.toString("ascii", 0, 4) === "RIFF"
+        && image.toString("ascii", 8, 12) === "WEBP";
+}
+
+export const updateAvatar = asyncHandler(async (req, res) => {
+    const contentType = req.headers["content-type"]?.split(";")[0]?.trim();
+    if (!contentType || !PROFILE_IMAGE_TYPES.has(contentType) || !Buffer.isBuffer(req.body)) {
+        return res.status(400).json({ message: "Choose a JPG, PNG, or WebP image." });
+    }
+    if (req.body.length === 0 || req.body.length > 5 * 1024 * 1024) {
+        return res.status(400).json({ message: "Profile picture must be smaller than 5 MB." });
+    }
+    if (!imageContentMatches(req.body, contentType)) {
+        return res.status(400).json({ message: "Image contents do not match the selected file type." });
+    }
+
+    const user = await saveCustomerAvatar(req.user!.userId, req.body, contentType);
+    return res.status(200).json({ message: "Profile picture updated.", user });
+});

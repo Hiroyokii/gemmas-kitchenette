@@ -4,6 +4,8 @@ import jwt, { TokenExpiredError } from "jsonwebtoken";
 
 import type { RegisterInput } from "../schemas/auth.schema.js";
 import type { LoginInput } from "../schemas/auth.schema.js";
+import type { UpdateProfileInput, ChangePasswordInput } from "../schemas/auth.schema.js";
+import { uploadFoodImageService } from "./foodImage.service.js";
 
 import {
     findUserByEmail,
@@ -12,6 +14,11 @@ import {
     storeRefreshToken,
     findValidRefreshToken,
     revokeRefreshToken,
+    findUserById,
+    updateUserProfile,
+    updateUserAvatar,
+    updateUserPassword,
+    revokeOtherRefreshTokens,
 } from "../repositories/user.repository.js";
 
 import { ConflictError } from "../errors/ConflictError.js";
@@ -29,8 +36,11 @@ type AuthUser = {
     lot: string;
     street: string;
     landmark: string | null;
+    avatarUrl?: string | null;
     role: { name: string };
 }
+
+type UserProfile = Omit<AuthUser, "role"> & { role: string };
 
 function signAccessToken(
     user: AuthUser
@@ -81,9 +91,63 @@ async function issueTokens(
             lot: user.lot,
             street: user.street,
             landmark: user.landmark,
+            avatarUrl: user.avatarUrl ?? null,
             role: user.role.name,
         },
     };
+}
+
+function asUserProfile(user: AuthUser): UserProfile {
+    return {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        block: user.block,
+        lot: user.lot,
+        street: user.street,
+        landmark: user.landmark,
+        avatarUrl: user.avatarUrl ?? null,
+        role: user.role.name,
+    };
+}
+
+export async function getCustomerProfile(userId: number) {
+    const user = await findUserById(userId);
+    if (!user) throw new NotFoundError("User not found.");
+    return asUserProfile(user);
+}
+
+export async function saveCustomerProfile(userId: number, data: UpdateProfileInput) {
+    const user = await updateUserProfile(userId, data);
+    return asUserProfile(user);
+}
+
+export async function saveCustomerAvatar(userId: number, image: Buffer, contentType: string) {
+    const avatarUrl = await uploadFoodImageService(image, contentType);
+    const user = await updateUserAvatar(userId, avatarUrl);
+    return asUserProfile(user);
+}
+
+export async function changeCustomerPassword(
+    userId: number,
+    data: ChangePasswordInput,
+    currentRefreshToken?: string,
+) {
+    const user = await findUserById(userId);
+    if (!user) throw new NotFoundError("User not found.");
+
+    const passwordMatches = await bcrypt.compare(data.currentPassword, user.passwordHash);
+    if (!passwordMatches) {
+        throw new UnauthorizedError("Your current password is incorrect.");
+    }
+
+    const passwordHash = await bcrypt.hash(data.newPassword, 12);
+    await updateUserPassword(userId, passwordHash);
+
+    await revokeOtherRefreshTokens(
+        userId,
+        currentRefreshToken ? hashToken(currentRefreshToken) : undefined,
+    );
 }
 
 export async function registerUser(

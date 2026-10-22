@@ -1,13 +1,18 @@
-import { Router } from "express";
+import express, { Router } from "express";
 
 import { 
     register, 
     login, 
     refresh, 
     logout, 
+    getProfile,
+    updateProfile,
+    updatePassword,
+    updateAvatar,
 } from "../controllers/auth.controller.js";
 
 import { authenticate } from "../middleware/auth.middleware.js";
+import { authorize } from "../middleware/authorize.middleware.js";
 import { loginRateLimiter, registerRateLimiter } from "../middleware/rateLimit.middleware.js";
 
 const router = Router();
@@ -90,6 +95,17 @@ router.post("/register", registerRateLimiter, register);
  *         description: No valid session
  */
 router.post("/refresh", refresh);
+
+router.get("/me", authenticate, authorize("CUSTOMER"), getProfile);
+router.put("/profile", authenticate, authorize("CUSTOMER"), updateProfile);
+router.put("/password", authenticate, authorize("CUSTOMER"), updatePassword);
+router.put(
+    "/avatar",
+    authenticate,
+    authorize("CUSTOMER"),
+    express.raw({ type: ["image/jpeg", "image/png", "image/webp"], limit: "5mb" }),
+    updateAvatar,
+);
 
 /**
  * @openapi

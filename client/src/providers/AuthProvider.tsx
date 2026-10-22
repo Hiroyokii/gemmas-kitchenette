@@ -41,6 +41,10 @@ export function AuthProvider({
         []
     );
 
+    const updateUser = useCallback((nextUser: User) => {
+        setUser(nextUser);
+    }, []);
+
     const logout = useCallback(async () => {
         try {
             await logoutRequest();
@@ -87,9 +91,10 @@ export function AuthProvider({
             token,
             isLoading,
             login,
+            updateUser,
             logout,
         }),
-        [user, token, isLoading, login, logout]
+        [user, token, isLoading, login, updateUser, logout]
     );
 
     return (

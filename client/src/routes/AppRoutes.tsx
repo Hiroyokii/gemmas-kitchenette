@@ -12,6 +12,7 @@ import CustomerFoodsPage from "../pages/customer/FoodsPage";
 import CartPage from "../pages/customer/CartPage";
 import OrderHistoryPage from "../pages/customer/OrderHistoryPage";
 import OrderStatusPage from "../pages/customer/OrderStatusPage";
+import ProfilePage from "../pages/customer/ProfilePage";
 
 import DashboardPage from "../pages/admin/DashboardPage";
 import FoodsPage from "../pages/admin/FoodsPage";
@@ -76,6 +77,11 @@ export default function AppRoutes() {
                         <Route
                             path="orders"
                             element={<OrderHistoryPage />}
+                        />
+
+                        <Route
+                            path="profile"
+                            element={<ProfilePage />}
                         />
 
                         <Route

@@ -98,6 +98,7 @@ export default function Navbar() {
 
                         {user ? (
                             <div className="flex items-center gap-3 border-l border-stone-200 pl-3">
+                                {user.role === "CUSTOMER" && <ProfileAvatar user={user} />}
                                 <span className="text-sm text-stone-500">
                                     Hi, {user.firstName}
                                 </span>
@@ -146,6 +147,12 @@ export default function Navbar() {
                 {user?.role === "CUSTOMER" && (
                     <NavLink to="/orders" className={linkClass}>
                         My Orders
+                    </NavLink>
+                )}
+
+                {user?.role === "CUSTOMER" && (
+                    <NavLink to="/profile" className={linkClass}>
+                        My Profile
                     </NavLink>
                 )}
             </nav>
@@ -199,6 +206,17 @@ export default function Navbar() {
                             </NavLink>
                         )}
 
+                        {user?.role === "CUSTOMER" && (
+                            <NavLink
+                                to="/profile"
+                                onClick={() => setIsMenuOpen(false)}
+                                className={({ isActive }) => `flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition-colors ${isActive ? "bg-[#FFB800] text-stone-950" : "text-stone-600 hover:bg-amber-50 hover:text-stone-950"}`}
+                            >
+                                <ProfileAvatar user={user} />
+                                My Profile
+                            </NavLink>
+                        )}
+
                         {user?.role === "ADMIN" && (
                             <Link
                                 to="/admin"
@@ -215,6 +233,7 @@ export default function Navbar() {
                         {user ? (
                             <div className="space-y-3">
                                 <span className="block truncate text-sm text-stone-500">
+                                    {user.role === "CUSTOMER" && <ProfileAvatar user={user} />}
                                     Signed in as {user.firstName} {user.lastName}
                                 </span>
 
@@ -275,6 +294,16 @@ function CartButton({ itemCount, onClick }: { itemCount: number; onClick: () => 
                 </span>
             )}
         </button>
+    );
+}
+
+function ProfileAvatar({ user }: { user: { firstName: string; lastName: string; avatarUrl?: string | null } }) {
+    return user.avatarUrl ? (
+        <img src={user.avatarUrl} alt="" className="h-8 w-8 rounded-full object-cover" />
+    ) : (
+        <span aria-hidden="true" className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 text-xs font-semibold text-amber-900">
+            {user.firstName[0]}{user.lastName[0]}
+        </span>
     );
 }
 

@@ -1,5 +1,6 @@
 import { prisma } from "../lib/prisma.js"
 import type { RegisterInput } from "../schemas/auth.schema.js";
+import type { UpdateProfileInput } from "../schemas/auth.schema.js";
 
 export async function findUserByEmail(email: string) {
     return prisma.user.findUnique({
@@ -9,6 +10,47 @@ export async function findUserByEmail(email: string) {
         include: {
             role:true,
         },
+    });
+}
+
+export async function findUserById(id: number) {
+    return prisma.user.findUnique({
+        where: { id },
+        include: { role: true },
+    });
+}
+
+export async function updateUserProfile(id: number, data: UpdateProfileInput) {
+    return prisma.user.update({
+        where: { id },
+        data,
+        include: { role: true },
+    });
+}
+
+export async function updateUserAvatar(id: number, avatarUrl: string) {
+    return prisma.user.update({
+        where: { id },
+        data: { avatarUrl },
+        include: { role: true },
+    });
+}
+
+export async function updateUserPassword(id: number, passwordHash: string) {
+    return prisma.user.update({
+        where: { id },
+        data: { passwordHash },
+    });
+}
+
+export async function revokeOtherRefreshTokens(userId: number, preservedTokenHash?: string) {
+    return prisma.refreshToken.updateMany({
+        where: {
+            userId,
+            revokedAt: null,
+            ...(preservedTokenHash ? { tokenHash: { not: preservedTokenHash } } : {}),
+        },
+        data: { revokedAt: new Date() },
     });
 }
 
