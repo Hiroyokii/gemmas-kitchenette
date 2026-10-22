@@ -8,7 +8,7 @@ import {
 } from "../controllers/auth.controller.js";
 
 import { authenticate } from "../middleware/auth.middleware.js";
-import { authRateLimiter } from "../middleware/rateLimit.middleware.js";
+import { loginRateLimiter, registerRateLimiter } from "../middleware/rateLimit.middleware.js";
 
 const router = Router();
 
@@ -37,7 +37,7 @@ const router = Router();
  *       200:
  *         description: Login successful
  */
-router.post("/login", authRateLimiter, login);
+router.post("/login", loginRateLimiter, login);
 
 /**
  * @openapi
@@ -74,7 +74,7 @@ router.post("/login", authRateLimiter, login);
  *       201:
  *         description: Customer registered successfully.
  */
-router.post("/register", authRateLimiter, register);
+router.post("/register", registerRateLimiter, register);
 
 /**
  * @openapi

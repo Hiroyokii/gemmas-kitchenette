@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,16 +22,33 @@ export default function LoginPage() {
     const navigate = useNavigate();
     const { login: loginContext } = useAuth();
     const [loginError, setLoginError] = useState("");
+    const [cooldownSeconds, setCooldownSeconds] = useState(0);
     const [showPassword, setShowPassword] = useState(false);
 
+    useEffect(() => {
+        if (cooldownSeconds <= 0) return;
+
+        const timer = window.setTimeout(() => {
+            setCooldownSeconds((seconds) => Math.max(0, seconds - 1));
+        }, 1000);
+
+        return () => window.clearTimeout(timer);
+    }, [cooldownSeconds]);
+
     async function onSubmit(data: LoginForm) {
+        if (cooldownSeconds > 0) return;
         setLoginError("");
         try {
             const response = await login(data);
             loginContext(response.token, response.user);
             navigate(response.user.role === "ADMIN" ? "/admin" : "/");
-        } catch {
-            setLoginError("Invalid email or password.");
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response?.status === 429) {
+                const retryAfter = Number(error.response.headers["retry-after"]);
+                setCooldownSeconds(Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter : 60);
+            } else {
+                setLoginError("Invalid email or password.");
+            }
         }
     }
 
@@ -60,7 +78,12 @@ export default function LoginPage() {
                         </p>
                     </div>
 
-                    <Alert type="error" message={loginError} />
+                    <Alert
+                        type={cooldownSeconds > 0 ? "info" : "error"}
+                        message={cooldownSeconds > 0
+                            ? `Too many attempts. Try again in ${cooldownSeconds}s.`
+                            : loginError}
+                    />
 
                     <div className="mt-6 space-y-5">
                         <Input
@@ -101,10 +124,11 @@ export default function LoginPage() {
                             fullWidth
                             size="lg"
                             isLoading={isSubmitting}
+                            disabled={cooldownSeconds > 0}
                             className="mt-2 h-12 rounded-xl font-semibold text-stone-950 shadow-sm"
                         >
-                            {isSubmitting ? "Logging in…" : "Log in"}
-                            {!isSubmitting && <Icon name="chevronRight" className="h-4 w-4" />}
+                            {isSubmitting ? "Logging in…" : cooldownSeconds > 0 ? `Wait ${cooldownSeconds}s` : "Log in"}
+                            {!isSubmitting && cooldownSeconds === 0 && <Icon name="chevronRight" className="h-4 w-4" />}
                         </Button>
                     </div>
 
