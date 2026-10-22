@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate} from "react-router-dom";
 
@@ -25,6 +26,13 @@ export default function HomePage() {
   });
 
   const menu = menuQuery.data ?? [];
+  const topRatedMenu = menu
+    .filter((item) => item.food.averageRating !== null && item.food.reviewCount > 0)
+    .sort((a, b) => {
+      const ratingDifference = b.food.averageRating! - a.food.averageRating!;
+      return ratingDifference || b.food.reviewCount - a.food.reviewCount;
+    })
+    .slice(0, 5);
 
   return (
     <div className="space-y-14 pb-8">
@@ -245,8 +253,8 @@ export default function HomePage() {
               </h2>
 
               <p className="mt-6 max-w-md text-base leading-7 text-stone-500 md:text-lg">
-                Freshly prepared meals and comforting favorites from Gemma’s
-                Kitchenette, available today.
+                Today’s menu, featuring the five highest-rated foods based on
+                customer reviews.
               </p>
 
               <div className="mt-9">
@@ -280,9 +288,7 @@ export default function HomePage() {
                 </div>
               )}
 
-              {!menuQuery.isPending &&
-                !menuQuery.error &&
-                menu.length === 0 && (
+              {!menuQuery.isPending && !menuQuery.error && menu.length === 0 && (
                   <EmptyState
                     icon={<Icon name="bowl" className="h-6 w-6" />}
                     title="Nothing prepared yet today"
@@ -290,8 +296,16 @@ export default function HomePage() {
                   />
                 )}
 
-              {!menuQuery.isPending && menu.length > 0 && (
-                <FoodSlider menu={menu} />
+              {!menuQuery.isPending && menu.length > 0 && topRatedMenu.length === 0 && (
+                <EmptyState
+                  icon={<Icon name="bowl" className="h-6 w-6" />}
+                  title="No rated foods available today yet"
+                  description="Check back after customers have rated today’s menu."
+                />
+              )}
+
+              {!menuQuery.isPending && topRatedMenu.length > 0 && (
+                <FoodSlider menu={topRatedMenu} />
               )}
             </div>
           </div>
@@ -329,9 +343,79 @@ export default function HomePage() {
 }
 
 function FoodSlider({ menu }: { menu: DailyMenu[] }) {
+  const sliderRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const slider = sliderRef.current;
+    if (!slider || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
+
+    let direction = 1;
+    let frameId = 0;
+    let resumeTimer: number | undefined;
+    let previousTime = 0;
+
+    const animate = (time: number) => {
+      const maxScroll = slider.scrollWidth - slider.clientWidth;
+      if (maxScroll <= 1) {
+        previousTime = time;
+        frameId = window.requestAnimationFrame(animate);
+        return;
+      }
+
+      if (previousTime) {
+        const elapsed = Math.min(time - previousTime, 32);
+        if (slider.scrollLeft >= maxScroll - 1) direction = -1;
+        if (slider.scrollLeft <= 1) direction = 1;
+        slider.scrollLeft += direction * elapsed * 0.025;
+      }
+
+      previousTime = time;
+      frameId = window.requestAnimationFrame(animate);
+    };
+
+    const pauseForManualControl = () => {
+      window.cancelAnimationFrame(frameId);
+      window.clearTimeout(resumeTimer);
+      resumeTimer = window.setTimeout(() => {
+        previousTime = 0;
+        frameId = window.requestAnimationFrame(animate);
+      }, 4000);
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        ["ArrowLeft", "ArrowRight", "Home", "End", "PageUp", "PageDown", " "].includes(event.key)
+      ) {
+        pauseForManualControl();
+      }
+    };
+
+    slider.addEventListener("wheel", pauseForManualControl, { passive: true });
+    slider.addEventListener("pointerdown", pauseForManualControl);
+    slider.addEventListener("touchstart", pauseForManualControl, { passive: true });
+    slider.addEventListener("keydown", handleKeyDown);
+    frameId = window.requestAnimationFrame(animate);
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.clearTimeout(resumeTimer);
+      slider.removeEventListener("wheel", pauseForManualControl);
+      slider.removeEventListener("pointerdown", pauseForManualControl);
+      slider.removeEventListener("touchstart", pauseForManualControl);
+      slider.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   return (
     <div className="overflow-hidden">
-      <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-4 md:gap-4 lg:gap-5">
+      <div
+        ref={sliderRef}
+        tabIndex={0}
+        aria-label="Today’s top-rated foods. Scroll to browse."
+        className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-4 md:gap-4 lg:gap-5"
+      >
         {menu.map((item) => (
           <div
             key={item.id}
