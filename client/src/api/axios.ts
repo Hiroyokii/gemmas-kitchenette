@@ -1,5 +1,6 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { clearAccessToken, getAccessToken, setAccessToken } from "./tokenStore";
+import { getDeviceId } from "./deviceId";
 
 interface RefreshResponse {
     token: string;
@@ -43,6 +44,10 @@ function clearSession(): void {
 
 api.interceptors.request.use((config) => {
     const token = getAccessToken();
+
+    if (config.url?.includes("/auth/login") || config.url?.includes("/auth/register")) {
+        config.headers["X-Device-Id"] = getDeviceId();
+    }
 
     if (token && !config.url?.includes("/auth/refresh")) {
         config.headers.Authorization = `Bearer ${token}`;
