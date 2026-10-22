@@ -100,13 +100,14 @@ export default function Navbar() {
                         )}
 
                         {user ? (
-                            <div className="flex items-center gap-3 border-l border-stone-200 pl-3">
+                            <div className="ml-auto flex items-center gap-3 border-l border-stone-200 pl-3">
                                 {user.role === "CUSTOMER" && (
-                                    <button type="button" onClick={() => setIsProfileOpen(true)} aria-label="Open profile management" title="Manage profile" className="rounded-full transition-opacity hover:opacity-75 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500">
+                                    <button type="button" onClick={() => setIsProfileOpen(true)} aria-label="Open profile management" title="Manage profile" className="relative rounded-full transition-opacity hover:opacity-75 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500">
                                         <ProfileAvatar user={user} />
+                                        <span aria-label="Online" title="Online" className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-emerald-500" />
                                     </button>
                                 )}
-                                <span className="text-sm text-stone-500">
+                                <span className="whitespace-nowrap text-sm font-medium text-stone-600">
                                     Hi, {user.firstName}
                                 </span>
 
@@ -157,11 +158,6 @@ export default function Navbar() {
                     </NavLink>
                 )}
 
-                {user?.role === "CUSTOMER" && (
-                    <NavLink to="/profile" className={linkClass}>
-                        My Profile
-                    </NavLink>
-                )}
             </nav>
 
             {/* Mobile sidebar */}
