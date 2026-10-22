@@ -6,7 +6,7 @@ describe("Authentication", () => {
     it("should reject invalid login", async () => {
         const response =
             await request(app)
-                .post("auth/login")
+                .post("/auth/login")
                 .send({
                     email: "wrong@test.com",
                     password: "123456",

@@ -193,7 +193,10 @@ export default function CartDrawer() {
               screenshot={paymentScreenshot}
               screenshotError={screenshotError}
               onPaymentMethodChange={setPaymentMethod}
-              onOrderTypeChange={setOrderType}
+              onOrderTypeChange={(value) => {
+                setOrderType(value);
+                if (value === "PICKUP") setPaymentMethod("COD");
+              }}
               onNotesChange={setOrderNotes}
               onScreenshotChange={(file, fileError) => {
                 setPaymentScreenshot(file);
@@ -334,6 +337,7 @@ function CheckoutForm({
         <label htmlFor="drawer-order-notes" className="mb-1.5 mt-4 block text-lg font-display text-stone-900">Order notes <span className="font-normal text-stone-500">(optional)</span></label>
         <textarea id="drawer-order-notes" value={notes} onChange={(event) => onNotesChange(event.target.value)} maxLength={500} rows={3} placeholder="Add a note for the kitchen or store" className="w-full resize-y rounded-xl border border-stone-200 px-3 py-2 text-sm outline-none focus:border-[#FFB800] focus:ring-2 focus:ring-[#FFB800]/20" />
 
+        {orderType === "DELIVERY" ? <>
         <h3 className="mt-6 font-display text-lg text-stone-900">Payment method</h3>
         <div className="mt-3 grid gap-3">
           <label
@@ -390,6 +394,11 @@ function CheckoutForm({
             fileError={screenshotError}
             onScreenshotChange={onScreenshotChange}
           />
+        )}
+        </> : (
+          <div className="mt-5 rounded-xl border border-stone-200 bg-stone-50 p-4 text-sm leading-6 text-stone-600">
+            Payment will be collected when you pick up your order.
+          </div>
         )}
         <p className="mt-5 rounded-xl bg-stone-50 p-4 text-sm leading-6 text-stone-500">
           {orderType === "DELIVERY" ? "Your saved delivery address and contact details will be used for this order." : "This order is for pickup at the store."} The final total is{" "}

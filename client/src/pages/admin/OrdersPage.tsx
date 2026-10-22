@@ -380,7 +380,9 @@ export default function OrdersPage() {
                                                 {order.payment ? (
                                                     <div className="space-y-1 text-xs">
                                                         <p className="font-medium text-ink-800">
-                                                            {order.payment
+                                                            {order.orderType === "PICKUP"
+                                                                ? "Pay at pickup"
+                                                                : order.payment
                                                                 .method ===
                                                             "GCASH"
                                                                 ? "GCash Payment"
@@ -401,10 +403,9 @@ export default function OrdersPage() {
                                                                     : "text-yellow-700",
                                                             ].join(" ")}
                                                         >
-                                                            {order.payment.status.replace(
-                                                                /_/g,
-                                                                " "
-                                                            )}
+                                                            {order.orderType === "PICKUP"
+                                                                ? "DUE AT PICKUP"
+                                                                : order.payment.status.replace(/_/g, " ")}
                                                         </p>
 
                                                         {order.payment
