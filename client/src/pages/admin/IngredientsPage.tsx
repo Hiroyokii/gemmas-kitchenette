@@ -153,21 +153,23 @@ export default function IngredientsPage() {
                                         </td>
 
                                         <td className="px-6 py-4">
-                                            <span
-                                                className={
-                                                    low
-                                                        ? "font-semibold text-red-600"
-                                                        : "text-ink-800"
-                                                }
-                                            >
-                                                {ingredient.currentStock}
-                                            </span>
-
-                                            {low && (
-                                                <span className="ml-2 rounded-full bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600">
-                                                    Low stock
+                                            <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-2">
+                                                <span
+                                                    className={
+                                                        low
+                                                            ? "font-semibold text-red-600"
+                                                            : "text-ink-800"
+                                                    }
+                                                >
+                                                    {ingredient.currentStock}
                                                 </span>
-                                            )}
+
+                                                {low && (
+                                                    <span className="whitespace-nowrap rounded-full bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600">
+                                                        Low stock
+                                                    </span>
+                                                )}
+                                            </div>
                                         </td>
 
                                         <td className="px-6 py-4 text-ink-600">
