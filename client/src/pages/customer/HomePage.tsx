@@ -414,7 +414,7 @@ function FoodSlider({ menu }: { menu: DailyMenu[] }) {
         ref={sliderRef}
         tabIndex={0}
         aria-label="Today’s top-rated foods. Scroll to browse."
-        className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-4 md:gap-4 lg:gap-5"
+        className="flex gap-3 overflow-x-auto pb-4 md:gap-4 lg:gap-5"
       >
         {menu.map((item) => (
           <div
@@ -424,8 +424,6 @@ function FoodSlider({ menu }: { menu: DailyMenu[] }) {
               min-w-[280px]
               max-w-[330px]
               shrink-0
-              snap-start
-
               md:w-[300px]
 
               lg:w-[330px]
